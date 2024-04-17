@@ -3,9 +3,11 @@ import dotenv from "dotenv"
 import errorHandler from "./middleware/errorHandler.js"
 import { router } from "./routes/featureRouter.js"
 import { connectionDb } from "./config/dbConnection.js"
+// import { connectPg } from "./config/pgDbConnection.js"
 dotenv.config()
 
 connectionDb()
+// connectPg();
 const app = express()
 const port = process.env.PORT
 
