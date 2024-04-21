@@ -2,7 +2,6 @@ import Features from "../models/featureModel.js";
 import crypto from "crypto";
 import embeddings from "../models/embeddingsModel.js";
 import { pipeline } from "@xenova/transformers";
-import { rmSync } from "fs";
 import { response } from "express";
 
 export const getFeatures = async (req, res) => {
@@ -24,6 +23,7 @@ const calculateHash = (data) => {
   return hash.digest("hex");
 };
 
+//the logic to calculate cosine similarity
 const calculateSimilarity = (embedding1, embedding2) => {
   let dotProduct = 0;
   for (let i = 0; i < embedding1.length; i++) {
@@ -42,31 +42,27 @@ const calculateSimilarity = (embedding1, embedding2) => {
   return similarity;
 };
 
-const updateSimilarityField = async (caseId, similarityObj) => {
+const updateSimilarityField = async ( caseId, existingEmbeddingId, similarityScore ) => {
   try {
-    console.log(similarityObj);
+    // Find the existing embedding by ID
+    const existingEmbedding = await embeddings.findById(existingEmbeddingId);
 
-    // Check if similarityObj is a valid object
-    if (similarityObj !== null && typeof similarityObj === 'object' && similarityObj.caseId && similarityObj.similarityStr !== undefined) {
-      
-      // Convert similarityStr to a number
-      const similarity = parseFloat(similarityObj.similarityStr);
+    // Check if the existing embedding exists and has a similarity field
+    if (existingEmbedding) {
+      // Push the new similarity object into the existing array
+      existingEmbedding.similarity.push({ CaseId: caseId, similarityScore });
 
-      // Construct the update query with the correct format
-      const updateQuery = { $set: { similarity: { caseId: similarityObj.caseId, similarity } } };
-      
-      // Update the document
-      await embeddings.findByIdAndUpdate(caseId, updateQuery);
-      
+      // Create a new document with the updated similarity field
+      await embeddings.create(existingEmbedding);
+
+      console.log(`Updated similarity field for embedding ${existingEmbeddingId} successfully`);
     } else {
-      console.error("Invalid similarityObj format. Expected { caseId: ObjectId, similarityStr: string }");
-      return;
+      console.log(`Existing embedding ${existingEmbeddingId} not found or does not have a similarity field`);
     }
   } catch (error) {
     console.error("Error updating similarity field:", error);
   }
 };
-
 
 
 export const createFeature = async (req, res) => {
@@ -79,7 +75,12 @@ export const createFeature = async (req, res) => {
         lower: { lowerClothType, lowerClothColor },
       },
       body_size,
-      description,
+      description: {
+        eyeDescription,
+        noseDescription,
+        hairDescription,
+        lastSeenAddressDes,
+      },
     } = req.body;
 
     const inputHash = calculateHash({
@@ -90,8 +91,14 @@ export const createFeature = async (req, res) => {
         lower: { clothType: lowerClothType, clothColor: lowerClothColor },
       },
       body_size,
+      description: {
+        eyeDescription,
+        noseDescription,
+        hairDescription,
+        lastSeenAddressDes,
+      },
     });
-
+    //check if incomming feature already in database
     const existingFeature = await Features.findOne({ inputHash });
 
     if (existingFeature) {
@@ -99,6 +106,19 @@ export const createFeature = async (req, res) => {
         .status(400)
         .json({ error: "Duplicate feature already exists" });
     }
+
+    const descriptionTypes = [
+      "eyeDescription",
+      "noseDescription",
+      "hairDescription",
+      "lastSeenAddressDes",
+    ];
+
+    let descriptions = ''
+    for (const descType of descriptionTypes) {
+      descriptions += req.body.description[descType]
+    }
+    console.log(descriptions)
 
     const feature = await Features.create({
       age,
@@ -108,18 +128,17 @@ export const createFeature = async (req, res) => {
         lower: { clothType: lowerClothType, clothColor: lowerClothColor },
       },
       body_size,
-      description,
+      description: descriptions,
       inputHash,
     });
-
     console.log("feature stored successfully");
 
     const existingEmbeddingsCount = await embeddings.countDocuments();
-
-    if (existingEmbeddingsCount < 1) {
+    let response = []
+    if (existingEmbeddingsCount < 1) {   
       const caseId = feature._id
       const pipelineModel = await generateEmbeddings();
-      const output = await pipelineModel(description, {
+      const output = await pipelineModel(descriptions, {
         pooling: "mean",
         normalize: true,
       });
@@ -130,25 +149,21 @@ export const createFeature = async (req, res) => {
       await embeddings.create({
         caseId,
         embedding: embeddingArray,
-        similarity: {},
+        similarity: {}
       });
-    } else {
-      // Find all embeddings in the database
-      const existingEmbeddings = await embeddings.find();
-      const caseId = feature._id
-      const pipelineModel = await generateEmbeddings();
-      const output = await pipelineModel(description, {
-        pooling: "mean",
-        normalize: true,
-      });
-      const embeddingData = output.data;
-
-      const embeddingArray = [...embeddingData];
-      await embeddings.create({
-        caseId,
-        embedding: embeddingArray,
-        similarity: [{}],
-      });
+      console.log('initial embedding stored successfully')
+    }else{
+       // Find all embeddings in the database
+       const existingEmbeddings = await embeddings.find();
+       const caseId = feature._id
+       const pipelineModel = await generateEmbeddings();
+       const output = await pipelineModel(descriptions, {
+         pooling: "mean",
+         normalize: true,
+       });
+       const embeddingData = output.data;
+ 
+       const embeddingArray = [...embeddingData];
       // Calculate cosine similarity with each existing embedding
       const similarityScores = await existingEmbeddings.map(
         (existingEmbedding) => {
@@ -156,30 +171,47 @@ export const createFeature = async (req, res) => {
             embeddingData,
             existingEmbedding.embedding
           );
-          return { embeddingId: existingEmbedding._id, similarityScore: similarity };
+          return { existingCaseId: existingEmbedding.caseId, existingEmbeddingId: existingEmbedding._id, similarityScore: similarity };
         }
       );
 
-      // Sort similarity scores in descending order
-      similarityScores.sort((a, b) => b.similarityScore - a.similarityScore);
+      
+        // Create an array of similarity objects
+      const similarityObjects = similarityScores.map(item => ({
+        CaseId: item.existingCaseId, // Corrected property name
+        existingEmbId: item.existingEmbeddingId,
+        similarityScore: item.similarityScore
+      }));
 
+      // Create the embeddings document with the similarity field
+      await embeddings.create({
+        caseId,
+        embedding: embeddingArray,
+        similarity: similarityObjects
+      });
+
+      console.log(similarityScores)
+      //sort similarity scores in descending order
+      similarityScores.sort((a, b) => b.similarityScore - a.similarityScore)
+      // Prepare top 10 similarities with their respective case IDs for response
+     response = similarityScores.slice(0, 10).map(item => ({
+      caseId: item.existingCaseId,
+      similarityScore: item.similarityScore
+    }));
       // Update similarity field for top 10 similar embeddings
       const topNSimilarities = similarityScores.slice(0, 10); // Consider only the top 10 similar embeddings
-      console.log(topNSimilarities);
-
       for (let i = 0; i < topNSimilarities.length; i++){
-        console.log(`embedding id: ${embeddingId}, similarity: ${similarity}`);
-        const similarityObj = {embeddingId, similarityScore}
-        await updateSimilarityField(caseId, similarityObj)
+        const {existingCaseId, existingEmbeddingId, similarityScore} = topNSimilarities[i]
+        await updateSimilarityField( caseId, existingEmbeddingId, similarityScore )
       }
-      
-      }
-    res.status(200).json({ message: "stored" });
-  } catch (error) {
+    }
+    res.status(200).json({ message:  response});
+} catch (error) {
     res.status(500).json({ error: "Server error" });
     console.error("Error creating feature:", error);
   }
 };
+
 
 export const compareFeature = async (req, res) => {
   try {

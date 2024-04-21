@@ -46,8 +46,8 @@ const attributes = Schema(
             enum: ["Thin","Average", "Muscular", "Overweight", "Obese", "Fit", "Athletic", "Curvy", "Petite"]
         },
         description: {
-            type: String,
-            required: false
+                type: String,
+                required: false
         },
         inputHash: {
             type: String,
@@ -55,8 +55,6 @@ const attributes = Schema(
             unique: true
         }
 });
-
-
 
 
 export default model("Features", attributes);

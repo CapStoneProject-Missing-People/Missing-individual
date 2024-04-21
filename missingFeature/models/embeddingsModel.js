@@ -9,12 +9,13 @@ const embeddingSchema = Schema({
     },
     embedding: [Number],
     similarity: [{
-        caseId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Feature'
-        },
-        similarityScore: Number
-      }]
+      CaseId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Feature'
+      },
+      similarityScore: Number,
+      _id: false
+    }]
 
 });
 
