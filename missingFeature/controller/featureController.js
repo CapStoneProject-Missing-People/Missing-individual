@@ -5,8 +5,39 @@ import { pipeline } from "@xenova/transformers";
 import { response } from "express";
 
 export const getFeatures = async (req, res) => {
-  const features = await Features.find();
-  res.status(200).json(features);
+  try{
+    let filterCriteria = {}
+
+    // Map age ranges to MongoDB query conditions
+    const ageRanges = {
+      "1-4": { $gte: 1, $lte: 4 },
+      "5-10": { $gte: 5, $lte: 10 },
+      "11-15": { $gte: 11, $lte: 15 },
+      "16-20": { $gte: 16, $lte: 20 },
+      "21-30": { $gte: 21, $lte: 30 },
+      "31-40": { $gte: 31, $lte: 40 },
+      "41-50": { $gte: 41, $lte: 50 },
+      ">51": { $gt: 51 }
+    };
+
+    //check if age range filter is provided in the request
+    if(req.query.ageRange) {
+      const ageRangeQuery = ageRanges[req.query.ageRange]
+      if(ageRangeQuery) {
+        filterCriteria.age = ageRangeQuery
+      }else{
+        return res.status(400).json({ error: "Invalid age range"})
+      }
+    }
+
+    //Query database with constructed filter criteria
+    const features = await Features.find(filterCriteria).lean()
+    
+    res.status(200).json(features)
+  }catch{
+    res.status(500).json({ error: "Server error"})
+    console.log("Error ferching features: ", error.message)
+  }
 };
 
 const generateEmbeddings = async () => {
@@ -224,6 +255,7 @@ export const compareFeature = async (req, res) => {
       },
       body_size,
     } = req.body;
+
     const criteria = {
       age,
       skin_color,
