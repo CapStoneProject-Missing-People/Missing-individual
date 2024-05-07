@@ -64,7 +64,7 @@ export const addFaceFeature = async (req, res) => {
     if (result) {
       // Update the MissingPerson record to indicate that face features have been created
       // await MissingPerson.findByIdAndUpdate(person_id, { faceFeatureCreated: true });
-      res.json({ message: "Face stored" });
+      res.status(200).json({ message: "Face stored" });
     } else {
       res.json({ message: "Something went wrong" });
     }
