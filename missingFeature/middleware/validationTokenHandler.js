@@ -1,7 +1,7 @@
-import AsyncHandler from "express-async-handler"
+
 import jwt from "jsonwebtoken"
 
-export const validateToken = AsyncHandler(async (req, res, next) => {
+export const validateToken = async (req, res, next) => {
     let token;
     let authHeader = req.headers.Authorization || req.headers.authorization 
     if(authHeader && authHeader.startsWith("Bearer")){
@@ -20,4 +20,4 @@ export const validateToken = AsyncHandler(async (req, res, next) => {
             throw new Error("user is not authorized or token is missing")
         }
     }
-})
+}

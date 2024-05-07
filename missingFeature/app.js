@@ -1,20 +1,21 @@
 import express from "express"
 import dotenv from "dotenv"
-import errorHandler from "./middleware/errorHandler.js"
+import userRouter from "./routes/userRoutes.js"
 import { router } from "./routes/featureRouter.js"
 import { connectionDb } from "./config/dbConnection.js"
-// import { connectPg } from "./config/pgDbConnection.js"
+// import cookieParser from "cookie-parser"
+// import { requireAuth, checkUser } from "./middleware/authMiddleware"
 dotenv.config()
 
-connectionDb()
-// connectPg();
-const app = express()
 const port = process.env.PORT
+const app = express()
+// app.use(cookieParser());
+
+connectionDb()
 
 app.use(express.json())
 app.use('/api/features', router)
-// app.use('/api/users', router2)
-app.use(errorHandler)
+app.use('/api/users', userRouter)
 
 app.listen(port, () => {
     console.log(`server listening on port ${port}`)

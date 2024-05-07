@@ -46,7 +46,7 @@ export const getFeatures = async (req, res) => {
 
 //@desc Get Feature
 //@route GET /api/features/:id
-//@access private
+//@access public
 export const getFeature = async (req, res) => {
   try {
     const feature = await Features.findById(req.params.id)
@@ -80,7 +80,7 @@ export const getFeature = async (req, res) => {
 
 //@desc Get Feature
 //@route GET /api/features/similarity/caseId
-//@access private
+//@access public
 
 //endpoint for getting similarity scores
 export const getSimilarityScore = async (req, res) => {
@@ -165,7 +165,7 @@ const updateSimilarityField = async (caseId, existingEmbeddingId, similarityScor
 
 //@desc Get Feature
 //@route GET /api/features
-//@access private
+//@access public
 //an endpoint to create features
 export const createFeature = async (req, res) => {
   try {
@@ -315,7 +315,7 @@ export const createFeature = async (req, res) => {
 
 //@desc Get Feature
 //@route GET /api/features/compare
-//@access private
+//@access public
 //an endpoint to compare features
 export const compareFeature = async (req, res) => {
   try {
@@ -473,7 +473,7 @@ export const compareFeature = async (req, res) => {
 
   //@desc Get Feature
   //@route GET /api/features
-  //@access private
+  //@access public
   //an endpoint to update fatures
   export const updateFeature = async (req, res) => {
     try {
