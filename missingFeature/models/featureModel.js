@@ -5,6 +5,23 @@ const { Schema, model } = mongoose;
 
 const attributes = Schema(
     {
+        user_id: {
+            type: String,
+            required: true,
+            ref: "User"
+        },
+        name: Schema({
+            firstName: {
+                type: String
+            },
+            middleName: {
+                type: String,
+            },
+            lastName: {
+                type: String,
+            },
+            _id: false
+        }),
         age: {
             type: Number,
             required: true    

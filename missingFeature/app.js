@@ -3,12 +3,13 @@ import dotenv from "dotenv"
 import userRouter from "./routes/userRoutes.js"
 import { router } from "./routes/featureRouter.js"
 import { connectionDb } from "./config/dbConnection.js"
+import { validateToken } from "./middleware/validationTokenHandler.js"
 // import cookieParser from "cookie-parser"
 // import { requireAuth, checkUser } from "./middleware/authMiddleware"
 dotenv.config()
-
-const port = process.env.PORT
 const app = express()
+const port = process.env.PORT
+
 // app.use(cookieParser());
 
 connectionDb()
