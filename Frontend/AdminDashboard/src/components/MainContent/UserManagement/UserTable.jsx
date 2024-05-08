@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import userData from './info'; 
 
-
-
 const UserTable = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [users, setUsers] = useState(() => {
@@ -35,7 +33,7 @@ const UserTable = () => {
         <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
           <div className="overflow-hidden">
             <table className="min-w-full text-left text-sm font-light text-slate-600 dark:text-white">
-              <thead className="border-b border-neutral-200 font-medium dark:border-white/10">
+              <thead className="border-b font-inter border-neutral-200 font-medium dark:border-white/10">
                 <tr>
                   <th scope="col" className="px-6 py-4">#</th>
                   <th scope="col" className="px-4 py-4">First Name</th>
@@ -51,15 +49,15 @@ const UserTable = () => {
                     className="border-b border-neutral-200 transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-white/10 dark:hover:bg-neutral-600"
                     onClick={() => handleUserClick(user)}
                   >
-                    <td className="whitespace-nowrap px-6 py-4 font-medium">{user.id}</td>
-                    <td className="whitespace-nowrap px-6 py-4">{user.firstName}</td>
-                    <td className="whitespace-nowrap px-6 py-4">{user.lastName}</td>
-                    <td className="whitespace-nowrap px-6 py-4">{user.handle}</td>
-                    <td className="whitespace-nowrap px-6 py-4">
+                    <td className="whitespace-nowrap font-inter px-6 py-4 font-medium">{user.id}</td>
+                    <td className="whitespace-nowrap font-inter px-6 py-4">{user.firstName}</td>
+                    <td className="whitespace-nowrap font-inter px-6 py-4">{user.lastName}</td>
+                    <td className="whitespace-nowrap font-inter px-6 py-4">{user.handle}</td>
+                    <td className="whitespace-nowrap font-inter px-6 py-4">
                       <button
                         className={`${
                           user.isAdmin ? 'bg-green-500' : 'bg-red-500'
-                        } hover:bg-opacity-75 text-white font-bold py-2 px-4 rounded-full`}
+                        } hover:bg-opacity-75 text-white font-bold w-24 ml-6 py-2 px-4 rounded-full`}
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent row click event from firing
                           toggleAdminPrivilege(user);

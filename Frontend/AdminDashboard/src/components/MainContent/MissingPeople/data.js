@@ -17,7 +17,7 @@ const people = [
     },
     {
       name: 'Dawit Yenew',
-      Description: 'tall,black-hair,something like this',
+      description: 'tall,black-hair,something like this',
       location: 'Hawassa',
       status: 'pending',
       email: 'Dawit.Yenew@example.com',

@@ -1,7 +1,19 @@
-import React from "react";
-import people from "./data"
+import React,{ useState } from "react";
+import people from "./data";
+import Modal from "./Modal";
 
 function MissingTable(){
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [isModalOpen, setisModalOpen] = useState(false);  
+
+  const handleEditClick = (person) => {
+    setSelectedPerson(person);
+    setisModalOpen(true);
+  }
+  const handleCloseModal = () =>{
+    setisModalOpen(false);
+  }
+  
     return(
         <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -48,21 +60,21 @@ function MissingTable(){
                           <img className="h-10 w-10 rounded-full" src={person.image} alt="" />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{person.name}</div>
-                          <div className="text-sm text-gray-500">{person.email}</div>
+                          <div className="text-sm font-inter font-medium text-gray-900">{person.name}</div>
+                          <div className="text-sm font-inter text-gray-500">{person.email}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{person.description}</div>
-                      <div className="text-sm text-gray-500">{person.location}</div>
+                      <div className="text-sm font-inter text-gray-900">{person.description}</div>
+                      <div className="text-sm font-inter text-gray-500">{person.location}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {person.role}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className="px-2 inline-flex text-xs leading-5
+                        className="px-2 font-inter inline-flex text-xs leading-5
                       font-semibold rounded-full bg-green-100 text-green-800"
                       >
                         {person.status}
@@ -70,9 +82,12 @@ function MissingTable(){
                     </td>
                     
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <a href="#" className="text-indigo-600 hover:text-indigo-900">
+                      <button
+                        onClick={()=>handleEditClick(person)}
+                        class="text-indigo-500 font-inter w-20 hover:text-indigo-950"
+                      >
                         Edit
-                      </a>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -81,6 +96,15 @@ function MissingTable(){
           </div>
         </div>
       </div>
+      {
+        isModalOpen && (
+          <Modal 
+            isOpen = {isModalOpen}
+            onClose ={handleCloseModal}
+            person = {selectedPerson}
+          />
+        )
+      }
     </div>
     )
 }
