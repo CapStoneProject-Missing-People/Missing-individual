@@ -7,7 +7,6 @@ export const RecognizeFace = async (req, res) => {
   const startTime = Date.now(); // Start timer
   try {
     const file1 = req.files[0]?.buffer;
-    console.log(req.files[0].buffer)
     if (!file1) {
       return res.status(400).json({ error: "Image is required." });
     }
@@ -54,7 +53,6 @@ export const addFaceFeature = async (req, res) => {
       return res.status(400).json({ message: "No images provided." });
     }
     // Process each uploaded image for face recognition
-    console.log(images);
     if (images.length === 0) {
       return res.status(400).json({ message: "No images provided." });
     }

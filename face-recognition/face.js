@@ -4,6 +4,8 @@ import faceapi from "face-api.js";
 import FaceModel from "./schema/face-feature.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import MissingPerson from "../missingFeature/models/missingPersonSchema.js";
+import mongoose from "mongoose";
 
 faceapi.env.monkeyPatch({ Canvas, Image });
 
@@ -21,8 +23,9 @@ LoadModels();
 export const uploadFaceFeature = async (images, person_id) => {
   try {
     // const existingPerson = await MissingPerson.findById(person_id);
+    // console.log(existingPerson);
     // if (!existingPerson) {
-    //   throw new Error("Person not found in the MissingPerson collection.");
+    //   throw new Error("Person not found in the MissingPerson database.");
     // }
     const descriptionsPromises = images.map(async (image) => {
       const imageBuffer = Buffer.from(image.data);
