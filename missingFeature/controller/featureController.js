@@ -2,12 +2,10 @@ import Features from "../models/featureModel.js";
 import crypto from "crypto";
 import embeddings from "../models/embeddingsModel.js";
 import { pipeline } from "@xenova/transformers";
-import { response } from "express";
-import { SchemaType } from "mongoose";
 
-//@desc Get Features
-//@route GET /api/features
-//@access private
+//@desc Get all Features
+//@route GET /api/features/getAll
+//@access public
 export const getFeatures = async (req, res) => {
   try {
     let filterCriteria = {};
@@ -24,14 +22,13 @@ export const getFeatures = async (req, res) => {
       ">51": { $gt: 51 },
     };
 
-    let response = []
     //check if age range filter is provided in the request
     if (req.query.ageRange) {
       const ageRangeQuery = ageRanges[req.query.ageRange];
       if (ageRangeQuery) {
         filterCriteria.age = ageRangeQuery;
       } else {
-        response = {filterCriteriaAge: "invalid filter criteria age range"}
+        throw new Error ("invalid filter criteria age range")
       }
     }
 
@@ -61,8 +58,8 @@ export const getFeatures = async (req, res) => {
   }
 };
 
-//@desc Get Feature
-//@route GET /api/features/:id
+//@desc Get single Feature
+//@route GET /api/features/getSingle/:id
 //@access public
 export const getFeature = async (req, res) => {
   try {
@@ -77,27 +74,9 @@ export const getFeature = async (req, res) => {
   }
 };
 
-//@desc Get Feature
-//@route GET /api/features/:id
-//@access private
-// export const getFeature = async ( req, res ) => {
-//   try{
-//     const feature = await Features.findById(req.params.id)
-//     if(!feature) {
-//       res.status(404)
-//       throw new Error("Feature not found")
-//     }
-//     res.status(200).json(feature)
-//   }catch(error) {
-//     res.status(500).json({ message: error.message})
-//   }
-// }
-
-//@desc Get Feature
+//@desc Get similarity score
 //@route GET /api/features/similarity/caseId
-//@access public
-
-//endpoint for getting similarity scores
+//@access private
 export const getSimilarityScore = async (req, res) => {
   try {
     const { caseId } = req.params;
@@ -155,21 +134,16 @@ const calculateSimilarity = (embedding1, embedding2) => {
   return similarity;
 };
 
+//updates the top10 similarities for a case
 const updateSimilarityField = async (
   caseId,
   existingEmbeddingId,
   similarityScore
 ) => {
   try {
-    // Find the existing embedding by ID
     const existingEmbedding = await embeddings.findById(existingEmbeddingId);
-
-    // Check if the existing embedding exists and has a similarity field
     if (existingEmbedding) {
-      // Push the new similarity object into the existing array
       existingEmbedding.similarity.push({ CaseId: caseId, similarityScore });
-
-      // Create a new document with the updated similarity field
       await embeddings.create(existingEmbedding);
 
     } else {
@@ -182,10 +156,9 @@ const updateSimilarityField = async (
   }
 };
 
-//@desc Get Feature
-//@route GET /api/features
-//@access public
-//an endpoint to create features
+//@desc create new Feature
+//@route POST /api/features/create
+//@access private
 export const createFeature = async (req, res) => {
   try {
     const {
@@ -347,10 +320,9 @@ export const createFeature = async (req, res) => {
   }
 };
 
-//@desc Get Feature
-//@route GET /api/features/compare
+//@desc compare Feature
+//@route POST /api/features/compare
 //@access public
-//an endpoint to compare features
 export const compareFeature = async (req, res) => {
   try {
     const descriptionTypes = [
@@ -519,10 +491,9 @@ export const compareFeature = async (req, res) => {
   }
 };
 
-//@desc Get Feature
-//@route GET /api/features
-//@access public
-//an endpoint to update fatures
+//@desc updare Feature
+//@route PUT /api/features
+//@access private
 export const updateFeature = async (req, res) => {
   try {
     const feature = await Features.findById(req.params.id);
@@ -572,7 +543,7 @@ export const updateFeature = async (req, res) => {
     res.status(201).json({ FeatureUpdated: updatedFeature }) ;
     console.log("Feature updated successfully");
   } catch (error) {
-    res.status(500).json({ error: "server error" });
+    res.json({ error: error.message });
     console.error(`Error updating feature ${error.message}`);
   }
 };

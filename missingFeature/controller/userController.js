@@ -6,37 +6,42 @@ import jwt from "jsonwebtoken"
 //@route Get /api/users/register
 //@access public
 export const registerUser = async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    res.status(400);
-    throw new Error("all fields are mandatory");
+  try {
+
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(400);
+      throw new Error("all fields are mandatory");
+    }
+    
+    const userAvailable = await User.findOne({ email });
+    console.log(userAvailable)
+    if (userAvailable) {
+      res.status(400);
+      throw new Error("User already registered");
+    }
+    
+    //hashPassword
+    const hashedPassowrd = await bcrypt.hash(password, 10);
+    console.log(`hashed password: ${hashedPassowrd}`);
+    
+    const user = await User.create({
+      email,
+      password: hashedPassowrd,
+    });
+    console.log(`User created ${user}`);
+    if (user) {
+      res.status(200).json({ email: user.email });
+    } else {
+      res.status(400);
+      throw new Error("user data is invalid");
+    }
+  } catch (error) {
+    res.status(404).json(error.message)
   }
-
-  const userAvailable = await User.findOne({ email });
-  console.log(userAvailable)
-  if (userAvailable) {
-    res.status(400);
-    throw new Error("User already registered");
-  }
-
-  //hashPassword
-  const hashedPassowrd = await bcrypt.hash(password, 10);
-  console.log(`hashed password: ${hashedPassowrd}`);
-
-  const user = await User.create({
-    email,
-    password: hashedPassowrd,
-  });
-  console.log(`User created ${user}`);
-  if (user) {
-    res.status(200).json({ email: user.email });
-  } else {
-    res.status(400);
-    throw new Error("user data is invalid");
-  }
-};
-
-//@desc login a user
+  };
+  
+  //@desc login a user
 //@route Get /api/users/login
 //@access public
 export const loginUser = async (req, res) => {
@@ -51,7 +56,6 @@ export const loginUser = async (req, res) => {
   let correctPassword = await bcrypt.compare(password, user.password)
   console.log(correctPassword)
   if (user && correctPassword) {
-    console.log('hello')
     const accessToken = jwt.sign(
       {
         user: {
@@ -63,7 +67,6 @@ export const loginUser = async (req, res) => {
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "40m" }
     )
-    console.log('hello again')
 
     res.status(200).json({ accessToken })
   }else{
