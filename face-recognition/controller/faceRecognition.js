@@ -1,7 +1,5 @@
 import { uploadFaceFeature, checkFaceMatch } from "../face.js";
-import multer from 'multer';
 
-const upload = multer();
 
 export const RecognizeFace = async (req, res) => {
   const startTime = Date.now(); // Start timer
