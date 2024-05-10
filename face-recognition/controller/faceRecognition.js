@@ -1,10 +1,11 @@
 import { uploadFaceFeature, checkFaceMatch } from "../face.js";
-
+import FaceMatchResult from "../schema/faceMatch.js";
 
 export const RecognizeFace = async (req, res) => {
   const startTime = Date.now(); // Start timer
   try {
     const file1 = req.files[0]?.buffer;
+    console.log(file1);
     if (!file1) {
       return res.status(400).json({ error: "Image is required." });
     }
@@ -14,10 +15,15 @@ export const RecognizeFace = async (req, res) => {
     if (result.error) {
       return res.status(400).json({ error: result.error });
     }
-
+    await FaceMatchResult.create({
+      person_id: result.person_id,
+      distance: result.distance,
+      similarity: result.similarity,
+    });
     res.json({
       person_id: result.person_id,
       distance: result.distance,
+      confidence: result.similarity,
     });
   } catch (error) {
     console.error("Error checking face:", error);
