@@ -1,8 +1,9 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
-require("dotenv").config();
+import jwt from "jsonwebtoken"
+import User from "../models/userModel.js"
+import dotenv from "dotenv"
+dotenv.config()
 
-const requireAuth = (req, res, next) => {
+export const requireAuth = (req, res, next) => {
   const token = req.cookies.jwt;
   //check json web token exists & is verified
   if (token) {
@@ -20,7 +21,7 @@ const requireAuth = (req, res, next) => {
 };
 
 // check current user
-const checkUser = (req, res, next) => {
+export const checkUser = (req, res, next) => {
   const token = req.cookies.jwt;
   //check json web token exists & is verified
   if (token) {
@@ -40,5 +41,3 @@ const checkUser = (req, res, next) => {
     next();
   }
 };
-
-module.exports = { requireAuth, checkUser };

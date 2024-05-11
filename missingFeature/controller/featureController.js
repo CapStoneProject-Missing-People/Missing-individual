@@ -1,7 +1,8 @@
-import Features from "../models/featureModel.js";
+import initializeFeaturesModel from "../models/featureModel.js";
 import crypto from "crypto";
 import embeddings from "../models/embeddingsModel.js";
 import { pipeline } from "@xenova/transformers";
+import mongoose from "mongoose";
 
 //@desc Get all Features
 //@route GET /api/features/getAll
@@ -28,7 +29,7 @@ export const getFeatures = async (req, res) => {
       if (ageRangeQuery) {
         filterCriteria.age = ageRangeQuery;
       } else {
-        throw new Error ("invalid filter criteria age range")
+        throw new Error("invalid filter criteria age range");
       }
     }
 
@@ -48,8 +49,12 @@ export const getFeatures = async (req, res) => {
       }
     }
 
+    const Features_GT_2 = await initializeFeaturesModel(3); 
+    const Features_LTE_2 = await initializeFeaturesModel(1);
+    const MergedFeaturesSchema = Features_GT_2.schema || Features_LTE_2.schema;
+    const MergedFeaturesModel = mongoose.model('MergedFeatures', MergedFeaturesSchema);
     //Query database with constructed filter criteria
-    const features = await Features.find(filterCriteria).lean();
+    const features = await MergedFeaturesModel.find(filterCriteria).lean();
 
     res.status(200).json(features);
   } catch {
@@ -63,7 +68,11 @@ export const getFeatures = async (req, res) => {
 //@access public
 export const getFeature = async (req, res) => {
   try {
-    const feature = await Features.findById(req.params.id);
+    const Features_GT_2 = await initializeFeaturesModel(3); 
+    const Features_LTE_2 = await initializeFeaturesModel(1);
+    const MergedFeaturesSchema = Features_GT_2.schema || Features_LTE_2.schema;
+    const MergedFeaturesModel = mongoose.model('MergedFeatures', MergedFeaturesSchema);
+    const feature = await MergedFeaturesModel.findById(req.params.id);
     if (!feature) {
       res.status(404);
       throw new Error("Feature not found");
@@ -145,7 +154,6 @@ const updateSimilarityField = async (
     if (existingEmbedding) {
       existingEmbedding.similarity.push({ CaseId: caseId, similarityScore });
       await embeddings.create(existingEmbedding);
-
     } else {
       console.log(
         `Existing embedding ${existingEmbeddingId} not found or does not have a similarity field`
@@ -161,80 +169,71 @@ const updateSimilarityField = async (
 //@access private
 export const createFeature = async (req, res) => {
   try {
-    const {
-      age,
-      name: { 
-        firstName, 
-        middleName, 
-        lastName,
-       },
-      skin_color,
-      clothing: {
-        upper: { clothType: upperClothType, clothColor: upperClothColor },
-        lower: { clothType: lowerClothType, clothColor: lowerClothColor },
-      },
-      body_size,
-      description: {
-        eyeDescription,
-        noseDescription,
-        hairDescription,
-        lastSeenAddressDes,
-      },
-    } = req.body;
-    console.log(lastName)
-
-    const inputHash = calculateHash({
-      age,
-      name: { firstName, middleName, lastName },
-      skin_color,
-      clothing: {
-        upper: { clothType: upperClothType, clothColor: upperClothColor },
-        lower: { clothType: lowerClothType, clothColor: lowerClothColor },
-      },
-      body_size,
-      description: {
-        eyeDescription,
-        noseDescription,
-        hairDescription,
-        lastSeenAddressDes,
-      },
-    });
-    //check if incomming feature already in database
-    const existingFeature = await Features.findOne({ inputHash });
-
-    if (existingFeature) {
-      return res
-        .status(400)
-        .json({ error: "Duplicate feature already exists" });
+    const { timeSinceDisappearance } = req.params;
+    const Features = await initializeFeaturesModel(timeSinceDisappearance);
+    
+    let baseReq;
+    if (timeSinceDisappearance > 2) {
+      const { lastSeenLocation, medicalInformation, circumstanceOfDisappearance, ...base } = req.body;
+      baseReq = { ...base, lastSeenLocation, medicalInformation, circumstanceOfDisappearance }
+      console.log(baseReq);
+    } else {
+      const { clothing: { upper: { clothType: upperClothType, clothColor: upperClothColor }, lower: { clothType: lowerClothType, clothColor: lowerClothColor } }, body_size, ...base } = req.body;
+      baseReq = base;
+      console.log(baseReq);
     }
-
+    
     const descriptionTypes = [
       "eyeDescription",
       "noseDescription",
       "hairDescription",
       "lastSeenAddressDes",
     ];
-
+    
     let descriptions = "";
     for (const descType of descriptionTypes) {
       descriptions += req.body.description[descType];
     }
-
-    const feature = await Features.create({
-      age,
-      name: {firstName, middleName, lastName},
-      skin_color,
-      clothing: {
-        upper: { clothType: upperClothType, clothColor: upperClothColor },
-        lower: { clothType: lowerClothType, clothColor: lowerClothColor },
-      },
-      body_size,
+    
+    const featureData = {
+      ...baseReq,
+      age: req.body.age,
+      name: req.body.name,
+      skin_color: req.body.skin_color,
+      clothing: req.body.clothing ? {
+        upper: { clothType: req.body.clothing.upper.clothType, clothColor: req.body.clothing.upper.clothColor },
+        lower: { clothType: req.body.clothing.lower.clothType, clothColor: req.body.clothing.lower.clothColor }
+      } : undefined,
+      body_size: req.body.body_size,
       description: descriptions,
-      inputHash,
-      user_id: req.user.id,
-    });
+      inputHash: calculateHash(req.body),
+      user_id: req.user.id
+    };
+
+    const existingFeature = await Features.findOne({inputHash: featureData.inputHash });
+    if (existingFeature) {
+      return res
+        .status(400)
+        .json({ error: "Duplicate feature already exists" });
+    }
+    const feature = await Features.create( featureData );
     console.log("feature stored successfully");
 
+    const Features_GT_2 = await initializeFeaturesModel(3); 
+    const Features_LTE_2 = await initializeFeaturesModel(1);
+    const MergedFeaturesSchema = Features_GT_2.schema || Features_LTE_2.schema;
+    const MergedFeaturesModel = mongoose.model('MergedFeatures', MergedFeaturesSchema);
+    featureData._id = feature._id;
+    const existingFeatureMerged = await MergedFeaturesModel.findOne({ _id: featureData._id });
+ 
+    if (existingFeatureMerged) {
+      return res
+        .status(400)
+        .json({ error: "Duplicate feature already exists in MergedFeatures collection" });
+     }
+     await MergedFeaturesModel.create(featureData);
+     console.log("Feature stored successfully in MergedFeatures collection.");
+ 
     const existingEmbeddingsCount = await embeddings.countDocuments();
     if (existingEmbeddingsCount < 1) {
       const caseId = feature._id;
@@ -275,7 +274,7 @@ export const createFeature = async (req, res) => {
           return {
             existingCaseId: existingEmbedding.caseId,
             existingEmbeddingId: existingEmbedding._id,
-            similarityScore: similarity,
+            similarityScore: similarity * 100,
           };
         }
       );
@@ -313,7 +312,12 @@ export const createFeature = async (req, res) => {
         );
       }
     }
-    res.status(200).json({ message: " feature stored succeffully",  createdFeature: feature});
+    res
+      .status(200)
+      .json({
+        message: " feature stored succeffully",
+        createdFeature: feature,
+      });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
     console.error("Error creating feature:", error);
@@ -325,6 +329,7 @@ export const createFeature = async (req, res) => {
 //@access public
 export const compareFeature = async (req, res) => {
   try {
+    let { timeSinceDisappearance } = req.params
     const descriptionTypes = [
       "eyeDescription",
       "noseDescription",
@@ -345,8 +350,31 @@ export const compareFeature = async (req, res) => {
       res.json({ message: "nothing in database" });
       return;
     } else {
-      let response = [];
-
+      let response = []
+      let featureModelName = "";
+      let featureData = {};
+      
+      if (timeSinceDisappearance > 2) {
+        featureModelName = "Features_GT_2";
+        featureData = {
+          lastSeenLocation: req.body.lastSeenLocation,
+          medicalInformation: req.body.medicalInformation,
+          circumstanceOfDisappearance: req.body.circumstanceOfDisappearance,
+        };
+      } else {
+        featureModelName = "Features_LTE_2";
+        console.log(req.body.clothing.lower.clothType)
+        featureData = {
+          "clothing.upper.clothType": req.body.clothing.upper.clothType,
+          "clothing.upper.clothColor": req.body.clothing.upper.clothColor,
+          "clothing.lower.clothType": req.body.clothing.lower.clothType,
+          "clothing.lower.clothColor": req.body.clothing.lower.clothColor,
+          body_size: req.body.body_size,
+        };
+      }
+      
+      const Features = await initializeFeaturesModel(timeSinceDisappearance)
+     
       // Find all embeddings in the database
       const existingEmbeddings = await embeddings.find();
       const pipelineModel = await generateEmbeddings();
@@ -372,18 +400,19 @@ export const compareFeature = async (req, res) => {
       );
 
       similarityScores.sort((a, b) => b.similarityScore - a.similarityScore);
-      console.log(similarityScores);
-      const {
-        age,
-        name: {firstName, middleName, lastName},
-        skin_color,
-        clothing: {
-          upper: { clothType: upperClothType, clothColor: upperClothColor },
-          lower: { clothType: lowerClothType, clothColor: lowerClothColor },
-        },
-        body_size,
-      } = req.body;
+      // console.log(similarityScores);
 
+   // Construct criteria based on the request body
+      const criteria = {
+        age: req.body.age,
+        "name.firstName": req.body.name.firstName,
+        "name.middleName": req.body.name.middleName,
+        "name.lastName": req.body.name.lastName,
+        skin_color: req.body.skin_color,
+        ...featureData, // Include feature-specific data
+      };
+
+      console.log(criteria)
       const ageRanges = {
         "1-4": { $gte: 1, $lte: 4 },
         "5-10": { $gte: 5, $lte: 10 },
@@ -397,30 +426,15 @@ export const compareFeature = async (req, res) => {
 
       const ageRangeKeys = Object.keys(ageRanges);
 
-      const criteria = {
-        age,
-        "name.firstName": firstName,
-        "name.middleName": middleName,
-        "name.lastName": lastName,
-        skin_color,
-        "clothing.upper.clothType": upperClothType,
-        "clothing.upper.clothColor": upperClothColor,
-        "clothing.lower.clothType": lowerClothType,
-        "clothing.lower.clothColor": lowerClothColor,
-        body_size,
-      };
-
       const matchingCases = await Features.find({}).lean();
-
       matchingCases.forEach((caseData) => {
         const matchingStatus = { id: caseData._id };
         for (const key in criteria) {
+          // var featurePercentValue = 0
           const value = criteria[key];
           if (key === "age") {
             if (caseData.age === value) {
-              console.log("casedata.age ", caseData.age);
-              console.log("value ", value);
-              matchingStatus.age = `Exact age match`;
+              matchingStatus.age = 100;
             } else {
               var ageRangeMatch = false;
               var caseDataAgeRange = "";
@@ -429,55 +443,57 @@ export const compareFeature = async (req, res) => {
                 const range = ageRanges[rangeKey];
                 if (caseData.age >= range.$gte && caseData.age <= range.$lte) {
                   caseDataAgeRange = rangeKey;
-                  // console.log("caseDataAgeRange: ", caseDataAgeRange)
                 }
                 if (value >= range.$gte && value <= range.$lte) {
                   newReqAge = rangeKey;
-                  // console.log("newReqAge: ", newReqAge)
                 }
               }
 
               if (caseDataAgeRange === newReqAge) {
                 console.log("potential age match");
+                // featurePercentValue = 85
                 ageRangeMatch = true;
-                matchingStatus.age = `potential age match (${caseDataAgeRange})`;
+                matchingStatus.age = 85;
               }
 
               if (!ageRangeMatch) {
                 console.log("did not match");
-                matchingStatus.age = "did not match";
+                matchingStatus.age = 0;
               }
             }
-          } else if (!key.startsWith("clothing." && !key.startsWith("name."))) {
-            matchingStatus[key] =
-              caseData[key] === value ? "match" : "did not match";
-          }
-
-          if (key.startsWith("clothing.")) {
+          } else if (key.startsWith("name.")) {
+            const nameWritten = key.split(".");
+            const nameType = nameWritten[1];
+            matchingStatus[nameType] =
+              caseData.name[nameType] === value ? 100 : 0;
+          } else if (key.startsWith("clothing.")) {
             const clothingParts = key.split(".");
             const clothingType = clothingParts[1];
             const clothKey = clothingParts[2];
-
             const caseClothType = caseData.clothing[clothingType][clothKey];
-            matchingStatus[`${clothingType} ${clothKey}`] =
-              caseClothType === value ? "match" : "did not match";
-          }
-
-          if (key.startsWith("name.")) {
-            const nameType = key.split(".")
-            const names = nameType[1]
-            const firstName = caseData.name[names]
-            matchingStatus[`${names}`] = firstName === value ? "match" : "did not match"
+            if (
+              (caseClothType === "blue" && value === "light blue") ||
+              (caseClothType === "light blue" && value === "blue")
+            ) {
+              console.log("85%");
+              matchingStatus[`${clothingType} ${clothKey}`] = 85;
+            } else if (
+              (caseClothType === "yellow" && value === "orange") ||
+              (caseClothType === "orange" && value === "yellow")
+            ) {
+              matchingStatus[`${clothingType} ${clothKey}`] = 85;
+            } else {
+              matchingStatus[`${clothingType} ${clothKey}`] =
+                caseClothType === value ? 100 : 0;
+            }
+          } else {
+            matchingStatus[key] = caseData[key] === value ? 100 : 0;
           }
         }
 
         similarityScores.forEach((score) => {
-          console.log("existingId: ", score.existingCaseId);
-          console.log("casedata id: ", caseData._id);
-          console.log(score.existingCaseId.equals(caseData._id));
           if (score.existingCaseId.equals(caseData._id)) {
-            console.log("they are the same");
-            matchingStatus.similarityScore = score.similarityScore;
+            matchingStatus.similarityScore = score.similarityScore * 100;
           }
         });
 
@@ -496,80 +512,109 @@ export const compareFeature = async (req, res) => {
 //@access private
 export const updateFeature = async (req, res) => {
   try {
+    const timeSinceDisappearance = req.query.timeSinceDisappearance;
+    const Features = await initializeFeaturesModel(timeSinceDisappearance);
+    
     const feature = await Features.findById(req.params.id);
     if (!feature) {
       res.status(404);
       throw new Error("Feature not found");
     }
 
-    if( feature.user_id.toString() !== req.user.id) {
-      res.status(403)
-      throw new Error("User don't have permission to update other users feature!")
+    if (feature.user_id.toString() !== req.user.id) {
+      res.status(403);
+      throw new Error(
+        "User doesn't have permission to update other users' features!"
+      );
     }
 
-    const {
-      age,
-      skin_color,
-      name: {firstName, middleName, lastName},
-      clothing: {
-        upper: { clothType: upperClothType, clothColor: upperClothColor },
-        lower: { clothType: lowerClothType, clothColor: lowerClothColor },
-      },
-      body_size,
-      description: {
-        eyeDescription,
-        noseDescription,
-        hairDescription,
-        lastSeenAddressDes,
-      },
-    } = req.body;
-    const concatenatedDescription = `${eyeDescription}.${ noseDescription}.${ hairDescription}.${ lastSeenAddressDes}`;
+    let baseReq;
+    if (timeSinceDisappearance > 2) {
+      const { lastSeenLocation, medicalInformation, circumstanceOfDisappearance, ...base } = req.body;
+      baseReq = { ...base, lastSeenLocation, medicalInformation, circumstanceOfDisappearance }
+    } else {
+      const { clothing: { upper: { clothType: upperClothType, clothColor: upperClothColor }, lower: { clothType: lowerClothType, clothColor: lowerClothColor } }, body_size, ...base } = req.body;
+      baseReq = base;
+    }
 
+    const concatenatedDescription = `${req.body.description.eyeDescription}.${req.body.description.noseDescription}.${req.body.description.hairDescription}.${req.body.description.lastSeenAddressDes}`;
+    const featureData = {
+      ...baseReq,
+      age: req.body.age,
+      name: req.body.name,
+      skin_color: req.body.skin_color,
+      clothing: req.body.clothing ? {
+        upper: { clothType: req.body.clothing.upper.clothType, clothColor: req.body.clothing.upper.clothColor },
+        lower: { clothType: req.body.clothing.lower.clothType, clothColor: req.body.clothing.lower.clothColor }
+      } : undefined,
+      body_size: req.body.body_size,
+      description: concatenatedDescription,
+      inputHash: calculateHash(req.body),
+      user_id: req.user.id
+    };
+
+    // Check if a feature with the same inputHash already exists
+    const existingFeature = await Features.findOne({ inputHash: featureData.inputHash });
+    if (existingFeature && existingFeature._id.toString() !== req.params.id) {
+      // If the existing feature has a different ID, it's a duplicate
+      return res.status(400).json({ error: "Duplicate feature already exists" });
+    }
+
+    // Update the feature
     const updatedFeature = await Features.findByIdAndUpdate(
       req.params.id,
-     {
-      age,
-      name: {firstName, middleName, lastName},
-      skin_color,
-      clothing: {
-        upper: { clothType: upperClothType, clothColor: upperClothColor },
-        lower: { clothType: lowerClothType, clothColor: lowerClothColor },
-      },
-      body_size,
-      description: concatenatedDescription,
-    },
+      featureData,
       { new: true }
     );
-    res.status(201).json({ FeatureUpdated: updatedFeature }) ;
+    
+    const Features_GT_2 = await initializeFeaturesModel(3); 
+    const Features_LTE_2 = await initializeFeaturesModel(1);
+    const MergedFeaturesSchema = Features_GT_2.schema || Features_LTE_2.schema;
+    const MergedFeaturesModel = mongoose.model('MergedFeatures', MergedFeaturesSchema);
+    await MergedFeaturesModel.findByIdAndUpdate(
+      req.params.id,
+      featureData,
+      { new: true }
+    );
+    res.status(201).json({ FeatureUpdated: updatedFeature });
     console.log("Feature updated successfully");
   } catch (error) {
-    res.json({ error: error.message });
-    console.error(`Error updating feature ${error.message}`);
+    res.status(500).json({ error: error.message });
+    console.error(`Error updating feature: ${error.message}`);
   }
 };
-
 
 //@desc Delete Feature
 //@route Delete /api/features/delete/:id
 //@access private
 //an endpoint to delete fature
 export const deleteFeature = async (req, res) => {
-  try{
-    const feature = await Features.findById(req.params.id)
+  try {
+    const timeSinceDisappearance = req.query.timeSinceDisappearance;
+    const Features = await initializeFeaturesModel(timeSinceDisappearance);
+    const feature = await Features.findById(req.params.id);
     if (!feature) {
-      res.status(404)
-      throw new Error("feature not found")
+      res.status(404);
+      throw new Error("feature not found");
     }
     if (feature.user_id.toString() !== req.user.id) {
-      res.status(403)
-      throw new Error("User don't have permission to update other users feature!")
+      res.status(403);
+      throw new Error(
+        "User don't have permission to update other users feature!"
+      );
     }
-    await feature.deleteOne()
-    res.status(200).json({message: "feature deleted succussfully", feature})
+    await feature.deleteOne();
+
+    const Features_GT_2 = await initializeFeaturesModel(3); 
+    const Features_LTE_2 = await initializeFeaturesModel(1);
+    const MergedFeaturesSchema = Features_GT_2.schema || Features_LTE_2.schema;
+    const MergedFeaturesModel = mongoose.model('MergedFeatures', MergedFeaturesSchema);
+    await MergedFeaturesModel.deleteOne({ _id: req.params.id });
+    res.status(200).json({ message: "feature deleted succussfully", feature });
   } catch (error) {
-    res.json({title: "UNAUTHORIZED", message: error.message})
+    res.json({ title: "UNAUTHORIZED", message: error.message });
   }
-}
+};
 
 //@desc search Feature
 //@route search /api/features/search
@@ -580,26 +625,32 @@ export const searchFeature = async (req, res) => {
     const { searchBy, searchTerm } = req.body;
 
     if (!searchBy || !searchTerm) {
-      return res.status(400).json({ error: 'Both searchBy and searchTerm are required.' });
+      return res
+        .status(400)
+        .json({ error: "Both searchBy and searchTerm are required." });
     }
 
     let searchCriteria = {};
-    if (searchBy === 'firstName') {
-      searchCriteria['name.firstName'] = { $regex: searchTerm, $options: 'i' };
-    } else if (searchBy === 'middleName') {
-      searchCriteria['name.middleName'] = { $regex: searchTerm, $options: 'i' };
-    } else if (searchBy === 'lastName') {
-      searchCriteria['name.lastName'] = { $regex: searchTerm, $options: 'i' };
+    if (searchBy === "firstName") {
+      searchCriteria["name.firstName"] = { $regex: searchTerm, $options: "i" };
+    } else if (searchBy === "middleName") {
+      searchCriteria["name.middleName"] = { $regex: searchTerm, $options: "i" };
+    } else if (searchBy === "lastName") {
+      searchCriteria["name.lastName"] = { $regex: searchTerm, $options: "i" };
     } else {
-      return res.status(400).json({ error: 'Invalid searchBy parameter.' });
+      return res.status(400).json({ error: "Invalid searchBy parameter." });
     }
 
+    const Features_GT_2 = await initializeFeaturesModel(3); 
+    const Features_LTE_2 = await initializeFeaturesModel(1);
+    const MergedFeaturesSchema = Features_GT_2.schema || Features_LTE_2.schema;
+    const MergedFeaturesModel = mongoose.model('MergedFeatures', MergedFeaturesSchema);
     // Query database with constructed search criteria
-    const features = await Features.find(searchCriteria).lean();
+    const features = await MergedFeaturesModel.find(searchCriteria).lean();
 
     res.status(200).json(features);
   } catch (error) {
-    console.error('Error fetching features:', error.message);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Error fetching features:", error.message);
+    res.status(500).json({ error: "Server error" });
   }
 };

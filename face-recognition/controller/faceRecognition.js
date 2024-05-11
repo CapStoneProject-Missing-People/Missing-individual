@@ -35,6 +35,7 @@ export const addFaceFeature = async (req, res) => {
   const startTime = Date.now(); // Start timer
 
   try {
+    console.log('inside')
     const {images, person_id} = req.body;
     // Check if person_id is provided
     

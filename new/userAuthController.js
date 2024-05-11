@@ -1,6 +1,7 @@
-const User = require("../models/User");
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
+import User from "../models/userModel.js"
+import jwt from "jsonwebtoken"
+import dotenv from "dotenv"
+dotenv.config();
 
 //handle errors
 const handleErrors = (err) => {
@@ -39,13 +40,15 @@ const createToken = (id) => {
   });
 };
 
-module.exports.signup_get = (req, res) => {
+export const signup_get = (req, res) => {
   res.render("signup");
 };
 
-module.exports.signup_post = async (req, res) => {
+export const registerUser = async (req, res) => {
+  console.log('register')
   const { email, password } = req.body;
   try {
+    console.log('here')
     const user = await User.create({ email, password });
     const token = createToken(user._id);
     res.cookie("jwt", token, {
@@ -59,10 +62,10 @@ module.exports.signup_post = async (req, res) => {
   }
 };
 
-module.exports.login_get = (req, res) => {
+export const getUser = (req, res) => {
   res.render("login");
 };
-module.exports.login_post = async (req, res) => {
+export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.login(email, password);
@@ -78,7 +81,7 @@ module.exports.login_post = async (req, res) => {
   }
 };
 
-module.exports.logout_get = (req, res) => {
+export const logoutUser = (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 });
   res.redirect("/");
 };
