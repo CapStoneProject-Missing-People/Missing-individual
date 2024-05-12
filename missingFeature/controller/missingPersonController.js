@@ -11,10 +11,14 @@ export const CreateMissingPerson = async (req, res) => {
     const imageBuffers = images.map((image) => image.buffer);
     const imagePaths = [];
 
-    const { userID, locationLastSeen } = req.body;
+    let userID = req.user.userId;
+    let userIDString = userID.toString();
+
+    const { locationLastSeen } = req.body;
     // Saving images to a dedicated folder
+    const userId = req.user.userId;
     const moduleDir = dirname(fileURLToPath(import.meta.url));
-    const uploadsDir = path.join(moduleDir, "..", "uploads", userID);
+    const uploadsDir = path.join(moduleDir, "..", "uploads", userIDString);
 
     // Create the directory if it doesn't exist
     if (!fs.existsSync(uploadsDir)) {
@@ -55,6 +59,6 @@ export const CreateMissingPerson = async (req, res) => {
       .status(201)
       .json({ message: "Missing person record created successfully." });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ err });
   }
 };

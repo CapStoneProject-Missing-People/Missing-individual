@@ -1,9 +1,12 @@
-import express from 'express';
-import multer from 'multer';
+import express from "express";
+import multer from "multer";
 import { CreateMissingPerson } from "../controller/missingPersonController.js";
+import { requireAuth } from "../middleware/authMiddleware.js";
 
 const upload = multer();
 
-export const routers = express.Router();
+export const router = express.Router();
 
-routers.route('/createMissingPerson').post(upload.any(), CreateMissingPerson)
+router
+  .route("/createMissingPerson")
+  .post(upload.any(), requireAuth, CreateMissingPerson);
