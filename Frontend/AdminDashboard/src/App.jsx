@@ -1,26 +1,29 @@
-import { BrowserRouter as Router } from 'react-router-dom';
-import { useState } from 'react'
-import './App.css'
-import Header from './components/Header'
-import Sidebar from './components/Sidebar'
-import Routes from './Routes'
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import MainLayout from './components/layouts/MainLayout';
+import MenuContextProvider from './context/MenuContext'; 
+import MainDashboard from './components/page/Dashboard/MainDashboard'
+import MainUserManagement from './components/page/UserManagement/MainUserManagement';
+import MainMissingPeople from './components/page/MissingPeople/MainMissingPeople';
+import Profile from './components/page/Profile';
+import MainFeedback from './components/page/Feedback/MainFeedback';
 
-function App() {
-  const [openSidebarToggle, setOpenSidebarToggle] = useState(false)
-
-  const OpenSidebar = () => {
-    setOpenSidebarToggle(!openSidebarToggle)
-  }
-
+const App = () => {
   return (
-    <Router>
-      <div className='grid-container'>
-        <Header OpenSidebar={OpenSidebar} />
-        <Sidebar openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar} />
-        <Routes/>
-      </div>
-    </Router>
-  );
-}
+    <MenuContextProvider>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<MainDashboard />} />
+          <Route path="/dashboard" element={<MainDashboard />} />
+          <Route path="/user-management" element={<MainUserManagement />} />
+          <Route path="/missing-people" element={<MainMissingPeople />} />
+          <Route path="/profiles" element={<Profile/>}/>
+          <Route path="/feedbacks" element={<MainFeedback/>}/>
 
-export default App
+        </Routes>
+      </MainLayout>
+    </MenuContextProvider>
+  );
+};
+
+export default App;
