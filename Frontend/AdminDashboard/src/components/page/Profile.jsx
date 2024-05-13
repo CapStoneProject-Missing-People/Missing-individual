@@ -14,10 +14,13 @@ const Profile = () => {
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
+    console.log("Edit mode toggled. isEditing:", !isEditing);
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsEditing(false);
+    console.log("Form submitted. isEditing:", isEditing);
   };
 
   return (
@@ -51,9 +54,9 @@ const Profile = () => {
           </div>
           <div className="max-w-lg mx-auto bg-white drop-shadow-2xl rounded-md p-6">
             <h2 className="text-2xl font-semibold mb-4">Admin Profile</h2>
-            <form onSubmit={handleSubmit}>
+            <form >
               <div className="mb-4">
-                <label htmlFor="firstName" className="block font-semibold mb-1">
+                <label htmlFor="firstName" className="block text-left font-semibold mb-1">
                   First Name
                 </label>
                 <input
@@ -67,7 +70,7 @@ const Profile = () => {
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="lastName" className="block font-semibold mb-1">
+                <label htmlFor="lastName" className="block text-left font-semibold mb-1">
                   Last Name
                 </label>
                 <input
@@ -81,7 +84,7 @@ const Profile = () => {
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="email" className="block font-semibold mb-1">
+                <label htmlFor="email" className="block text-left font-semibold mb-1">
                   Email
                 </label>
                 <input
@@ -95,7 +98,7 @@ const Profile = () => {
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="phoneNumber" className="block font-semibold mb-1">
+                <label htmlFor="phoneNumber" className="block text-left font-semibold mb-1">
                   Phone Number
                 </label>
                 <input
@@ -109,7 +112,7 @@ const Profile = () => {
                 />
               </div>
               <div className="mb-4">
-                <label htmlFor="address" className="block font-semibold mb-1">
+                <label htmlFor="address" className="block text-left font-semibold mb-1">
                   Address
                 </label>
                 <textarea
@@ -122,7 +125,7 @@ const Profile = () => {
                 ></textarea>
               </div>
               <div className="flex justify-end">
-                {!isEditing ? (
+                {!isEditing ? 
                   <button
                     type="button"
                     onClick={handleEditToggle}
@@ -130,14 +133,15 @@ const Profile = () => {
                   >
                     Edit
                   </button>
-                ) : (
+                 : 
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={handleSubmit}
                     className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600"
                   >
                     Save
                   </button>
-                )}
+                }
               </div>
             </form>
           </div>

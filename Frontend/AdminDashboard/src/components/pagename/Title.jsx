@@ -14,7 +14,7 @@ const Title = ({ pageName }) => {
               Dashboard /
             </Link>
           </li>
-          <li className="font-medium text-primary">{pageName}</li>
+          <li className="font-medium text-sky-500 text-primary">{pageName}</li>
         </ol>
       </nav>
     </div>
