@@ -7,6 +7,7 @@ import MainUserManagement from './components/page/UserManagement/MainUserManagem
 import MainMissingPeople from './components/page/MissingPeople/MainMissingPeople';
 import Profile from './components/page/Profile';
 import MainFeedback from './components/page/Feedback/MainFeedback';
+import MainLogManagement from './components/page/LogManagement/MainLogManagement';
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/missing-people" element={<MainMissingPeople />} />
           <Route path="/profiles" element={<Profile/>}/>
           <Route path="/feedbacks" element={<MainFeedback/>}/>
+          <Route path="/log-management" element={<MainLogManagement/>}/> 
 
         </Routes>
       </MainLayout>
