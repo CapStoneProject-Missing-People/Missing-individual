@@ -8,5 +8,5 @@ const upload = multer();
 export const router = express.Router();
 
 router
-  .route("/createMissingPerson")
+  .route("/createMissingPerson/:timeSinceDisappearance")
   .post(upload.any(), requireAuth, CreateMissingPerson);
