@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,12 +15,17 @@ const Login = () => {
     setErrors({ email: '', password: '' });
 
     try {
-      const res = await fetch('/login', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-        headers: { 'Content-Type': 'application/json' },
+      const res = await axios.post('http://localhost:3000/api/users/login', {
+        email,
+        password
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
-      const data = await res.json();
+
+      const data = res.data;
+      console.log('Response data:', data);
 
       if (data.errors) {
         setErrors(data.errors);
@@ -27,10 +33,11 @@ const Login = () => {
 
       if (data.user) {
         document.cookie = `jwt=${data.token}; path=/`; // Store JWT in the cookie
-        navigate('/'); // Redirect to the home page or dashboard
+        console.log('Navigating to dashboard');
+        navigate('/dashboard'); // Redirect to the home page or dashboard
       }
     } catch (err) {
-      console.log(err);
+      console.error('Error during login:', err);
     }
   };
 

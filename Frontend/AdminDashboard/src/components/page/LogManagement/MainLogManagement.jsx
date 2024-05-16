@@ -7,7 +7,7 @@ export default function MainLogManagement() {
     return (
       <div className="h-96">
         <Title pageName="Log management"/>
-        <Info/>
+        <Log/>
       </div>
     )
   }

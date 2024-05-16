@@ -29,7 +29,7 @@ const getColumns = () => [
   {
     Header: "Name",
     accessor: "name",
-    width: "300px",
+    width: "150px",
     Cell: ({ row, value }) => {
       return (
         <div className="flex gap-2 items-center">
@@ -369,11 +369,10 @@ function TableComponent({
 function Table1() {
   const [data, setData] = useState([]);
   const columns = useMemo(getColumns, []);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("/api/usermanagement");
+        const response = await axios.get("http://localhost:3000/api/admin/getAll");
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data: ", error);
