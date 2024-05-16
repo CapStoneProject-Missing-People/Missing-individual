@@ -1,11 +1,16 @@
-import express from "express";
-import dotenv from "dotenv";
-import { routers } from "./routes/featureRouter.js";
+
+import express from "express"
+import dotenv from "dotenv"
 import { userRouter } from "./routes/userRoutes.js";
+import { router } from "./routes/featureRouter.js"
 import { profileRouter } from "./routes/profileRouter.js";
-import { connectionDb } from "./config/dbConnection.js";
-import { router } from "./routes/routes.js";
+import { connectionDb } from "./config/dbConnection.js"
+import { routers } from "./routes/routes.js";
 import { adminRouters } from "./routes/adminRouter.js";
+// import cookieParser from "cookie-parser"
+// import { requireAuth, checkUser } from "./middleware/authMiddleware"
+dotenv.config()
+
 
 dotenv.config();
 
