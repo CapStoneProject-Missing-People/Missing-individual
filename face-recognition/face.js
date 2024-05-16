@@ -20,10 +20,6 @@ LoadModels();
 
 export const uploadFaceFeature = async (images, person_id) => {
   try {
-    // const existingPerson = await MissingPerson.findById(person_id);
-    // if (!existingPerson) {
-    //   throw new Error("Person not found in the MissingPerson collection.");
-    // }
     const descriptionsPromises = images.map(async (image) => {
       const imageBuffer = Buffer.from(image.data);
       const img = await loadImage(imageBuffer);

@@ -58,19 +58,16 @@ export const addFaceFeature = async (req, res) => {
     if (images.length === 0) {
       return res.status(400).json({ message: "No images provided." });
     }
-    // Perform face recognition on the uploaded images
     let result = await uploadFaceFeature(images, person_id);
 
     if (result) {
-      // Update the MissingPerson record to indicate that face features have been created
-      // await MissingPerson.findByIdAndUpdate(person_id, { faceFeatureCreated: true });
-      res.status(200).json({ message: "Face stored" });
+      return res.status(200).json({ message: "Face stored" });
     } else {
-      res.json({ message: "Something went wrong" });
+      return res.json({ message: "Something went wrong" });
     }
   } catch (error) {
     console.error("Error uploading images:", error);
-    res.status(500).json({ message: "Internal server error" });
+    throw new Error(error)
   } finally {
     const endTime = Date.now(); // End timer
     console.log("Total processing time:", endTime - startTime, "ms");
