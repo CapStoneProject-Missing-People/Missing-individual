@@ -3,6 +3,7 @@ import crypto from "crypto";
 import embeddings from "../models/embeddingsModel.js";
 import { pipeline } from "@xenova/transformers";
 import mongoose from "mongoose";
+import MergedFeaturesModel from "../models/mergedFeatureSchema.js"
 
 //@desc Get all Features
 //@route GET /api/features/getAll
@@ -168,7 +169,6 @@ const updateSimilarityField = async (
 //@desc create new Feature
 //@route POST /api/features/create
 //@access private
-let MergedFeaturesModel;
 export const createFeature = async (data, timeSinceDisappearance, userId, res) => {
   try {
     const Features = await initializeFeaturesModel(timeSinceDisappearance)
@@ -185,18 +185,12 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
     const feature = await Features.create( featureData );
     console.log("feature stored successfully");
 
-    if (!MergedFeaturesModel) {
-      const Features_GT_2 = await initializeFeaturesModel(3); 
-      const Features_LTE_2 = await initializeFeaturesModel(1);
-      const MergedFeaturesSchema = timeSinceDisappearance > 2 ? Features_GT_2.schema : Features_LTE_2.schema;
-      MergedFeaturesModel = mongoose.model('MergedFeatures', MergedFeaturesSchema);
-    }
     const existingFeatureMerged = await MergedFeaturesModel.findOne({ inputHash: featureData.inputHash });
- 
     if (existingFeatureMerged) {
       return 'Duplicate feature already exists in MergedFeatures collection'
     }
-    await MergedFeaturesModel.create(featureData);
+
+    const mergedFeatures = await MergedFeaturesModel.create( featureData )
     console.log("Feature stored successfully in MergedFeatures collection.");
  
     const existingEmbeddingsCount = await embeddings.countDocuments();
