@@ -5,6 +5,7 @@ import FaceModel from "./schema/face-feature.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
+
 faceapi.env.monkeyPatch({ Canvas, Image });
 
 async function LoadModels() {
@@ -21,8 +22,9 @@ LoadModels();
 export const uploadFaceFeature = async (images, person_id) => {
   try {
     // const existingPerson = await MissingPerson.findById(person_id);
+    // console.log(existingPerson);
     // if (!existingPerson) {
-    //   throw new Error("Person not found in the MissingPerson collection.");
+    //   throw new Error("Person not found in the MissingPerson database.");
     // }
     const descriptionsPromises = images.map(async (image) => {
       const imageBuffer = Buffer.from(image.data);
@@ -56,6 +58,16 @@ export const uploadFaceFeature = async (images, person_id) => {
   }
 };
 
+function getSimilarityPercentage(distance) {
+  // Invert the distance to get similarity
+  const similarity = 1 - distance;
+  // Convert similarity to percentage
+  const similarityPercentage = similarity * 100;
+  return similarityPercentage;
+}
+
+
+
 export const checkFaceMatch = async (image) => {
   try {
     // Load the image asynchronously
@@ -74,10 +86,14 @@ export const checkFaceMatch = async (image) => {
     // Match the detected face with the database
     const result = await matchFaceDescriptor(detection.descriptor);
 
+    // Calculate similarity percentage
+    const similarityPercentage = getSimilarityPercentage(result[0]._distance);
+
     // Return only relevant information from the result
     return {
       person_id: result[0]._label,
       distance: result[0]._distance,
+      similarity: similarityPercentage,
     };
   } catch (error) {
     console.error("Error detecting face:", error);

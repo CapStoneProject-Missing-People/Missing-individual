@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import userRouter from "./routes/userRoutes.js"
 import { router } from "./routes/featureRouter.js"
 import { connectionDb } from "./config/dbConnection.js"
-import {routers} from "./routes/routes.js";
+import { routers } from "./routes/routes.js";
 // import cookieParser from "cookie-parser"
 // import { requireAuth, checkUser } from "./middleware/authMiddleware"
 dotenv.config()
