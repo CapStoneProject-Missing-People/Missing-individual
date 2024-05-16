@@ -1,4 +1,3 @@
-import { faker } from "@faker-js/faker";
 import {
   useTable,
   useGlobalFilter,
@@ -16,27 +15,18 @@ import {
   FaSortDown,
 } from "react-icons/fa";
 import { Listbox, Transition } from "@headlessui/react";
-import { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 function Avatar({ src, alt = "avatar" }) {
   return (
     <img src={src} alt={alt} className="w-8 h-8 rounded-full object-cover" />
   );
 }
-const generateData = (numberOfRows = 25) =>
-  [...Array(numberOfRows)].map(() => ({
-    name: faker.name.fullName(),
-    image: faker.image.avatar(),
-    email: faker.internet.email(name),
-    idNumber: faker.finance.accountNumber(),
-  }));
+
 const getColumns = () => [
-    {
-        Header: "id number",
-        accessor: "idNumber",
-        width: "150px",
-    },
-    {
+  
+  {
     Header: "Name",
     accessor: "name",
     width: "300px",
@@ -50,6 +40,11 @@ const getColumns = () => [
     },
   },
   {
+    Header: "phone number",
+    accessor: "phonenumber",
+    width: "150px",
+  },
+  {
     Header: "Email",
     accessor: "email",
     width: "240px",
@@ -59,31 +54,31 @@ const getColumns = () => [
     Header: "Admin privilege",
     accessor: "adminPrivilege",
     Cell: ({ row }) => {
-        const [isAdmin, setIsAdmin] = useState(() => {
-          const storedAdmin = localStorage.getItem(`admin_${row.id}`);
-          return storedAdmin ? JSON.parse(storedAdmin) : false;
-        });
-  
-        useEffect(() => {
-          localStorage.setItem(`admin_${row.id}`, JSON.stringify(isAdmin));
-        }, [isAdmin, row.id]);
-  
-        const toggleAdmin = () => {
-          setIsAdmin((prevState) => !prevState);
-        };
-  
-        return (
-            <button
-                onClick={toggleAdmin}
-                className={`px-4 py-2 w-24 ml-6 rounded-full ${
-                isAdmin ? "bg-green-600" : "bg-red-600"
-                } text-white`}
-            >
-                {isAdmin ? "On" : "Off"}
-            </button>
-        );
-      },
-    disableSortBy: true,  
+      const [isAdmin, setIsAdmin] = useState(() => {
+        const storedAdmin = localStorage.getItem(`admin_${row.id}`);
+        return storedAdmin ? JSON.parse(storedAdmin) : false;
+      });
+
+      useEffect(() => {
+        localStorage.setItem(`admin_${row.id}`, JSON.stringify(isAdmin));
+      }, [isAdmin, row.id]);
+
+      const toggleAdmin = () => {
+        setIsAdmin((prevState) => !prevState);
+      };
+
+      return (
+        <button
+          onClick={toggleAdmin}
+          className={`px-4 py-2 w-24 ml-6 rounded-full ${
+            isAdmin ? "bg-green-600" : "bg-red-600"
+          } text-white`}
+        >
+          {isAdmin ? "On" : "Off"}
+        </button>
+      );
+    },
+    disableSortBy: true,
     width: "170px",
   },
 ];
@@ -217,17 +212,17 @@ function SelectMenu1({ value, setValue, options, className = "", disabled }) {
 function Button2({ content, onClick, active, disabled }) {
   return (
     <button
-    className={`flex flex-col cursor-pointer items-center justify-center w-9 h-9 shadow-[0_4px_10px_rgba(0,0,0,0.03)] text-sm font-normal transition-colors rounded-lg
-    ${active ? "bg-gray-500 text-white" : "text-slate-900	"}
-    ${
-      !disabled
-        ? "bg-white hover:bg-gray-500 hover:text-white"
-        : "text-slate-600 bg-white cursor-not-allowed"
-    }
-    `}
-    onClick={onClick}
-    disabled={disabled}
-  >
+      className={`flex flex-col cursor-pointer items-center justify-center w-9 h-9 shadow-[0_4px_10px_rgba(0,0,0,0.03)] text-sm font-normal transition-colors rounded-lg
+      ${active ? "bg-red-500 text-white" : "text-slate-900	"}
+      ${
+        !disabled
+          ? "bg-white hover:bg-gray-500 hover:text-white"
+          : "text-slate-600 bg-white cursor-not-allowed"
+      }
+      `}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {content}
     </button>
   );
@@ -370,9 +365,23 @@ function TableComponent({
     </div>
   );
 }
+
 function Table1() {
-  const data = useMemo(() => generateData(100), []);
+  const [data, setData] = useState([]);
   const columns = useMemo(getColumns, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/api/usermanagement");
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -397,6 +406,7 @@ function Table1() {
     useSortBy,
     usePagination
   );
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row justify-between gap-2">
@@ -444,4 +454,4 @@ function Table1Presentation() {
   );
 }
 
-export default Table1Presentation ;
+export default Table1Presentation;

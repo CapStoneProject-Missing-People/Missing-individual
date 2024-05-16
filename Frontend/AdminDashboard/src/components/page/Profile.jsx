@@ -1,26 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios"; // Import Axios
 import Title from "../pagename/Title";
 import { IoCameraOutline } from "react-icons/io5";
 import userSix from '../../images/user/userImage-min.png';
 
 const Profile = () => {
-  const [firstName, setFirstName] = useState("Kaleb");
-  const [lastName, setLastName] = useState("Tesfaye");
-  const [email, setEmail] = useState("Kaleb.tes@example.com");
-  const [phoneNumber, setPhoneNumber] = useState("+1234567890");
-  const [address, setAddress] = useState("123 Main Street, City, Country");
+  const [adminData, setAdminData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    address: ""
+  });
   const [isEditing, setIsEditing] = useState(false);
 
+  useEffect(() => {
+    // Fetch admin data from the server after successful login
+    fetchAdminData();
+  }, []);
+
+  const fetchAdminData = async () => {
+    try {
+      const response = await axios.get('/admin/profile');
+      const data = response.data;
+      setAdminData(data); // Set admin data received from the server
+    } catch (err) {
+      console.error('Error fetching admin data:', err);
+    }
+  };
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
     console.log("Edit mode toggled. isEditing:", !isEditing);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsEditing(false);
-    console.log("Form submitted. isEditing:", isEditing);
+    try {
+      const response = await axios.put('/admin/profile', adminData); // Make a PUT request to update the profile
+      setIsEditing(false);
+      console.log("Form submitted. isEditing:", isEditing);
+      console.log("Updated admin data:", response.data);
+      // Optionally, show a success message to the user
+    } catch (err) {
+      console.error('Error updating admin data:', err);
+      // Optionally, show an error message to the user
+    }
   };
 
   return (
@@ -54,7 +79,7 @@ const Profile = () => {
           </div>
           <div className="max-w-lg mx-auto bg-white drop-shadow-2xl rounded-md p-6">
             <h2 className="text-2xl font-semibold mb-4">Admin Profile</h2>
-            <form >
+            <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label htmlFor="firstName" className="block text-left font-semibold mb-1">
                   First Name
@@ -63,8 +88,8 @@ const Profile = () => {
                   type="text"
                   id="firstName"
                   name="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  value={adminData.firstName}
+                  onChange={(e) => setAdminData({ ...adminData, firstName: e.target.value })}
                   disabled={!isEditing}
                   className="w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
@@ -77,8 +102,8 @@ const Profile = () => {
                   type="text"
                   id="lastName"
                   name="lastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  value={adminData.lastName}
+                  onChange={(e) => setAdminData({ ...adminData, lastName: e.target.value })}
                   disabled={!isEditing}
                   className="w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
@@ -91,8 +116,8 @@ const Profile = () => {
                   type="email"
                   id="email"
                   name="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={adminData.email}
+                  onChange={(e) => setAdminData({ ...adminData, email: e.target.value })}
                   disabled={!isEditing}
                   className="w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
@@ -105,25 +130,13 @@ const Profile = () => {
                   type="tel"
                   id="phoneNumber"
                   name="phoneNumber"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  value={adminData.phoneNumber}
+                  onChange={(e) => setAdminData({ ...adminData, phoneNumber: e.target.value })}
                   disabled={!isEditing}
                   className="w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
-              <div className="mb-4">
-                <label htmlFor="address" className="block text-left font-semibold mb-1">
-                  Address
-                </label>
-                <textarea
-                  id="address"
-                  name="address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  disabled={!isEditing}
-                  className="w-full h-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                ></textarea>
-              </div>
+              
               <div className="flex justify-end">
                 {!isEditing ? 
                   <button
@@ -135,8 +148,7 @@ const Profile = () => {
                   </button>
                  : 
                   <button
-                    type="button"
-                    onClick={handleSubmit}
+                    type="submit"
                     className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600"
                   >
                     Save
