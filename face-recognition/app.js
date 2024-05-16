@@ -7,14 +7,24 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json( {limit: '10mb'}));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 
 app.use('/', router);
+<<<<<<< HEAD
 const port = process.env.PORT || 3000
 connectToDb()
     .then(() => {
         app.listen(port);
         console.log(`DB connected and server is running on port: ${port}`);
+=======
+const port = process.env.PORT || 5000
+connectToDb()
+    .then(() => {
+        app.listen(port);
+        console.log(`DB connected and server is running on port ${port}`);
+>>>>>>> 44812e343dceb6d5765968fb726a7a4453187e1a
     })
     .catch((err) => {
         console.log(err);
