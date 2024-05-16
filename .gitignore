@@ -2,3 +2,4 @@ missingFeature/node_modules
 .env
 .vscode
 missingFeature/.env
+missingFeature/uploads
