@@ -168,6 +168,7 @@ const updateSimilarityField = async (
 //@desc create new Feature
 //@route POST /api/features/create
 //@access private
+let MergedFeaturesModel;
 export const createFeature = async (data, timeSinceDisappearance, userId, res) => {
   try {
     const Features = await initializeFeaturesModel(timeSinceDisappearance)
@@ -184,18 +185,19 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
     const feature = await Features.create( featureData );
     console.log("feature stored successfully");
 
-    const Features_GT_2 = await initializeFeaturesModel(3); 
-    const Features_LTE_2 = await initializeFeaturesModel(1);
-    const MergedFeaturesSchema = Features_GT_2.schema || Features_LTE_2.schema;
-    const MergedFeaturesModel = mongoose.model('MergedFeatures', MergedFeaturesSchema);
-    featureData._id = feature._id;
-    const existingFeatureMerged = await MergedFeaturesModel.findOne({ _id: featureData._id });
+    if (!MergedFeaturesModel) {
+      const Features_GT_2 = await initializeFeaturesModel(3); 
+      const Features_LTE_2 = await initializeFeaturesModel(1);
+      const MergedFeaturesSchema = timeSinceDisappearance > 2 ? Features_GT_2.schema : Features_LTE_2.schema;
+      MergedFeaturesModel = mongoose.model('MergedFeatures', MergedFeaturesSchema);
+    }
+    const existingFeatureMerged = await MergedFeaturesModel.findOne({ inputHash: featureData.inputHash });
  
     if (existingFeatureMerged) {
       return 'Duplicate feature already exists in MergedFeatures collection'
-     }
-     await MergedFeaturesModel.create(featureData);
-     console.log("Feature stored successfully in MergedFeatures collection.");
+    }
+    await MergedFeaturesModel.create(featureData);
+    console.log("Feature stored successfully in MergedFeatures collection.");
  
     const existingEmbeddingsCount = await embeddings.countDocuments();
     if (existingEmbeddingsCount < 1) {
@@ -274,7 +276,7 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
         );
       }
     }
-   return {message: " feature stored succeffully", createdFeature: feature}
+   return {message: " feature stored succeffully", createdFeature: feature }
   } catch (error) {
     console.error("Error creating feature:", error);
     throw new Error(error)
