@@ -21,7 +21,7 @@ export const RecognizeFace = async (req, res) => {
       similarity: result.similarity,
     });
     await axios.post(
-      "http://localhost:3000/api/add_log_data",
+      "http://localhost:5000/api/add_log_data",
       {
         action: "FaceRecognition",
         user_id: result.person_id || "1234",

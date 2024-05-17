@@ -2,7 +2,7 @@
 import express from "express"
 import dotenv from "dotenv"
 import { userRouter } from "./routes/userRoutes.js";
-import { router } from "./routes/featureRouter.js"
+import { featureRouter } from "./routes/featureRouter.js"
 import { profileRouter } from "./routes/profileRouter.js";
 import { connectionDb } from "./config/dbConnection.js"
 import { routers } from "./routes/routes.js";
@@ -20,11 +20,11 @@ const app = express();
 connectionDb();
 
 app.use(express.json());
-app.use("/api/features", routers);
+app.use("/api/features", featureRouter);
 app.use("/api/users", userRouter);
 app.use("/api/profile", profileRouter);
 app.use("/api/admin", adminRouters);
-app.use("/api", router);
+app.use("/api", routers);
 
 app.listen(port, () => {
   console.log(`server listening on port ${port}`);

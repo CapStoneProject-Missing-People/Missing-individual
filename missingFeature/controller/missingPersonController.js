@@ -5,6 +5,7 @@ import path, { parse } from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { createFeature } from "./featureController.js";
+import MergedFeaturesModel from "../models/mergedFeatureSchema.js";
 import { error } from "console";
 import { features } from "process";
 
@@ -107,6 +108,7 @@ export const CreateMissingPerson = async (req, res) => {
       userID,
       imagePaths,
     });
+    console.log("newMissId: ", newMissingPerson._id)
 
     const response = await axios.post(
       "http://localhost:6000/add-face-feature",
@@ -121,9 +123,10 @@ export const CreateMissingPerson = async (req, res) => {
       newMissingPerson.faceFeatureCreated = true;
     }
     await newMissingPerson.save();
-    result.createdFeature.missing_case_id = newMissingPerson._id;
-    console.log(result.createdFeature.missing_case_id)
-    await result.createdFeature.save();
+    result.createdFeature.missing_case_id = newMissingPerson._id
+    result.mergedFeature.missing_case_id = newMissingPerson._id
+    await result.createdFeature.save()
+    await result.mergedFeature.save()
     return res
       .status(201)
       .json({ message: "Missing person record created successfully." , createdFeatures: result});
