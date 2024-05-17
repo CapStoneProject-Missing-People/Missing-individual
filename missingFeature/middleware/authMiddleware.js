@@ -9,11 +9,11 @@ dotenvConfig();
 export const requireAuth = (req, res, next) => {
   //const token = req.cookies.jwt;
   // Check if JSON web token exists & is verified
-  const authHeader = req.headers["authorization"];
+  const authHeader = req.headers["x-auth-token"];
   if (!authHeader)
     return res.status(401).json({ msg: "unauthorized login first" });
-  const token = authHeader.split(" ")[1];
-  if (token) {
+  //const token = authHeader.split(" ")[1];
+  if (authHeader) {
     jwt.verify(token, process.env.PRIV_KEY, async (err, decodedToken) => {
       if (err) {
         console.log(err.message);
