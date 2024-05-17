@@ -8,7 +8,8 @@ import MainMissingPeople from './components/page/MissingPeople/MainMissingPeople
 import Profile from './components/page/Profile';
 import MainFeedback from './components/page/Feedback/MainFeedback';
 import MainLogManagement from './components/page/LogManagement/MainLogManagement';
-import Login from './components/page/Login'; // Import Login component
+import Login from './components/page/Login';
+import PrivateRoute from './components/PrivateRoute';
 
 const App = () => {
   return (
@@ -18,49 +19,61 @@ const App = () => {
         <Route
           path="/dashboard"
           element={
-            <MainLayout>
-              <MainDashboard />
-            </MainLayout>
+            <PrivateRoute>
+              <MainLayout>
+                <MainDashboard />
+              </MainLayout>
+            </PrivateRoute>
           }
         />
         <Route
           path="/user-management"
           element={
-            <MainLayout>
-              <MainUserManagement />
-            </MainLayout>
+            <PrivateRoute>
+              <MainLayout>
+                <MainUserManagement />
+              </MainLayout>
+            </PrivateRoute>
           }
         />
         <Route
           path="/missing-people"
           element={
-            <MainLayout>
-              <MainMissingPeople />
-            </MainLayout>
+            <PrivateRoute>
+              <MainLayout>
+                <MainMissingPeople />
+              </MainLayout>
+            </PrivateRoute>
           }
         />
         <Route
           path="/profiles"
           element={
-            <MainLayout>
-              <Profile />
-            </MainLayout>
+            <PrivateRoute>
+              <MainLayout>
+                <Profile />
+              </MainLayout>
+            </PrivateRoute>
           }
         />
         <Route
           path="/feedbacks"
           element={
-            <MainLayout>
-              <MainFeedback />
-            </MainLayout>
+            <PrivateRoute>
+              <MainLayout>
+                <MainFeedback />
+              </MainLayout>
+            </PrivateRoute>
           }
         />
         <Route
           path="/log-management"
           element={
-            <MainLayout>
-              <MainLogManagement />
-            </MainLayout>
+            <PrivateRoute>
+              <MainLayout>
+                <MainLogManagement />
+              </MainLayout>
+            </PrivateRoute>
           }
         />
         <Route path="*" element={<Navigate to="/" replace />} /> {/* Redirect to Login page for any other route */}
