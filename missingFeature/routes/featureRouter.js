@@ -16,6 +16,6 @@ featureRouter.route("/getAll").get(getFeatures);
 featureRouter.route("/getSingle/:id").get(getFeature);
 featureRouter.route("/similarity/:caseId").get(getSimilarityScore);
 featureRouter.route("/create").post(createFeature);
-featureRouter.route("/compare").post(compareFeature);
+featureRouter.route("/compare/:timeSinceDisappearance").post(compareFeature);
 featureRouter.route("/update/:id").put(requireAuth, updateFeature);
-featureRouter.route("/delete/:id").delete(requireAuth, deleteFeature)
+featureRouter.route("/delete/:id").delete(requireAuth, deleteFeature);
