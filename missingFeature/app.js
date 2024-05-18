@@ -7,6 +7,7 @@ import { profileRouter } from "./routes/profileRouter.js";
 import { connectionDb } from "./config/dbConnection.js"
 import { routes } from "./routes/routes.js";
 import { adminRouters } from "./routes/adminRouter.js";
+import cors from "cors";
 // import cookieParser from "cookie-parser"
 // import { requireAuth, checkUser } from "./middleware/authMiddleware"
 dotenv.config()
@@ -20,6 +21,7 @@ const app = express();
 connectionDb();
 
 app.use(express.json());
+app.use(cors());
 app.use("/api/features", routers);
 app.use("/api/users", userRouter);
 app.use("/api/profile", profileRouter);
