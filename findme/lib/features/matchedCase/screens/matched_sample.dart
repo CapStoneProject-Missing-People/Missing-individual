@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:findme/missing/missing_person1.dart';
-import 'package:findme/missing/missing_person_detail1.dart';
+import 'package:findme/features/matchedCase/models/missing_person1.dart';
+import 'package:findme/features/missingPersonDetail/screens/missing_person_detail1.dart';
 
 class MatchedSamplePage extends StatelessWidget {
   final MissingPerson missingPerson;
