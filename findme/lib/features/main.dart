@@ -1,4 +1,4 @@
-import 'package:findme/missing/missing_person_page1.dart';
+import 'package:findme/features/matchedCase/screens/missing_person_page1.dart';
 import 'package:flutter/material.dart';
 
 void main() {
