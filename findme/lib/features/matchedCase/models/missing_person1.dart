@@ -1,4 +1,4 @@
-class MissingPerson {
+class MissingPersonAdd {
   final String name;
   final int age;
   final String lastSeenPlace;
@@ -13,7 +13,7 @@ class MissingPerson {
   final double eyeColorMatch;
   final double bodySizeMatch;
 
-  MissingPerson({
+  MissingPersonAdd({
     required this.name,
     required this.age,
     required this.lastSeenPlace,

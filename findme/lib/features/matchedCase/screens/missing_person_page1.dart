@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:findme/missing/missing_person1.dart';
-import 'package:findme/missing/missing_person_card1.dart';
+import 'package:missingpersonapp/features/matchedCase/models/missing_person1.dart';
+import 'package:missingpersonapp/features/matchedCase/screens/missing_person_card1.dart';
 //matched missing person
 
-class MissingPersonPage extends StatelessWidget {
-  final List<MissingPerson> missingPersons = [
-    MissingPerson(
+class MissingPersonMatchPage extends StatelessWidget {
+  final List<MissingPersonAdd> missingPersons = [
+    MissingPersonAdd(
       name: 'John Doe',
       age: 30,
       lastSeenPlace: 'New York',
@@ -23,7 +23,7 @@ class MissingPersonPage extends StatelessWidget {
       eyeColorMatch: 75,
       bodySizeMatch: 85,
     ),
-    MissingPerson(
+    MissingPersonAdd(
       name: 'bel del',
       age: 30,
       lastSeenPlace: 'New York',
@@ -44,7 +44,7 @@ class MissingPersonPage extends StatelessWidget {
     // Additional MissingPerson instances can be added here...
   ];
 
-  MissingPersonPage({super.key});
+  MissingPersonMatchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,10 +56,10 @@ class MissingPersonPage extends StatelessWidget {
     });
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: Text('Missing Persons'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
@@ -77,7 +77,7 @@ class MissingPersonPage extends StatelessWidget {
     );
   }
 
-  double calculateMatchPercentage(MissingPerson person) {
+  double calculateMatchPercentage(MissingPersonAdd person) {
     double totalMatch = person.ageMatch +
         person.skinColorMatch +
         person.clothColorMatch +
