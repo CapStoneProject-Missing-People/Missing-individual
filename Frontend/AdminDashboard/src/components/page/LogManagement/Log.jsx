@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const Log = () => {
@@ -9,7 +9,8 @@ const Log = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const response = await axios.get('/api/logs');
+        const response = await axios.get('http://localhost:3000/api/get-action-logs');
+        console.log(response)
         setLogs(response.data);
         setLoading(false);
       } catch (error) {
