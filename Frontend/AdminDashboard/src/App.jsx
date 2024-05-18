@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import MainLayout from './components/layouts/MainLayout';
 import MenuContextProvider from './context/MenuContext';
@@ -12,10 +12,12 @@ import Login from './components/page/Login';
 import PrivateRoute from './components/PrivateRoute';
 
 const App = () => {
+  const [user, setUser] = useState(null);
+
   return (
     <MenuContextProvider>
       <Routes>
-        <Route path="/" element={<Login />} /> {/* Render Login page by default */}
+        <Route path="/" element={<Login setUser={setUser}/>} /> {/* Render Login page by default */}
         <Route
           path="/dashboard"
           element={
