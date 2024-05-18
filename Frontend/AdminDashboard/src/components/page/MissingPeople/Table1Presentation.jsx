@@ -4,7 +4,7 @@ import {
   useSortBy,
   usePagination,
 } from "react-table";
-import { useMemo, Fragment, useCallback } from "react";
+import { useMemo, Fragment, useCallback, useState, useEffect } from "react";
 import {
   FaSearch,
   FaChevronDown,
@@ -15,47 +15,33 @@ import {
   FaSortDown,
 } from "react-icons/fa";
 import { Listbox, Transition } from "@headlessui/react";
-import { useState,useEffect } from "react";
-import { fetchDataById } from './data.js'
+import axios from 'axios';
 import EditModal from './Modal';
-
 
 function Avatar({ src, alt = "avatar" }) {
   return (
     <img src={src} alt={alt} className="w-8 h-8 rounded-full object-cover" />
   );
 }
-const generateData = (numberOfRows = 25) =>
-    [...Array(numberOfRows)].map((_, index) => {
-      const id = index + 1; 
-      const data = fetchDataById(id); 
-      return {
-        ...data,
-        id: id, 
-      };
-    });
-const getColumns = () => [
-    {
-        Header: "id number",
-        accessor: "id",
-        width: "150px",
-    },
-    {
+
+const getColumns = (handleEditClick) => [
+  {
+    Header: "ID",
+    accessor: "id",
+    width: "150px",
+  },
+  {
     Header: "Name",
     accessor: "name",
     width: "300px",
     Cell: ({ row, value }) => {
       return (
         <div className="flex gap-2 items-center">
-            <div className= "items-center">
-                <Avatar src={row.original.image} alt={`${value}'s Avatar`} />
-            </div>
-            <div className="flex flex-col text-sm text-gray-500 items-start">
-                <span>{value}</span>
-                <span>{row.original.email}</span>
-            </div>
+          <Avatar src={row.original.image} alt={`${value}'s Avatar`} />
+          <div className="flex flex-col text-sm text-gray-500 items-start">
+            <span>{value}</span>
+          </div>
         </div>
-        
       );
     },
   },
@@ -66,35 +52,30 @@ const getColumns = () => [
     disableSortBy: true,
   },
   {
-    Header: "other information",
-    accessor: "age",
-    width: "200px",
-    disableSortBy: true,
-  },
-  {
-    Header: "status",
+    Header: "Status",
     accessor: "status",
     width: "240px",
     disableSortBy: true,
-    
+    Cell: ({ value }) => (
+      <span className={`font-normal w-16 px-1 inline-flex leading-5 font-semibold rounded-full ${value === "Found" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+        {value}
+      </span>
+    ),
   },
   {
     Header: "",
-    accessor: "Edit",
-    Cell: ({ row }) => {
-        return (
-          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-            <button
-              onClick={() => handleEditClick(row.original)}
-              className="text-indigo-500 font-inter w-20 hover:text-indigo-950"
-            >
-              Edit
-            </button>
-          </td>
-        );
-      },
-      
-    disableSortBy: true,  
+    accessor: "edit",
+    Cell: ({ row }) => (
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button
+          onClick={() => handleEditClick(row.original)}
+          className="text-indigo-500 font-inter w-20 hover:text-indigo-950"
+        >
+          Edit
+        </button>
+      </td>
+    ),
+    disableSortBy: true,
     width: "170px",
   },
 ];
@@ -171,7 +152,6 @@ function SelectMenu1({ value, setValue, options, className = "", disabled }) {
               ? "bg-gray-200 cursor-not-allowed"
               : "bg-white cursor-default"
           }
-        
         `}
         >
           <span className="block truncate">{selectedOption.caption}</span>
@@ -228,17 +208,17 @@ function SelectMenu1({ value, setValue, options, className = "", disabled }) {
 function Button2({ content, onClick, active, disabled }) {
   return (
     <button
-    className={`flex flex-col cursor-pointer items-center justify-center w-9 h-9 shadow-[0_4px_10px_rgba(0,0,0,0.03)] text-sm font-normal transition-colors rounded-lg
-    ${active ? "bg-gray-500 text-white" : "text-slate-900"}
+      className={`flex flex-col cursor-pointer items-center justify-center w-9 h-9 shadow-[0_4px_10px_rgba(0,0,0,0.03)] text-sm font-normal transition-colors rounded-lg
+    ${active ? "bg-red-500 text-white" : "text-slate-900"}
     ${
       !disabled
         ? "bg-white hover:bg-gray-500 hover:text-white"
         : "text-slate-600 bg-white cursor-not-allowed"
     }
     `}
-    onClick={onClick}
-    disabled={disabled}
-  >
+      onClick={onClick}
+      disabled={disabled}
+    >
       {content}
     </button>
   );
@@ -365,36 +345,6 @@ function TableComponent({
             return (
               <tr {...row.getRowProps()} className="hover:bg-gray-100">
                 {row.cells.map((cell) => {
-                  if (cell.column.id === "status") {
-                    return (
-                      <td className="px-5 py-4 text-xs ">
-                        <span
-                        {...cell.getCellProps()}
-                        className={`font-normal w-16 px-1 ${
-                          row.original.status === "pending"
-                            ? "text-green-800"
-                            : row.original.status === "found"
-                            ? "text-red-600"
-                            : ""
-                        } inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800`}
-                      >
-                        {row.original.status}
-                                                    
-                        </span>
-                      </td>
-                    );
-                  } else if (cell.column.id === "Edit") {
-                    return (
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          onClick={() => handleEditClick(row.original)} 
-                          className="text-indigo-500 font-inter w-20 hover:text-indigo-950"
-                        >
-                          Edit
-                        </button>
-                      </td>
-                    );
-                  } else {
                   return (
                     <td
                       {...cell.getCellProps()}
@@ -403,7 +353,6 @@ function TableComponent({
                       {cell.render("Cell")}
                     </td>
                   );
-                }
                 })}
               </tr>
             );
@@ -413,14 +362,30 @@ function TableComponent({
     </div>
   );
 }
-function Table1({handleEditClick}) {
-    const [data, setData] = useState([]);
 
-    useEffect(() => {
-      const generatedData = generateData(100);
-      setData(generatedData);
-    }, []);
-  const columns = useMemo(getColumns, []);
+function Table1({ handleEditClick }) {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('https://api.fbi.gov/@wanted-persons');
+        const fetchedData = response.data.items.map((item, index) => ({
+          id: index + 1,
+          name: item.title,
+          description: item.description,
+          status: item.status,
+          image: item.images[0], // Assuming there is at least one image and we want the large one
+        }));
+        setData(fetchedData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const columns = useMemo(() => getColumns(handleEditClick), [handleEditClick]);
   const {
     getTableProps,
     getTableBodyProps,
@@ -445,6 +410,7 @@ function Table1({handleEditClick}) {
     useSortBy,
     usePagination
   );
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row justify-between gap-2">
@@ -486,19 +452,26 @@ function Table1({handleEditClick}) {
 }
 
 function Table1Presentation() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editUser, setEditUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editUser, setEditUser] = useState(null);
 
   const handleEditClick = (user) => {
     setEditUser(user);
     setIsModalOpen(true);
   };
+
   return (
     <div className="flex flex-col overflow-auto py-4 sm:py-0">
-      <Table1 handleEditClick={handleEditClick}/>
-      <EditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} user={editUser} />
+      <Table1 handleEditClick={handleEditClick} />
+      {isModalOpen && (
+        <EditModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          user={editUser}
+        />
+      )}
     </div>
   );
 }
 
-export default Table1Presentation ;
+export default Table1Presentation;
