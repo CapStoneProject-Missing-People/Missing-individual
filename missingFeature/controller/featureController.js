@@ -272,6 +272,7 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
   }
 };
 
+
 //@desc compare Feature
 //@route POST /api/features/compare
 //@access public
@@ -454,6 +455,10 @@ export const compareFeature = async (req, res) => {
   }
 };
 
+
+export const update = async (req, res) => {
+
+}
 //@desc updare Feature
 //@route PUT /api/features
 //@access private
