@@ -15,6 +15,7 @@ export const routers = express.Router();
 const upload = multer();
 
 // Routes for missing person
+
 routers
   .route("/createMissingPerson/:timeSinceDisappearance")
   .post(upload.any(), requireAuth, CreateMissingPerson);
