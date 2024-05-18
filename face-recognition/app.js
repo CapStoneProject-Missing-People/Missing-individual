@@ -12,6 +12,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 
 app.use('/', router);
+
 const port = process.env.PORT || 5000
 connectToDb()
     .then(() => {
