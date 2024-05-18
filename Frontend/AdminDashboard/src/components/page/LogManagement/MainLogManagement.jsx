@@ -1,6 +1,7 @@
 import React from "react";
 import Log from "./Log";
 import Title from '../../pagename/Title'
+import Info from "./info";
 
 export default function MainLogManagement() {
     return (

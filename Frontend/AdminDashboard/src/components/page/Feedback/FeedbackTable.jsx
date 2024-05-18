@@ -1,17 +1,30 @@
 import React, { useState } from "react";
+import axios from 'axios';
 
 const FeedbackTable = ({ feedbackData }) => {
   const [selectedResponses, setSelectedResponses] = useState([]);
+  const [responseStatus, setResponseStatus] = useState({});
+
   const handleSelectResponse = (event, index) => {
     const updatedResponses = [...selectedResponses];
     updatedResponses[index] = event.target.value;
     setSelectedResponses(updatedResponses);
   };
-  const handleSend = (index) => {
+
+  const handleSend = async (index) => {
     const selectedResponse = selectedResponses[index];
     if (selectedResponse) {
-      console.log(`Sending response "${selectedResponse}" to ${feedbackData[index].name}`);
-     
+      try {
+        const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
+        const feedbackId = feedbackData[index].id;
+        await axios.post(`/api/feedback/${feedbackId}/respond`, { response: selectedResponse }, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setResponseStatus(prevState => ({ ...prevState, [index]: 'Success' }));
+      } catch (error) {
+        console.error('Error sending response:', error);
+        setResponseStatus(prevState => ({ ...prevState, [index]: 'Failed' }));
+      }
     } else {
       console.log('Please select a response before sending.');
     }
@@ -76,6 +89,11 @@ const FeedbackTable = ({ feedbackData }) => {
                 >
                   Send
                 </button>
+                {responseStatus[index] && (
+                  <span className={`ml-2 text-sm ${responseStatus[index] === 'Success' ? 'text-green-500' : 'text-red-500'}`}>
+                    {responseStatus[index]}
+                  </span>
+                )}
               </td>
             </tr>
           ))}
