@@ -440,3 +440,9 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
     );
   }
 }
+
+void main() {
+  runApp(MaterialApp(
+    home: MissingPersonAddPage(),
+  ));
+}
