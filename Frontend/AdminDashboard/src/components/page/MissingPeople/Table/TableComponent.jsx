@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaSortUp, FaSortDown } from 'react-icons/fa';
 import Avatar from './Avatar';
+import EditModal from './EditModal'; // Import the modal component
 
 function TableComponent({
   getTableProps,
@@ -10,6 +11,14 @@ function TableComponent({
   prepareRow,
   pageSize,
 }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const handleRowClick = (row) => {
+    setSelectedUser(row.original);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="w-full flex justify-center">
       <div className="w-full max-w-[60rem] p-4 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.03)] overflow-x-auto">
@@ -61,15 +70,28 @@ function TableComponent({
             {rows.map((row) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()} className="py-1 border-b last:border-none">
+                <tr
+                  {...row.getRowProps()}
+                  className="py-1 border-b last:border-none cursor-pointer"
+                  onClick={() => handleRowClick(row)}
+                >
                   {row.cells.map((cell) => {
                     return (
                       <td {...cell.getCellProps()} className="p-4">
                         {cell.column.id === "name" ? (
                           <div className="flex gap-2 items-center">
-                            <Avatar src={cell.row.original.imageUrl} name={cell.row.original.name} />
+                            <Avatar
+                              src={cell.row.original.imageUrl}
+                              name={cell.row.original.name}
+                            />
                             {cell.render("Cell")}
                           </div>
+                        ) : cell.column.id === 'description' ? (
+                          <span>
+                            {cell.value.length > 15
+                              ? cell.value.slice(0, 15) + '...'
+                              : cell.value}
+                          </span>
                         ) : (
                           cell.render("Cell")
                         )}
@@ -82,6 +104,13 @@ function TableComponent({
           </tbody>
         </table>
       </div>
+      {isModalOpen && (
+        <EditModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          user={selectedUser}
+        />
+      )}
     </div>
   );
 }
