@@ -15,13 +15,14 @@ const Profile = () => {
     const fetchAdminUser = async () => {
       try {
         const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
-        const response = await axios.get('http://localhost:3000/api/users/profile', {
+        const response = await axios.get('http://localhost:4000/api/profile/current', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
         setAdminUser(response.data);
+        console.log(response.data);
         setFormData({ name: response.data.name, email: response.data.email });
       } catch (err) {
         setError(err.response ? err.response.data : err.message);
@@ -42,14 +43,19 @@ const Profile = () => {
     e.preventDefault();
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
-      const response = await axios.put('http://localhost:3000/api/users/profile', formData, {
+      const response = await axios.put('http://localhost:4000/api/profile/current', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
       setAdminUser(response.data);
-      setFormData({ name: response.data.name, email: response.data.email });
+      setFormData(
+        { 
+          name: response.data.name, 
+          email: response.data.email,
+          phoneNo: response.data.phoneNo 
+        });
       document.cookie = `user=${JSON.stringify(response.data)}; path=/;`;
       setEditMode(false);
     } catch (err) {
@@ -69,7 +75,6 @@ const Profile = () => {
   if (!adminUser) {
     return <div>No profile data available</div>;
   }
-
   return (
     <div className="h-96">
       <Title pageName="Profile" />
@@ -129,6 +134,21 @@ const Profile = () => {
                     type="email"
                     name="email"
                     value={formData.email}
+                    onChange={handleChange}
+                    className="w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="phoneNo"
+                    className="block text-left font-semibold mb-1"
+                  >
+                    Phone number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phoneNo"
+                    value={formData.phoneNo}
                     onChange={handleChange}
                     className="w-full h-10 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
                   />
