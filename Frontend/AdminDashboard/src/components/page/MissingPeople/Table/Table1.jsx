@@ -20,37 +20,57 @@ const Table = ({ data }) => {
   const columns = useMemo(
     () => [
       {
-        Header: "Name",
-        accessor: "name",
-        width: "180px",
-      },
-      {
-        Header: "Phone",
-        accessor: "phoneNo",
-        width: "180px",
-        disableSortBy: true,
-      },
-      {
-        Header: "Email",
-        accessor: "email",
-        width: "240px",
-        disableSortBy: true,
-      },
-      {
-        Header: "Actions",
-        accessor: "actions",
-        Cell: ({ row }) => (
-          <button 
-            onClick={() => handleDeleteClick(row.original._id)}
-            className="bg-red-600 text-white px-4 py-2 rounded-full"
-          >
-            Delete
-          </button>
-        ),
-        disableSortBy: true,
+        Header: "ID",
+        accessor: "_id",
         width: "100px",
       },
-
+      {
+        Header: 'Name',
+        accessor: 'name',
+        width: '180px',
+        Cell: ({ row }) =>
+          `${row.original.name.firstName} ${row.original.name.middleName} ${row.original.name.lastName}`,
+      },
+      {
+        Header: 'Gender',
+        accessor: 'gender',
+        width: '100px',
+        disableSortBy: true,
+      },
+      {
+        Header: 'Age',
+        accessor: 'age',
+        width: '100px',
+      },
+      {
+        Header: 'Description',
+        accessor: 'description',
+        width: '300px',
+        disableSortBy: true,
+      },
+      {
+        Header: 'Last Seen Location',
+        accessor: 'lastSeenLocation',
+        width: '200px',
+        disableSortBy: true,
+      },
+      {
+        Header: 'Status',
+        accessor: 'missing_case_id.status',
+        width: '100px',
+        Cell: ({ value }) => (
+          <span className={`text-sm font-medium ${value === 'missing' ? 'text-red-600' : 'text-green-600'}`}>
+            {value === 'missing' ? 'Missing' : 'Found'}
+          </span>
+        ),
+      },
+      {
+        Header: 'Date Reported',
+        accessor: 'missing_case_id.dateReported',
+        width: '200px',
+        disableSortBy: true,
+        Cell: ({ value }) => new Date(value).toLocaleDateString(),
+      },
     ],
     []
   );
@@ -87,27 +107,27 @@ const Table = ({ data }) => {
 
   const { globalFilter, pageIndex, pageSize } = state;
 
-  const handleDeleteClick = (_id) => {
-    setCurrentId(_id);
-    setShowModal(true);
-  };
+  // const handleDeleteClick = (_id) => {
+  //   setCurrentId(_id);
+  //   setShowModal(true);
+  // };
 
-  const confirmDelete = async () => {
-    setShowModal(false);
-    try {
-      const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
-      // Include token in request headers
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
-      // Send a DELETE request to the backend endpoint
-      await axios.delete(`http://localhost:4000/api/admin/deleteUser/${currentId}`, { headers });
-      // If the request is successful, update the state to remove the deleted row
-      setTableData(prevData => prevData.filter(row => row._id !== currentId));
-    } catch (error) {
-      console.error("Error deleting row:", error);
-    }
-  };
+  // const confirmDelete = async () => {
+  //   setShowModal(false);
+  //   try {
+  //     const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
+  //     // Include token in request headers
+  //     const headers = {
+  //       Authorization: `Bearer ${token}`,
+  //     };
+  //     // Send a DELETE request to the backend endpoint
+  //     await axios.delete(`http://localhost:4000/api/admin/deleteUser/${currentId}`, { headers });
+  //     // If the request is successful, update the state to remove the deleted row
+  //     setTableData(prevData => prevData.filter(row => row._id !== currentId));
+  //   } catch (error) {
+  //     console.error("Error deleting row:", error);
+  //   }
+  // };
 
   return (
     <div className="w-full flex flex-col items-center gap-4">
@@ -145,11 +165,11 @@ const Table = ({ data }) => {
           pageIndex={pageIndex}
         />
       </div>
-      <Modal 
+      {/* <Modal 
         show={showModal}
         onClose={() => setShowModal(false)}
         onConfirm={confirmDelete}
-      />
+      /> */}
     </div>
   );
 };
