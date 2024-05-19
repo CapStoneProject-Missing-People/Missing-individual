@@ -10,12 +10,12 @@ import {
   deleteFeature,
 } from "../controller/featureController.js";
 
-export const routers = express.Router();
+export const featureRouter = express.Router();
 
-routers.route("/getAll").get(getFeatures);
-routers.route("/getSingle/:id").get(getFeature);
-routers.route("/similarity/:caseId").get(getSimilarityScore);
-routers.route("/create").post(createFeature);
-routers.route("/compare").post(compareFeature);
-routers.route("/update/:id").put(requireAuth, updateFeature);
-routers.route("/delete/:id").delete(requireAuth, deleteFeature)
+featureRouter.route("/getAll").get(getFeatures);
+featureRouter.route("/getSingle/:id").get(getFeature);
+featureRouter.route("/similarity/:caseId").get(getSimilarityScore);
+featureRouter.route("/create").post(createFeature);
+featureRouter.route("/compare").post(compareFeature);
+featureRouter.route("/update/:id").put(requireAuth, updateFeature);
+featureRouter.route("/delete/:id").delete(requireAuth, deleteFeature)
