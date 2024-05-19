@@ -9,7 +9,7 @@ const missingPerson = new Schema({
   },
   dateReported: { type: Date, default: Date.now },
   status: { type: String, enum: ["missing", "pending", "found"], default: "missing" },
-  imagePaths: [{ type: String }], // Array of image URLs
+  imageBuffers: [{ type: Buffer }], 
   faceFeatureCreated: { type: Boolean, default: false },
 });
 
