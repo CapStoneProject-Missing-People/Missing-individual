@@ -19,13 +19,13 @@ export const getUserProfile = async (req, res) => {
       return res.status(400).json({ msg: "No profile found" });
     } else {
       const posts = await MissingPerson.find({ userID }).select(
-        "-_id -__v -userID -faceFeatureCreated -imagePaths"
+        "-_id -__v -userID -faceFeatureCreated -imageBuffers"
       );
       if (!posts) {
         res.json({ msg: "There are no posts", profile });
       }
-      const combinedData = { profile, posts };
-      res.json(combinedData);
+      //const combinedData = { profile, posts };
+      res.json(profile);
     }
   } catch (err) {
     console.error(err.message);

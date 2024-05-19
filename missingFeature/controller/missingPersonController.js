@@ -84,31 +84,30 @@ export const CreateMissingPerson = async (req, res) => {
 
     const images = req.files;
     const imageBuffers = images.map((image) => image.buffer);
-    const imagePaths = [];
+console.log(imageBuffers)
+    // const moduleDir = dirname(fileURLToPath(import.meta.url));
+    // const uploadsDir = path.join(moduleDir, "..", "uploads", userIDString);
 
-    const moduleDir = dirname(fileURLToPath(import.meta.url));
-    const uploadsDir = path.join(moduleDir, "..", "uploads", userIDString);
-
-    // Create the directory if it doesn't exist
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
+    // // Create the directory if it doesn't exist
+    // if (!fs.existsSync(uploadsDir)) {
+    //   fs.mkdirSync(uploadsDir, { recursive: true });
+    // }
 
     // Save images to the uploads directory
-    images.forEach((image) => {
-      const filename = image.originalname;
-      const filepath = path.join(uploadsDir, filename);
-      fs.writeFileSync(filepath, image.buffer);
-      imagePaths.push(filepath); // Saving the image path
-    });
-
+    // images.forEach((image) => {
+    //   const filename = image.originalname;
+    //   const filepath = path.join(uploadsDir, filename);
+    //   fs.writeFileSync(filepath, image.buffer);
+    // });
+    
+// console.log(imageBuffers)
     // Create a new missing person record in the database
     const newMissingPerson = new MissingPerson({
       userID,
-      imagePaths,
+      imageBuffers,
     });
     console.log("newMissId: ", newMissingPerson._id)
-
+    console.log(imageBuffers)
     const response = await axios.post(
       "http://localhost:6000/add-face-feature",
       {
