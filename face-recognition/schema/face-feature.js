@@ -1,10 +1,11 @@
+import mongoose from "mongoose";
 import pkg from "mongoose";
 const { Schema, model, models } = pkg;
 
 
 const faceSchema = new Schema({
   person_id: {
-    type: String,
+    type: Schema.Types.ObjectId,
     required: true,
   },
   feature_vector: {
