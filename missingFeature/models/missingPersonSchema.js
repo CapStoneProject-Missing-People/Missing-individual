@@ -8,7 +8,7 @@ const missingPerson = new Schema({
     ref: "user",
   },
   dateReported: { type: Date, default: Date.now },
-  status: { type: String, enum: ["missing", "found"], default: "missing" },
+  status: { type: String, enum: ["missing", "pending", "found"], default: "missing" },
   imageBuffers: [{ type: Buffer }], 
   faceFeatureCreated: { type: Boolean, default: false },
 });

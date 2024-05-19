@@ -24,8 +24,8 @@ export const getUserProfile = async (req, res) => {
       if (!posts) {
         res.json({ msg: "There are no posts", profile });
       }
-      const combinedData = { profile, posts };
-      res.json(combinedData);
+      //const combinedData = { profile, posts };
+      res.json(profile);
     }
   } catch (err) {
     console.error(err.message);
