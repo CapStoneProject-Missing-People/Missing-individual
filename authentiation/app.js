@@ -23,7 +23,10 @@ mongoose
     useUnifiedTopology: true,
     useCreateIndex: true,
   })
-  .then((result) => app.listen(3000))
+  .then((result) => {app.listen(5000)
+    console.log(`listning on port 5000`)
+    console.log(`connected to db ${result.connection.name}`)
+  })
   .catch((err) => console.log(err));
 
 // routes
