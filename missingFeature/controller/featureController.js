@@ -51,9 +51,9 @@ export const getFeatures = async (req, res) => {
         filterCriteria.user_id = req.user.id;
       }
     }
+    const features = await MergedFeaturesModel.find(filterCriteria).lean().populate({path: 'missing_case_id', select:['status', 'imageBuffers', 'dateReported']});
+    console.log(features);
 
-    const features = await MergedFeaturesModel.find(filterCriteria).lean().populate({path: 'missing_case_id', select:['status', 'imagePaths', 'dateReported']});
-    console.log(features.missing_case_id)
     res.status(200).json(features);
   } catch (error){
     res.status(500).json({ error: "Server error" });
