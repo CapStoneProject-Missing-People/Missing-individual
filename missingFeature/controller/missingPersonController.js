@@ -109,7 +109,7 @@ export const CreateMissingPerson = async (req, res) => {
       imagePaths,
     });
     console.log("newMissId: ", newMissingPerson._id)
-
+    console.log(imageBuffers)
     const response = await axios.post(
       "http://localhost:6000/add-face-feature",
       {

@@ -27,7 +27,7 @@ const Table = ({ data }) => {
       {
         Header: 'Name',
         accessor: 'name',
-        width: '180px',
+        width: '290px',
         Cell: ({ row }) =>
           `${row.original.name.firstName} ${row.original.name.middleName} ${row.original.name.lastName}`,
       },
@@ -60,7 +60,7 @@ const Table = ({ data }) => {
         width: '100px',
         Cell: ({ value }) => (
           <span className={`text-sm font-medium ${value === 'missing' ? 'text-red-600' : 'text-green-600'}`}>
-            {value === 'missing' ? 'Missing' : 'Found'}
+            {value}
           </span>
         ),
       },
@@ -131,7 +131,7 @@ const Table = ({ data }) => {
 
   return (
     <div className="w-full flex flex-col items-center gap-4">
-      <div className="w-full  max-w-[60rem] flex flex-col sm:flex-row justify-between gap-2">
+      <div className="w-full  flex flex-col sm:flex-row justify-between gap-2">
         <GlobalSearchFilter1
           className="sm:w-64"
           globalFilter={globalFilter}
