@@ -17,10 +17,11 @@ const Navbar = () => {
     const fetchUser = async () => {
       try {
         const token = Cookies.get('jwt');
-        const response = await axios.get('/api/user/profile', {
+        const response = await axios.get('http://localhost:4000/api/profile/current', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(response.data);
+        
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {
