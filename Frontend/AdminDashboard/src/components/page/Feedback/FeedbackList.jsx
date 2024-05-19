@@ -7,7 +7,7 @@ const FeedbackList = () => {
   useEffect(() => {
     const fetchFeedbackData = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/feedbacks');
+        const response = await axios.get('http://localhost:4000/api/feedbacks');
         // Ensure the data is an array
         setFeedbackData(Array.isArray(response.data) ? response.data : []);
       } catch (error) {

@@ -108,7 +108,7 @@ console.log(imageBuffers)
       imageBuffers,
     });
     console.log("newMissId: ", newMissingPerson._id)
-
+    console.log(imageBuffers)
     const response = await axios.post(
       "http://localhost:6000/add-face-feature",
       {
