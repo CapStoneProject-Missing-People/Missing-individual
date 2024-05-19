@@ -2,11 +2,16 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
-const baseAttributes = {
+const MergedFeatures = {
   user_id: {
     type: Schema.Types.ObjectId ,
     required: true,
     ref: "User",
+  },
+  featureId: {
+    type: Schema.Types.ObjectId,
+    required: false,
+    ref: "Features_GT_2" || "Features_LTE_2"
   },
   missing_case_id: {
     type: Schema.Types.ObjectId ,
@@ -44,24 +49,24 @@ const baseAttributes = {
       clothType: {
         type: String,
         enum: ["tshirt", "hoodie", "sweater", "sweetshirt"],
-        required: true,
+        required: false,
       },
       clothColor: {
         type: String,
         enum: ["red", "blue", "white", "black", "orange", "light blue", "brown", "blue black", "yellow"],
-        required: true,
+        required: false,
       },
     },
     lower: {
       clothType: {
         type: String,
         enum: ["trouser", "short", "nothing", "boxer"],
-        required: true,
+        required: false,
       },
       clothColor: {
         type: String,
         enum: ["red", "blue", "white", "black", "orange", "light blue", "brown", "blue black", "yellow"],
-        required: true,
+        required: false,
       },
     },
     _id: false,
@@ -69,6 +74,7 @@ const baseAttributes = {
   body_size: {
     type: String,
     enum: ["thin", "average", "muscular", "overweight", "obese", "fit", "athletic", "curvy", "petite", "fat"],
+    required: false
   },
   description: {
     type: String,
@@ -82,44 +88,18 @@ const baseAttributes = {
     required: true,
     unique: true,
   },
-};
-
-const extendSchema = (baseSchema, additionalFields, removedFields) => {
-  const extendedSchema = { ...baseSchema };
-  Object.assign(extendedSchema, additionalFields);
-  removedFields.forEach((field) => {
-    delete extendedSchema[field];
-  });
-  return new Schema(extendedSchema);
-};
-
-const modelCache = {}
-const initializeFeaturesModel = async (timeSinceDisappearance) => {
-  try {
-    const modelName = timeSinceDisappearance > 2 ? "Features_GT_2" : "Features_LTE_2"
-    if (modelCache[modelName]) {
-      return modelCache[modelName]
-    }
-
-    let featureSchema = extendSchema(baseAttributes, {}, []);
-
-    if (timeSinceDisappearance > 2) {
-      const additionalFields = {
-        lastSeenLocation: { type: String },
-        medicalInformation: { type: String },
-        circumstanceOfDisappearance: { type: String }
-      };
-      const removedFields = ['clothing', 'body_size'];
-      featureSchema = extendSchema(baseAttributes, additionalFields, removedFields);
-    }
-    const Features = model(modelName, featureSchema);
-    modelCache[modelName] = Features
-    return Features;
-  } catch (error) {
-    console.error("Error initializing Features model:", error);
-    throw error;
+  lastSeenLocation: { 
+    type: String,
+    required: false
+  },
+  medicalInformation: { 
+    type: String,
+  required: false
+},
+  circumstanceOfDisappearance: {
+    type: String,
+    required: false
   }
 };
 
-
-export default initializeFeaturesModel;
+export default model("MergedFeaturesModel", MergedFeatures)
