@@ -5,7 +5,6 @@ import path, { parse } from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { createFeature } from "./featureController.js";
-import MergedFeaturesModel from "../models/mergedFeatureSchema.js";
 import { error } from "console";
 import { features } from "process";
 
@@ -74,7 +73,7 @@ export const CreateMissingPerson = async (req, res) => {
 
     let userID = req.user.userId;
     let userIDString = userID.toString();
-
+    
     // Handling feature creation
     const result = await createFeature(parsedData, timeSinceDisappearance, userID, res);
     if (typeof(result) === "string") {
