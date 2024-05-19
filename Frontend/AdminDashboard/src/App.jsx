@@ -58,7 +58,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route
+        {/*<Route
           path="/feedbacks"
           element={
             <PrivateRoute>
@@ -67,7 +67,7 @@ const App = () => {
               </MainLayout>
             </PrivateRoute>
           }
-        />
+        />*/}
         <Route
           path="/log-management"
           element={

@@ -1,14 +1,14 @@
 const fs = require('fs');
 
-export const FetchImageBuffer = async (imagePaths) => {
+export const FetchImageBuffer = async (imageBuffers) => {
   try {
-    if (!Array.isArray(imagePaths) || imagePaths.length === 0) {
+    if (!Array.isArray(imageBuffers) || imageBuffers.length === 0) {
       return null;
     }
 
     // Read image files from the file system based on the image paths
     const images = [];
-    for (const imagePath of imagePaths) {
+    for (const imagePath of imageBuffers) {
       if (fs.existsSync(imagePath)) {
         const imageData = fs.readFileSync(imagePath);
         const base64Image = Buffer.from(imageData).toString("base64");
