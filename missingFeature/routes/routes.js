@@ -9,22 +9,23 @@ import { requireAuth } from "../middleware/authMiddleware.js";
 
 
 // Create an instance of Express Router
-export const routes = express.Router();
+export const routers = express.Router();
 
 // Initialize Multer middleware for file uploads
 const upload = multer();
 
 // Routes for missing person
-routes
+
+routers
   .route("/createMissingPerson/:timeSinceDisappearance")
   .post(upload.any(), requireAuth, CreateMissingPerson);
 
 // Routes for Logging
-routes.route('/add_log_data').post(AddActionLogGateWay);
-routes.route('/get-action-logs').get(getAllActionLogs);
-routes.route('/get-action-log/:logId').get(getActionLogByID);
-routes.route('/get-user-action-log/:userId').get(getActionLogByUser);
+routers.route('/add_log_data').post(AddActionLogGateWay);
+routers.route('/get-action-logs').get(getAllActionLogs);
+routers.route('/get-action-log/:logId').get(getActionLogByID);
+routers.route('/get-user-action-log/:userId').get(getActionLogByUser);
 
 // Routes for Notification
-routes.route('/send-notification').post(sendPushNotification);
+routers.route('/send-notification').post(sendPushNotification);
 

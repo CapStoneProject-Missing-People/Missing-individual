@@ -3,7 +3,7 @@ import 'package:findme/features/matchedCase/models/missing_person1.dart';
 import 'package:findme/features/missingPersonDetail/screens/missing_person_detail1.dart';
 
 class MatchedSamplePage extends StatelessWidget {
-  final MissingPerson missingPerson;
+  final MissingPersonAdd missingPerson;
 
   const MatchedSamplePage({super.key, required this.missingPerson});
 
@@ -32,26 +32,26 @@ class MatchedSamplePage extends StatelessWidget {
                 children: [
                   Text(
                     missingPerson.name,
-                    style: const TextStyle(
+                    style: const TextStyle (
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 10),
                   _buildPercentageRow(
-                      'Age Percentage:', missingPerson.ageMatch as int),
+                      'Age Percentage:', missingPerson.ageMatch),
                   _buildPercentageRow('Skin Color percentage:',
-                      missingPerson.skinColorMatch as int),
+                      missingPerson.skinColorMatch),
                   _buildPercentageRow('Cloth Color percentage:',
-                      missingPerson.clothColorMatch as int),
+                      missingPerson.clothColorMatch),
                   _buildPercentageRow('Body Size percentage:',
-                      missingPerson.bodySizeMatch as int),
+                      missingPerson.bodySizeMatch),
                   _buildPercentageRow('Unique Feature percentage:',
-                      missingPerson.uniqueFeatureMatch as int),
+                      missingPerson.uniqueFeatureMatch),
                   _buildPercentageRow('Eye Color percentage:',
-                      missingPerson.eyeColorMatch as int),
+                      missingPerson.eyeColorMatch),
                   _buildPercentageRow('Description percentage:',
-                      missingPerson.descriptionMatch as int),
+                      missingPerson.descriptionMatch),
                 ],
               ),
             ),
@@ -78,27 +78,10 @@ class MatchedSamplePage extends StatelessWidget {
     );
   }
 
-  Widget _buildPercentageRow(String label, int percentage) {
+  Widget _buildPercentageRow(String label, double percentage) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Text('$label $percentage%', style: const TextStyle(fontSize: 16)),
-    );
-  }
-}
-
-// Assume PersonalDetailsPage is defined in another file or provided elsewhere
-class PersonalDetailsPage extends StatelessWidget {
-  const PersonalDetailsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Personal Details'),
-      ),
-      body: const Center(
-        child: Text('This is the Personal Details Page'),
-      ),
+      child: Text('$label ${percentage.toStringAsFixed(2)}%', style: const TextStyle(fontSize: 16)),
     );
   }
 }

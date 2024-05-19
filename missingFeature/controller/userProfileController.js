@@ -6,6 +6,7 @@ import User from "../models/userModel.js";
 //@access private
 export const getUserProfile = async (req, res) => {
   try {
+    console.log("in")
     if (!req.user) {
       return res.status(401).json({ msg: "Not authorized! Login First" });
     }

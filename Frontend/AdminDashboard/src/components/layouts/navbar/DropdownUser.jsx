@@ -7,7 +7,6 @@ import { CiLogout } from 'react-icons/ci';
 const DropdownUser = ({ user }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
-
   const trigger = useRef(null);
   const dropdown = useRef(null);
 

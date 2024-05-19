@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Login = ({ setUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
@@ -33,7 +33,7 @@ const Login = () => {
 
       if (data.user) {
         document.cookie = `jwt=${data.token}; path=/`; // Store JWT in the cookie
-        console.log('Navigating to dashboard');
+        setUser(data.user); // Set the user data in state or context
         navigate('/dashboard'); // Redirect to the home page or dashboard
       }
     } catch (err) {
