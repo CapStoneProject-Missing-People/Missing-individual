@@ -9,7 +9,9 @@ import { requireAuth, isAdmin } from "../middleware/authMiddleware.js";
 
 export const adminRouters = express.Router();
 
-adminRouters.route("/getAll").get(requireAuth, isAdmin("admin"), getAllUsers);
+adminRouters
+  .route("/getAll")
+  .get(requireAuth, isAdmin(["admin", "superAdmin"]), getAllUsers);
 adminRouters
   .route("/deleteUser/:userId")
   .delete(requireAuth, isAdmin("admin"), deleteUserProfile);
