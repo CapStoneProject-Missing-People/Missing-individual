@@ -12,9 +12,13 @@ const MainFeedback = () => {
     const fetchFeedback = async () => {
       try {
         const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
-        const response = await axios.get('/api/feedback', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        // const response = await axios.get('/api/feedback', {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
+        const response = {
+          name : "kaleb tesfaye",
+          feedback : "it was nice App!"
+        }
         setFeedbackData(response.data);
         setLoading(false);
       } catch (error) {
