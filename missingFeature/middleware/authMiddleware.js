@@ -38,9 +38,9 @@ export const requireAuth = (req, res, next) => {
 };
 
 //middleware to check the request is coming from admin
-export const isAdmin = (role) => {
+export const isAdmin = (roles) => {
   return (req, res, next) => {
-    if (req.user.role !== role) {
+    if (!roles.includes(req.user.role)) {
       return res.status(403).json({ msg: "you can't access this route" });
     }
     next();
