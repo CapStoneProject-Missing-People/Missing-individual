@@ -163,9 +163,9 @@ const Table = ({ data }) => {
           value={pageSize}
           setValue={setPageSize}
           options={[
-            { id: 5, caption: "5 items per page" },
-            { id: 10, caption: "10 items per page" },
-            { id: 20, caption: "20 items per page" },
+            { id: 5, caption: "5 persons per page" },
+            { id: 10, caption: "10 persons per page" },
+            { id: 20, caption: "20 persons per page" },
           ]}
         />
       </div>

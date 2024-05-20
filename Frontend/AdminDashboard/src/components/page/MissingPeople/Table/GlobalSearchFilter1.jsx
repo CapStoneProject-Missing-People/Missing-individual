@@ -7,7 +7,7 @@ function GlobalSearchFilter1({ globalFilter, setGlobalFilter, className = "" }) 
     <InputGroup7
       name="search"
       value={globalFilter || ""}
-      onChange={(e) => setGlobalFilter(e.target.value)}
+      onChange={(e) => setGlobalFilter(e.target.value || undefined)}
       label="Search"
       decoration={<FaSearch size="1rem" className="text-gray-400" />}
       className={className}
