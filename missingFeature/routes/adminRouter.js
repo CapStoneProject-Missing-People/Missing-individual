@@ -4,6 +4,7 @@ import {
   deleteUserProfile,
   getAllUsers,
   updateUserRole,
+  getAllAdmins
 } from "../controller/adminController.js";
 import { requireAuth, isAdmin } from "../middleware/authMiddleware.js";
 
@@ -13,8 +14,11 @@ adminRouters
   .route("/getAll")
   .get(requireAuth, isAdmin(["admin", "superAdmin"]), getAllUsers);
 adminRouters
+  .route("/getAllAdmins")
+  .get(requireAuth, isAdmin(["admin","superAdmin"]), getAllAdmins);
+adminRouters
   .route("/deleteUser/:userId")
-  .delete(requireAuth, isAdmin("admin"), deleteUserProfile);
+  .delete(requireAuth, isAdmin(["admin","superAdmin"]), deleteUserProfile);
 adminRouters
   .route("/deletePost/:postId")
   .delete(requireAuth, isAdmin("admin"), deleteUserPost);

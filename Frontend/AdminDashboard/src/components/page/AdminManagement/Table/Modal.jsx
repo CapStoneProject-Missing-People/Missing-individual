@@ -11,7 +11,7 @@ const Modal = ({ show, onClose, onConfirm }) => {
     >
       <div className="bg-white rounded-lg p-6 space-y-4 w-96">
         <h2 className="text-lg font-semibold">Are you sure?</h2>
-        <p>Do you really want to delete this user? This action cannot be undone.</p>
+        <p>Do you really want to delete this Admin? This action cannot be undone.</p>
         <div className="flex justify-end gap-4">
           <button
             onClick={onClose}

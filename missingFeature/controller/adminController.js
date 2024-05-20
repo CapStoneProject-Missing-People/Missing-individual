@@ -13,6 +13,15 @@ export const getAllUsers = async (req, res) => {
     res.status(500).send("Server Error");
   }
 };
+export const getAllAdmins = async (req, res) => {
+  try {
+    const users = await User.find({ role: "admin" }).select("-__v -password");
+    res.json(users);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
 
 //@desc delete any user
 //@route DELETE /api/admin/delete/:userId

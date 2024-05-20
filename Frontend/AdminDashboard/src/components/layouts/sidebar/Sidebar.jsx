@@ -8,16 +8,14 @@ import { useMediaQuery } from "react-responsive";
 import { NavLink, useLocation, useRoutes } from "react-router-dom";
 import Submenu from "./Submenu";
 import { MenuContext } from "../../../context/MenuContext";
-
-import 
-{BsGrid1X2Fill}
- from 'react-icons/bs'
-import { MdOutlineFeedback } from "react-icons/md";
-import { MdOutlineManageAccounts } from "react-icons/md";
+import { MdOutlineFeedback, MdDashboard, MdOutlineManageAccounts } from "react-icons/md";
 import { FaArrowsDownToPeople } from "react-icons/fa6";
 import { SiMicrosoftonenote } from "react-icons/si";
 import { TbTextRecognition } from "react-icons/tb";
+import { FaUser } from "react-icons/fa";
 import Logo from "./newlogo.png"
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const subsubMenuList = [
   {
@@ -42,6 +40,22 @@ const Sidebar = () => {
   const [open, setOpen] = useState(isTabletMid ? false : true);
   const sidebarRef = useRef();
   const { pathname } = useLocation();
+  const [loggedInUserRole, setLoggedInUserRole] = useState(null);
+
+  useEffect(() => {
+    const fetchLoggedInUserRole = async () => {
+      try {
+        const token = Cookies.get('jwt');
+        const response = await axios.get('http://localhost:4000/api/profile/current', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setLoggedInUserRole(response.data.role);
+      } catch (error) {
+        console.error('Error fetching logged-in user data:', error);
+      }
+    };
+    fetchLoggedInUserRole();
+  }, []);
 
   useEffect(() => {
     if (isTabletMid) {
@@ -97,7 +111,6 @@ const Sidebar = () => {
     <div>
       <div
         onClick={toggleMenu}
-        // onClick={handleClick}
         className={`md:hidden fixed inset-0 max-h-screen z-[998] bg-black/50 ${
           isOpen ? "block" : "hidden"
         } `}
@@ -112,20 +125,30 @@ const Sidebar = () => {
        h-screen "
       >
         <div className="flex items-center gap-2.5 font-medium border-b py-3 border-slate-300  mx-3">
-          <img
+          <NavLink to={"/dashboard"}>
+            <img
             src={Logo}
             width={45}
             alt=""
            className="h-10 w-10 rounded-full"
           />
-          <span className="text-xl text-gray-200 whitespace-pre">FindMe</span>
+          </NavLink>
+          
+          <NavLink to={"/dashboard"}>
+            <span className="text-xl text-gray-200 whitespace-pre">
+            FindMe
+          </span>
+          </NavLink>
+          
         </div>
 
         <div className="flex flex-col  ">
           <ul className="whitespace-pre px-2.5 text-[0.9rem] py-5 flex flex-col gap-1  font-medium overflow-x-hidden scrollbar-thin scrollbar-track-white scrollbar-thumb-slate-100   md:h-[68%] h-[70%]">
             <li>
-              <NavLink to={"/dashboard"} className="link text-gray-200 hover:bg-sky-700">
-                <BsGrid1X2Fill
+              <NavLink to={"/dashboard"} className={({ isActive }) =>
+                  `link text-gray-200 hover:bg-sky-700 ${isActive ? "bg-sky-600" : ""}`
+                }>
+                <MdDashboard
                   size={23}
                   className="min-w-max text-gray-200"
                 />
@@ -133,13 +156,27 @@ const Sidebar = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink to={"/user-management"} className="link text-gray-200 hover:bg-sky-700">
-                <MdOutlineManageAccounts size={23} className="min-w-max text-gray-200" />
+              <NavLink to={"/user-management"} className={({ isActive }) =>
+                  `link text-gray-200 hover:bg-sky-700 ${isActive ? "bg-sky-600" : ""}`
+                }>
+                <FaUser size={23} className="min-w-max text-gray-200" />
                 User Management
               </NavLink>
             </li>
+            {loggedInUserRole === 'superAdmin' && (
+              <li>
+                <NavLink to={"/admin-management"} className={({ isActive }) =>
+                    `link text-gray-200 hover:bg-sky-700 ${isActive ? "bg-sky-600" : ""}`
+                  }>
+                  <MdOutlineManageAccounts size={23} className="min-w-max text-gray-200" />
+                  Admin Management
+                </NavLink>
+              </li>
+            )}
             <li>
-              <NavLink to={"/missing-people"} className="link text-gray-200 hover:bg-sky-700">
+              <NavLink to={"/missing-people"} className={({ isActive }) =>
+                  `link text-gray-200 hover:bg-sky-700 ${isActive ? "bg-sky-600" : ""}`
+                }>
                 <FaArrowsDownToPeople
                   size={23}
                   className="min-w-max text-gray-200"
@@ -148,7 +185,9 @@ const Sidebar = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink to={"/log-management"} className="link text-gray-200 hover:bg-sky-700">
+              <NavLink to={"/log-management"} className={({ isActive }) =>
+                  `link text-gray-200 hover:bg-sky-700 ${isActive ? "bg-sky-600" : ""}`
+                }>
                 <SiMicrosoftonenote
                   size={23}
                   className="min-w-max text-gray-200"
@@ -157,7 +196,9 @@ const Sidebar = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink to={"/feedbacks"} className="link text-gray-200 hover:bg-sky-700">
+              <NavLink to={"/feedbacks"} className={({ isActive }) =>
+                  `link text-gray-200 hover:bg-sky-700 ${isActive ? "bg-sky-600" : ""}`
+                }>
                 <MdOutlineFeedback
                   size={23}
                   className="min-w-max text-gray-200"

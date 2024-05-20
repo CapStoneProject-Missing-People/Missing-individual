@@ -4,6 +4,7 @@ import {
   useSortBy,
   useGlobalFilter,
   usePagination,
+  useAsyncDebounce,
 } from 'react-table';
 import GlobalSearchFilter1 from './GlobalSearchFilter1';
 import SelectMenu1 from './SelectMenu1';
@@ -12,6 +13,23 @@ import TableComponent from './TableComponent';
 import Modal from './Modal';
 import axios from 'axios';
 
+const globalFilterFunction = (rows, columns, filterValue) => {
+  if (!filterValue) return rows;
+
+  const lowercasedFilter = filterValue.toLowerCase();
+
+  return rows.filter(row => {
+    return columns.some(column => {
+      const value = row.values[column.accessor];
+      if (typeof value === 'object' && value !== null) {
+        return Object.values(value).some(nestedValue =>
+          String(nestedValue).toLowerCase().includes(lowercasedFilter)
+        );
+      }
+      return String(value).toLowerCase().includes(lowercasedFilter);
+    });
+  });
+};
 const Table = ({ data }) => {
   const [tableData, setTableData] = useState(data);
   const [showModal, setShowModal] = useState(false);
@@ -27,9 +45,11 @@ const Table = ({ data }) => {
       {
         Header: 'Name',
         accessor: 'name',
-        width: '290px',
-        Cell: ({ row }) =>
-          `${row.original.name.firstName} ${row.original.name.middleName} ${row.original.name.lastName}`,
+        width: '320px',
+        Cell: ({ row }) => {
+          const { firstName, middleName, lastName } = row.original.name;
+          return `${firstName} ${middleName} ${lastName}`;
+        },
       },
       {
         Header: 'Gender',
@@ -49,8 +69,8 @@ const Table = ({ data }) => {
         disableSortBy: true,
       },
       {
-        Header: 'Last Seen Location',
-        accessor: 'lastSeenLocation',
+        Header: 'Body Size',
+        accessor: 'body_size',
         width: '200px',
         disableSortBy: true,
       },
@@ -99,6 +119,7 @@ const Table = ({ data }) => {
       columns,
       data: tableData,
       initialState: { pageSize: 5 },
+      globalFilter: globalFilterFunction,
     },
     useGlobalFilter,
     useSortBy,

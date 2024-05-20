@@ -10,7 +10,6 @@ const Log = () => {
     const fetchLogs = async () => {
       try {
         const response = await axios.get('http://localhost:3000/api/get-action-logs');
-        console.log(response)
         setLogs(response.data);
         setLoading(false);
       } catch (error) {
