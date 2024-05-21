@@ -9,11 +9,13 @@ import {
   deleteFeature,
   update,
   searchFeature,
+  getOwnFeatures,
 } from "../controller/featureController.js";
 
 export const featureRouter = express.Router();
 
 featureRouter.route("/getAll").get(getFeatures);
+featureRouter.route("/getOwnFeatures").get(requireAuth, getOwnFeatures)
 featureRouter.route("/getSingle/:id").get(getFeature);
 featureRouter.route("/similarity/:caseId").get(getSimilarityScore);
 featureRouter.route("/compare/:timeSinceDisappearance").post(compareFeature);
