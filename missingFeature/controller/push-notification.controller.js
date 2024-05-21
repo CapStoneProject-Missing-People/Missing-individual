@@ -7,32 +7,47 @@ admin.initializeApp({
 });
 
 
-export const sendPushNotification = async(req, res, next) => {
+export const sendPushNotification = async (req, res, next) => {
+    try {
+        const { title, body, caseID, fcm_token } = req.body;
+        const result = await sendPushNotificationFunc({
+            title,
+            body,
+            caseID: String(caseID),
+            orderDate: new Date().toISOString(),
+            fcmToken: fcm_token
+        });
+
+        if (result.success) {
+            res.status(200).send({ message: "Notification Sent" });
+        } else {
+            res.status(500).send({ message: "Error sending notification", error: result.error });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send({ message: "Internal Server Error" });
+    }
+};
+
+export const sendPushNotificationFunc = async ({ title, body, caseID, fcmToken }) => {
     try {
         const message = {
             notification: {
-                title: req.body.title || "test notification", // Set a default title if none is provided
-                body: req.body.body || "Notification Message" // Set a default message if none is provided
+                title: title,
+                body: body
             },
             data: {
-                orderId: req.body.orderId || "122737", // Include any custom data fields
-                orderDate: new Date().toISOString() // Convert date to ISO string for consistent format
+                caseID: caseID,
+                orderDate: new Date().toISOString()
             },
-            token: req.body.fcm_token
+            token: fcmToken
         };
 
-        await admin.messaging().send(message)
-            .then((response) => {
-                console.log('Successfully sent FCM messages:', response);
-                res.status(200).send({ message: "Notification Sent" });
-            })
-            .catch((error) => {
-                console.error('Error sending FCM messages:', error);
-                res.status(500).send({ message: "Error sending notification" });
-            });
+        const response = await admin.messaging().send(message);
+        console.log('Successfully sent FCM message:', response);
+        return { success: true, response };
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).send({ message: "Internal Server Error" }); // Handle unexpected errors gracefully
+        console.error('Error sending FCM message:', error);
+        return { success: false, error };
     }
-}
-
+};
