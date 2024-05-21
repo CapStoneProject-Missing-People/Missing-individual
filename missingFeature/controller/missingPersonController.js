@@ -5,8 +5,6 @@ import path, { parse } from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { createFeature } from "./featureController.js";
-import { error } from "console";
-import { features } from "process";
 
 export const CreateMissingPerson = async (req, res) => {
   try {
@@ -43,7 +41,12 @@ export const CreateMissingPerson = async (req, res) => {
     const clothing = {};
 
     for (let key in req.body) {
-      let value = req.body[key].trim().replace(/^"(.*)"$/, "$1");
+      let value = req.body[key];
+      
+      // Check if value is a string before calling trim
+      if (typeof value === 'string') {
+        value = value.trim().replace(/^"(.*)"$/, '$1');
+      }
 
       if (key === "age") {
         parsedData[key] = parseInt(value);
@@ -85,14 +88,9 @@ export const CreateMissingPerson = async (req, res) => {
     let userIDString = userID.toString();
 
     // Handling feature creation
-    const result = await createFeature(
-      parsedData,
-      timeSinceDisappearance,
-      userID,
-      res
-    );
-    if (typeof result === "string") {
-      return res.status(400).json({ message: result });
+    const result = await createFeature(parsedData, timeSinceDisappearance, userID, res);
+    if (typeof(result) === "string") {
+      return res.status(400).json({message: result});
     }
 
     console.log(result);
@@ -100,22 +98,6 @@ export const CreateMissingPerson = async (req, res) => {
     const images = req.files;
     const imageBuffers = images.map((image) => image.buffer);
     console.log(imageBuffers);
-    // const moduleDir = dirname(fileURLToPath(import.meta.url));
-    // const uploadsDir = path.join(moduleDir, "..", "uploads", userIDString);
-
-    // // Create the directory if it doesn't exist
-    // if (!fs.existsSync(uploadsDir)) {
-    //   fs.mkdirSync(uploadsDir, { recursive: true });
-    // }
-
-    // Save images to the uploads directory
-    // images.forEach((image) => {
-    //   const filename = image.originalname;
-    //   const filepath = path.join(uploadsDir, filename);
-    //   fs.writeFileSync(filepath, image.buffer);
-    // });
-
-    // console.log(imageBuffers)
     // Create a new missing person record in the database
     const newMissingPerson = new MissingPerson({
       userID,
@@ -142,13 +124,10 @@ export const CreateMissingPerson = async (req, res) => {
     await result.mergedFeature.save();
     return res
       .status(201)
-      .json({
-        message: "Missing person record created successfully.",
-        createdFeatures: result,
-      });
+      .json({ message: "Missing person record created successfully.", createdFeatures: result });
   } catch (error) {
     // Handle unexpected errors
-    console.error("Error occurred:", error);
-    return res.status(500).json({ error: error });
+    console.error('Error occurred:', error);
+    return res.status(500).json({ error: error.message });
   }
 };
