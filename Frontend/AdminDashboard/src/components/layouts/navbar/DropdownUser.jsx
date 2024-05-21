@@ -40,7 +40,7 @@ const DropdownUser = ({ user }) => {
   }, [dropdownOpen]);
 
   return (
-    <div className="relative">
+    <div className="relative z-50">
       <Link
         ref={trigger}
         onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -48,10 +48,10 @@ const DropdownUser = ({ user }) => {
         to="#"
       >
         <span className="hidden text-right lg:block">
-          <span className="block text-sm text-white dark:text-white">
+          <span className="block text-center text-sm text-white dark:text-white">
             {user.name} {user.lastName}
           </span>
-          <span className="block text-xs">Admin</span>
+          <span className="block text-xs">{user.role}</span>
         </span>
 
         <div className="h-8 w-8 mr-1 rounded-full bg-gray-300 text-gray-700 flex items-center justify-center font-bold">
