@@ -5,10 +5,30 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:findme/features/addPost/models/addpost_model.dart';
 
-class MissingPersonAddPage extends StatefulWidget {
-  const MissingPersonAddPage({Key? key}) : super(key: key);
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Missing Person App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MissingPersonAddPage(),
+    );
+  }
+}
+
+class MissingPersonAddPage extends StatefulWidget {
+  const MissingPersonAddPage({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
   _MissingPersonAddPageState createState() => _MissingPersonAddPageState();
 }
 
@@ -18,16 +38,12 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _middleNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _lastPlaceSeenController =
-      TextEditingController();
+  final TextEditingController _lastPlaceSeenController = TextEditingController();
   final TextEditingController _lastTimeSeenController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _eyeDescriptionController =
-      TextEditingController();
-  final TextEditingController _noseDescriptionController =
-      TextEditingController();
-  final TextEditingController _hairDescriptionController =
-      TextEditingController();
+  final TextEditingController _eyeDescriptionController = TextEditingController();
+  final TextEditingController _noseDescriptionController = TextEditingController();
+  final TextEditingController _hairDescriptionController = TextEditingController();
 
   String _selectedGender = 'Male';
   String _selectedSkinColor = 'fair';
@@ -101,8 +117,7 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   }
 
   void postData(MissingPerson missingPerson) async {
-    final url = Uri.parse(
-        'https://localhost:4000/api/features/create/:timeSinceDisappearance');
+    final url = Uri.parse('http://192.168.28.13:4000/api/createMissingPerson/${missingPerson.lastTimeSeen}'); // Use your machine's local IP
 
     try {
       final response = await http.post(
