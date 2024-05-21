@@ -18,7 +18,7 @@ const upload = multer();
 
 routers
   .route("/createMissingPerson/:timeSinceDisappearance")
-  .post(upload.any(), requireAuth, CreateMissingPerson);
+  .post(upload.any(), CreateMissingPerson);
 
 // Routes for Logging
 routers.route('/add_log_data').post(AddActionLogGateWay);

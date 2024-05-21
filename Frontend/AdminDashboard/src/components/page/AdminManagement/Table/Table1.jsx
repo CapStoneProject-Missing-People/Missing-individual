@@ -150,6 +150,7 @@ const Table = ({ data }) => {
       };
       const newRole = currentRole === 'admin' ? 'user' : 'admin';
       const response = await axios.put(`http://localhost:4000/api/admin/updateRole/${_id}`, { role: newRole }, { headers });
+      console.log('updating.');
       if (response.data) {
         // Filter out the row with the specified _id and update the table data
         setTableData(prevData => prevData.map(row => row._id === _id ? { ...row, role: newRole } : row));
@@ -172,9 +173,9 @@ const Table = ({ data }) => {
           value={pageSize}
           setValue={setPageSize}
           options={[
-            { id: 5, caption: "5 users per page" },
-            { id: 10, caption: "10 users per page" },
-            { id: 20, caption: "20 users per page" },
+            { id: 5, caption: "5 admins per page" },
+            { id: 10, caption: "10 admins per page" },
+            { id: 20, caption: "20 admins per page" },
           ]}
         />
       </div>
