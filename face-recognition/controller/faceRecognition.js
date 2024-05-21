@@ -63,6 +63,7 @@ export const addFaceFeature = async (req, res) => {
   const startTime = Date.now(); // Start timer
 
   try {
+    console.log(req.body)
     const {images, person_id} = req.body;
     // Check if person_id is provided
     
@@ -77,10 +78,12 @@ export const addFaceFeature = async (req, res) => {
     //   return res.status(400).json({ message: "Invalid person_id format." });
     // }
 
+    console.log("image")
     // Check if any images are provided
     if (!images || images.length === 0) {
       return res.status(400).json({ message: "No images provided." });
     }
+    console.log("after image")
     // Process each uploaded image for face recognition
     if (images.length === 0) {
       return res.status(400).json({ message: "No images provided." });
