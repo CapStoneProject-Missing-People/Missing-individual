@@ -4,6 +4,7 @@ import MainLayout from './components/layouts/MainLayout';
 import MenuContextProvider from './context/MenuContext';
 import MainDashboard from './components/page/Dashboard/MainDashboard';
 import MainUserManagement from './components/page/UserManagement/MainUserManagement';
+import MainAdminManagement from './components/page/AdminManagement/MainAdminManagement';
 import MainMissingPeople from './components/page/MissingPeople/MainMissingPeople';
 import Profile from './components/page/Profile';
 import MainFeedback from './components/page/Feedback/MainFeedback';
@@ -39,6 +40,16 @@ const App = () => {
           }
         />
         <Route
+          path="/admin-management"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainAdminManagement />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/missing-people"
           element={
             <PrivateRoute>
@@ -58,7 +69,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        {/*<Route
+        <Route
           path="/feedbacks"
           element={
             <PrivateRoute>
@@ -67,7 +78,7 @@ const App = () => {
               </MainLayout>
             </PrivateRoute>
           }
-        />*/}
+        />
         <Route
           path="/log-management"
           element={
