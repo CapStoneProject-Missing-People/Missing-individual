@@ -38,12 +38,16 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _middleNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _lastPlaceSeenController = TextEditingController();
+  final TextEditingController _lastPlaceSeenController =
+      TextEditingController();
   final TextEditingController _lastTimeSeenController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _eyeDescriptionController = TextEditingController();
-  final TextEditingController _noseDescriptionController = TextEditingController();
-  final TextEditingController _hairDescriptionController = TextEditingController();
+  final TextEditingController _eyeDescriptionController =
+      TextEditingController();
+  final TextEditingController _noseDescriptionController =
+      TextEditingController();
+  final TextEditingController _hairDescriptionController =
+      TextEditingController();
 
   String _selectedGender = 'Male';
   String _selectedSkinColor = 'fair';
@@ -117,7 +121,8 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   }
 
   void postData(MissingPerson missingPerson) async {
-    final url = Uri.parse('http://192.168.28.13:4000/api/createMissingPerson/${missingPerson.lastTimeSeen}'); // Use your machine's local IP
+    final url = Uri.parse(
+        '192.168.219.140/api/features/create/:timeSinceDisappearance');
 
     try {
       final response = await http.post(
@@ -221,7 +226,7 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
                         });
                       }
                     },
-                    items: <String>['Male', 'Female', 'Other']
+                    items: <String>['Male', 'Female']
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -254,7 +259,7 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
                         });
                       }
                     },
-                    items: <String>['fair', 'light', 'dark']
+                    items: <String>['fair', 'black', 'white', 'tseyim']
                         .map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -278,8 +283,18 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
                         });
                       }
                     },
-                    items: <String>['thin', 'medium', 'fat']
-                        .map<DropdownMenuItem<String>>((String value) {
+                    items: <String>[
+                      'thin',
+                      'average',
+                      'muscular',
+                      'overweight',
+                      'obese',
+                      'fit',
+                      'athletic',
+                      'curvy',
+                      'petite',
+                      'fat'
+                    ].map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
@@ -336,8 +351,12 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
                           });
                         }
                       },
-                      items: <String>['tshirt', 'shirt', 'jacket']
-                          .map<DropdownMenuItem<String>>((String value) {
+                      items: <String>[
+                        'tshirt',
+                        'hoodie',
+                        'sweater',
+                        'sweetshirt'
+                      ].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -360,8 +379,17 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
                           });
                         }
                       },
-                      items: <String>['red', 'blue', 'green']
-                          .map<DropdownMenuItem<String>>((String value) {
+                      items: <String>[
+                        'red',
+                        'blue',
+                        'white',
+                        'black',
+                        'orange',
+                        'light blue',
+                        'brown',
+                        'blue black',
+                        'yellow'
+                      ].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -384,7 +412,7 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
                           });
                         }
                       },
-                      items: <String>['trouser', 'shorts', 'skirt']
+                      items: <String>['trouser', 'shorts', 'nothing', 'boxer']
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -408,8 +436,17 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
                           });
                         }
                       },
-                      items: <String>['blue', 'black', 'white']
-                          .map<DropdownMenuItem<String>>((String value) {
+                      items: <String>[
+                        'blue',
+                        'black',
+                        'white',
+                        'red',
+                        'orange',
+                        'light blue',
+                        'brown',
+                        'blue black',
+                        'yellow'
+                      ].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),

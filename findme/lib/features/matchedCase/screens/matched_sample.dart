@@ -32,7 +32,7 @@ class MatchedSamplePage extends StatelessWidget {
                 children: [
                   Text(
                     missingPerson.name,
-                    style: const TextStyle (
+                    style: const TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
                     ),
@@ -40,16 +40,16 @@ class MatchedSamplePage extends StatelessWidget {
                   const SizedBox(height: 10),
                   _buildPercentageRow(
                       'Age Percentage:', missingPerson.ageMatch),
-                  _buildPercentageRow('Skin Color percentage:',
-                      missingPerson.skinColorMatch),
-                  _buildPercentageRow('Cloth Color percentage:',
-                      missingPerson.clothColorMatch),
-                  _buildPercentageRow('Body Size percentage:',
-                      missingPerson.bodySizeMatch),
+                  _buildPercentageRow(
+                      'Skin Color percentage:', missingPerson.skinColorMatch),
+                  _buildPercentageRow(
+                      'Cloth Color percentage:', missingPerson.clothColorMatch),
+                  _buildPercentageRow(
+                      'Body Size percentage:', missingPerson.bodySizeMatch),
                   _buildPercentageRow('Unique Feature percentage:',
                       missingPerson.uniqueFeatureMatch),
-                  _buildPercentageRow('Eye Color percentage:',
-                      missingPerson.eyeColorMatch),
+                  _buildPercentageRow(
+                      'Eye Color percentage:', missingPerson.eyeColorMatch),
                   _buildPercentageRow('Description percentage:',
                       missingPerson.descriptionMatch),
                 ],
@@ -81,7 +81,8 @@ class MatchedSamplePage extends StatelessWidget {
   Widget _buildPercentageRow(String label, double percentage) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Text('$label ${percentage.toStringAsFixed(2)}%', style: const TextStyle(fontSize: 16)),
+      child: Text('$label ${percentage.toStringAsFixed(2)}%',
+          style: const TextStyle(fontSize: 16)),
     );
   }
 }

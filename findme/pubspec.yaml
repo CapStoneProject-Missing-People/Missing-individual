@@ -52,6 +52,8 @@ dependencies:
   image_cropper_platform_interface: any
 
   mongo_dart: ^0.8.0
+  flutter_rating_bar: ^4.0.0
+
   
   
  
