@@ -1,4 +1,6 @@
-missingFeature/node_modules
+missingFeature/node_modules/
+authentiation/node_modules/
+face-recognition/node_modules/
 .env
 .vscode
 missingFeature/.env

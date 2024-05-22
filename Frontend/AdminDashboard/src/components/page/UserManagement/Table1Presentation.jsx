@@ -17,6 +17,7 @@ import {
 import { Listbox, Transition } from "@headlessui/react";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Cookies from 'js-cookie';
 
 function Avatar({ src, alt = "avatar" }) {
   return (
@@ -24,7 +25,7 @@ function Avatar({ src, alt = "avatar" }) {
   );
 }
 
-const getColumns = () => [
+const getColumns = (handleDeleteClick) => [
   
   {
     Header: "Name",
@@ -41,7 +42,7 @@ const getColumns = () => [
   },
   {
     Header: "phone number",
-    accessor: "phonenumber",
+    accessor: "phoneNo",
     width: "150px",
   },
   {
@@ -80,6 +81,20 @@ const getColumns = () => [
     },
     disableSortBy: true,
     width: "170px",
+  },
+  {
+    Header: "Delete",
+    accessor: "delete",
+    Cell: ({ row }) => (
+      <button
+        onClick={() => handleDeleteClick(row.original)}
+        className="bg-red-600 text-white px-4 py-2 rounded-full"
+      >
+        Delete
+      </button>
+    ),
+    disableSortBy: true,
+    width: "100px",
   },
 ];
 
@@ -213,7 +228,7 @@ function Button2({ content, onClick, active, disabled }) {
   return (
     <button
       className={`flex flex-col cursor-pointer items-center justify-center w-9 h-9 shadow-[0_4px_10px_rgba(0,0,0,0.03)] text-sm font-normal transition-colors rounded-lg
-      ${active ? "bg-red-500 text-white" : "text-slate-900	"}
+      ${active ? "bg-red-900 text-white" : "text-slate-900	"}
       ${
         !disabled
           ? "bg-white hover:bg-gray-500 hover:text-white"
@@ -368,18 +383,59 @@ function TableComponent({
 
 function Table1() {
   const [data, setData] = useState([]);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
+    setIsDeleteDialogOpen(true);
+  };
   const columns = useMemo(getColumns, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/admin/getAll");
+        // Retrieve the token from cookies
+        const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1]; // Replace 'token' with the actual cookie name
+  
+        // Set the headers with the token
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+  
+        // Make the request with the headers
+        const response = await axios.get("http://localhost:4000/api/admin/getAll", { headers });
+        
         setData(response.data);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
     };
     fetchData();
   }, []);
+  
+
+  const handleConfirmDelete = async () => {
+    try {
+      const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      console.log(userToDelete)
+      await axios.delete(`http://localhost:4000/api/admin/deleteUser/${userToDelete.id}`, { headers });
+      setData(data.filter((item) => item.id !== userToDelete.id));
+    } catch (error) {
+      console.error("Error deleting user: ", error);
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setUserToDelete(null);
+  };
 
   const {
     getTableProps,
@@ -441,6 +497,27 @@ function Table1() {
           pageIndex={pageIndex}
         />
       </div>
+      {isDeleteDialogOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-lg font-medium mb-4">Are you sure?</h2>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={handleCancelDelete}
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-full"
+              >
+                No
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded-full"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
