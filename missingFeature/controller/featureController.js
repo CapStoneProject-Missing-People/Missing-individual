@@ -597,21 +597,25 @@ export const deleteFeature = async (req, res) => {
   try {
     const timeSinceDisappearance = req.query.timeSinceDisappearance;
     const Features = await initializeFeaturesModel(timeSinceDisappearance);
-    const feature = await Features.findById(req.params.id);
-    if (!feature) {
+    console.log(req.params.caseId)
+    const mergedFeature = await MergedFeaturesModel.findById(req.params.caseId)
+    console.log(mergedFeature)
+    // const feature = await Features.findById(req.params.id);
+    if (!mergedFeature) {
       res.status(404).json({message: "feature not found"});
     }
     
-    if (feature.user_id.toString() !== req.user.userId.toString()) {
+    if (mergedFeature.user_id.toString() !== req.user.userId.toString()) {
       res.status(403);
       throw new Error(
         "User don't have permission to update other users feature!"
       );
     }
-    await feature.deleteOne();
-    await MergedFeaturesModel.deleteOne({ _id: req.params.id });
-    res.status(200).json({ message: "feature deleted succussfully", feature });
+    await mergedFeature.deleteOne();
+    Features.deleteOne(Features.mergedFeatureId)
+    res.status(200).json({ message: "feature deleted succussfully", mergedFeature });
   } catch (error) {
+    console.log(error)
     res.json({ title: "UNAUTHORIZED", message: error.message });
   }
 };

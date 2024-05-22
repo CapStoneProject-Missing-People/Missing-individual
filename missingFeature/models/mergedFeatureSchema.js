@@ -9,7 +9,7 @@ const MergedFeatures = {
     ref: "User",
   },
   missing_case_id: {
-    type: Schema.Types.ObjectId ,
+    type: Schema.Types.ObjectId,
     required: false,
     ref: "MissingPerson"
   },
