@@ -3,10 +3,10 @@ import express from "express"
 import dotenv from "dotenv"
 import { userRouter } from "./routes/userRoutes.js";
 import { featureRouter } from "./routes/featureRouter.js"
-
 import { profileRouter } from "./routes/profileRouter.js";
 import { connectionDb } from "./config/dbConnection.js"
 import { routers } from "./routes/routes.js";
+import { feedBackRouter } from "./routes/feedBackRouter.js";
 import { adminRouters } from "./routes/adminRouter.js";
 import cors from "cors";
 // import cookieParser from "cookie-parser"
@@ -29,6 +29,7 @@ app.use("/api/users", userRouter);
 app.use("/api/profile", profileRouter);
 app.use("/api/admin", adminRouters);
 app.use("/api", routers);
+app.use("/api", feedBackRouter)
 
 
 app.listen(port, () => {
