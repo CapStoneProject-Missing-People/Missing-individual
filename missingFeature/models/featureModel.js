@@ -8,6 +8,11 @@ const baseAttributes = {
     required: true,
     ref: "User",
   },
+  mergedFeatureId: {
+    type: Schema.Types.ObjectId,
+    required: false,
+    ref: "Features_GT_2" || "Features_LTE_2"
+  },
   missing_case_id: {
     type: Schema.Types.ObjectId ,
     required: false,
