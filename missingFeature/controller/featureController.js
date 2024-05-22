@@ -7,7 +7,6 @@ import MergedFeaturesModel from "../models/mergedFeatureSchema.js"
 
 export const getOwnFeatures = async (req, res) => {
   try {
-    console.log(req.user)
     const filterCriteria = {}
     if (req.user) {
       // Check if the user wants to view their own features
@@ -16,7 +15,7 @@ export const getOwnFeatures = async (req, res) => {
       }
     }
     const features = await MergedFeaturesModel.find(filterCriteria).lean().populate({path: 'missing_case_id', select:['status', 'imageBuffers', 'dateReported']});
-    console.log(features);
+    console.log("features", features);
 
     res.status(200).json(features);
   } catch (error){
@@ -66,11 +65,11 @@ export const getFeatures = async (req, res) => {
     if (req.user) {
       // Check if the user wants to view their own features
       if (req.query.ownFeatures === "true") {
-        filterCriteria.user_id = req.user.id;
+        filterCriteria.user_id = req.user.userId;
       }
     }
     const features = await MergedFeaturesModel.find(filterCriteria).lean().populate({path: 'missing_case_id', select:['status', 'imageBuffers', 'dateReported']});
-    console.log(features);
+    console.log("features: ", features);
 
     res.status(200).json(features);
   } catch (error){

@@ -91,6 +91,23 @@ export const login_post = async (req, res) => {
   }
 };
 
+export const admin_login_post = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.adminlogin(email, password);
+    const token = createToken(user._id);
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      maxAge: maxAge * 1000,
+    });
+    res.status(200).json({ user, token: token });
+  } catch (err) {
+    const errors = handleErrors(err);
+    console.log("the error is:",errors);
+    res.status(400).json({ errors });
+  }
+};
+
 export const logout_get = (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 });
   res.send("logged out");

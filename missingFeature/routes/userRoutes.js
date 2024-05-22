@@ -8,3 +8,4 @@ userRouter.route("/signup").post(authController.signup_post);
 userRouter.route("/login").get(authController.login_get);
 userRouter.route("/login").post(authController.login_post);
 userRouter.route("/logout").get(authController.logout_get);
+userRouter.route("/adminLogin").post(authController.admin_login_post);
