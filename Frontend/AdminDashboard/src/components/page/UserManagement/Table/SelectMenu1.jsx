@@ -31,7 +31,7 @@ function SelectMenu1({ value, setValue, options, className = "", disabled }) {
             {options.map((option) => (
               <Listbox.Option
                 key={option.id}
-                className={({ active }) => `relative cursor-default select-none py-3 pl-10 pr-4 ${active ? "bg-red-100" : ""}`}
+                className={({ active }) => `relative cursor-default select-none py-3 pl-10 pr-4 ${active ? "bg-sky-100" : ""}`}
                 value={option.id}
               >
                 {({ selected }) => (
