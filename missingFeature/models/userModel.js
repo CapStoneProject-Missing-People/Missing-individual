@@ -64,6 +64,20 @@ userSchema.statics.login = async function (email, password) {
   throw new Error("incorrect email");
 };
 
+userSchema.statics.adminlogin = async function (email, password) {
+  const user = await this.findOne({ email });
+  if (user) {
+    if (user.role !== 'admin' && user.role !== 'superAdmin') {
+      throw new Error("unauthorized access");
+    }
+    const auth = await bcrypt.compare(password, user.password);
+    if (auth) {
+      return user;
+    }
+    throw new Error("incorrect password");
+  }
+  throw new Error("incorrect email");
+};
 const User = model("user", userSchema);
 
 export default User;
