@@ -9,7 +9,6 @@ import { sendPushNotificationFunc } from "./push-notification.controller.js";
 
 export const CreateMissingPerson = async (req, res) => {
   try {
-    console.log(req.body);
     const { timeSinceDisappearance } = req.params;
     let baseReq;
     if (timeSinceDisappearance > 2) {
@@ -35,7 +34,6 @@ export const CreateMissingPerson = async (req, res) => {
         ...base
       } = req.body;
       baseReq = base;
-      console.log(baseReq);
     }
 
     const parsedData = {};
@@ -94,18 +92,13 @@ export const CreateMissingPerson = async (req, res) => {
       return res.status(400).json({message: result});
     }
 
-    console.log(result);
-
     const images = req.files;
     const imageBuffers = images.map((image) => image.buffer);
-    console.log(imageBuffers);
     // Create a new missing person record in the database
     const newMissingPerson = new MissingPerson({
       userID,
       imageBuffers,
     });
-    console.log("newMissId: ", newMissingPerson._id);
-    console.log(imageBuffers);
     const response = await axios.post(
       "http://localhost:6000/add-face-feature",
       {

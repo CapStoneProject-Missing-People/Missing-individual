@@ -4,19 +4,13 @@ import embeddings from "../models/embeddingsModel.js";
 import { pipeline } from "@xenova/transformers";
 import mongoose from "mongoose";
 import MergedFeaturesModel from "../models/mergedFeatureSchema.js"
+import { features } from "process";
 
 export const getOwnFeatures = async (req, res) => {
   try {
-    console.log(req.user)
     const filterCriteria = {}
-    if (req.user) {
-      // Check if the user wants to view their own features
-      if (req.query.ownFeatures === "true") {
-        filterCriteria.user_id = req.user.id;
-      }
-    }
     const features = await MergedFeaturesModel.find(filterCriteria).lean().populate({path: 'missing_case_id', select:['status', 'imageBuffers', 'dateReported']});
-    console.log(features);
+    console.log("features", features);
 
     res.status(200).json(features);
   } catch (error){
@@ -66,11 +60,11 @@ export const getFeatures = async (req, res) => {
     if (req.user) {
       // Check if the user wants to view their own features
       if (req.query.ownFeatures === "true") {
-        filterCriteria.user_id = req.user.id;
+        filterCriteria.user_id = req.user.userId;
       }
     }
     const features = await MergedFeaturesModel.find(filterCriteria).lean().populate({path: 'missing_case_id', select:['status', 'imageBuffers', 'dateReported']});
-    console.log(features);
+    console.log("features: ", features);
 
     res.status(200).json(features);
   } catch (error){
@@ -84,10 +78,6 @@ export const getFeatures = async (req, res) => {
 //@access public
 export const getFeature = async (req, res) => {
   try {
-    const Features_GT_2 = await initializeFeaturesModel(3); 
-    const Features_LTE_2 = await initializeFeaturesModel(1);
-    const MergedFeaturesSchema = Features_GT_2.schema || Features_LTE_2.schema;
-    const MergedFeaturesModel = mongoose.model('MergedFeatures', MergedFeaturesSchema);
     const feature = await MergedFeaturesModel.findById(req.params.id);
     if (!feature) {
       res.status(404);
@@ -199,7 +189,6 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
     }
     const feature = await Features.create( featureData );
     console.log("feature stored successfully");
-    const featureId = feature._id
     const existingFeatureMerged = await MergedFeaturesModel.findOne({ inputHash: featureData.inputHash });
     if (existingFeatureMerged) {
       return 'Duplicate feature already exists in MergedFeatures collection'
@@ -208,8 +197,9 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
     const mergedFeatures = await MergedFeaturesModel.create( featureData )
     console.log("Feature stored successfully in MergedFeatures collection.");
     console.log("mergedFeatures: ", mergedFeatures)
-    mergedFeatures.featureId = featureId
-    mergedFeatures.save()
+    const mergedFeatureCaseId = mergedFeatures._id
+    feature.mergedFeatureId = mergedFeatureCaseId
+    feature.save()
     const existingEmbeddingsCount = await embeddings.countDocuments();
     if (existingEmbeddingsCount < 1) {
       const caseId = feature._id;
@@ -490,28 +480,25 @@ export const update = async (req, res) => {
     const updateObject = {};
     updateObject[`name.${updateBy}`] = updateTerm;
     const Features = await initializeFeaturesModel(timeSinceDisappearance);
-    const feature = await Features.findById(req.params.id);
-    console.log(feature)
-    if (!feature) {
+    console.log(req.params.caseId)
+    const mergedFeature = await MergedFeaturesModel.findById(req.params.caseId);
+    if (!mergedFeature) {
       return res.status(404).json({ error: "Feature not found" });
     }
 
-    // Check user permissions
-    console.log(req.user.userId)
-    console.log(feature.user_id)
-    if (feature.user_id.toString() !== req.user.userId.toString()) {
+    if (mergedFeature.user_id.toString() !== req.user.userId.toString()) {
       return res.status(403).json({ error: "User doesn't have permission to update other users' features!" });
     }
 
     // Update the feature in the primary collection
-    const updatedFeature = await Features.findByIdAndUpdate(
-      req.params.id,
+    const updatedFeature = await Features.findOneAndUpdate(
+      Features.mergedFeatureId,
       { $set: updateObject },
       { new: true }
     );
 
     const updatedMergedFeature = await MergedFeaturesModel.findByIdAndUpdate(
-      MergedFeaturesModel.featureId,
+      req.params.caseId,
       { $set: updateObject },
       { new: true }
     );
@@ -610,21 +597,25 @@ export const deleteFeature = async (req, res) => {
   try {
     const timeSinceDisappearance = req.query.timeSinceDisappearance;
     const Features = await initializeFeaturesModel(timeSinceDisappearance);
-    const feature = await Features.findById(req.params.id);
-    if (!feature) {
+    console.log(req.params.caseId)
+    const mergedFeature = await MergedFeaturesModel.findById(req.params.caseId)
+    console.log(mergedFeature)
+    // const feature = await Features.findById(req.params.id);
+    if (!mergedFeature) {
       res.status(404).json({message: "feature not found"});
     }
     
-    if (feature.user_id.toString() !== req.user.userId.toString()) {
+    if (mergedFeature.user_id.toString() !== req.user.userId.toString()) {
       res.status(403);
       throw new Error(
         "User don't have permission to update other users feature!"
       );
     }
-    await feature.deleteOne();
-    await MergedFeaturesModel.deleteOne({ _id: req.params.id });
-    res.status(200).json({ message: "feature deleted succussfully", feature });
+    await mergedFeature.deleteOne();
+    Features.deleteOne(Features.mergedFeatureId)
+    res.status(200).json({ message: "feature deleted succussfully", mergedFeature });
   } catch (error) {
+    console.log(error)
     res.json({ title: "UNAUTHORIZED", message: error.message });
   }
 };

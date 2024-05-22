@@ -6,7 +6,12 @@ const baseAttributes = {
   user_id: {
     type: Schema.Types.ObjectId ,
     required: true,
-    ref: "User",
+    ref: "user",
+  },
+  mergedFeatureId: {
+    type: Schema.Types.ObjectId,
+    required: false,
+    ref: "Features_GT_2" || "Features_LTE_2"
   },
   missing_case_id: {
     type: Schema.Types.ObjectId ,
