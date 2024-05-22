@@ -3,11 +3,11 @@ import 'package:findme/features/matchedCase/screens/matched_sample.dart';
 import 'package:flutter/material.dart';
 
 class MissingPersonCard extends StatelessWidget {
-  final mp.MissingPerson missingPerson;
+  final mp.MissingPersonAdd missingPerson;
 
   const MissingPersonCard({super.key, required this.missingPerson});
 
-  double calculateMatchPercentage(mp.MissingPerson person) {
+  double calculateMatchPercentage(mp.MissingPersonAdd person) {
     double totalMatch = person.ageMatch +
         person.skinColorMatch +
         person.clothColorMatch +

@@ -6,6 +6,7 @@ import DropdownFeedback from './DropdownFeedback';
 import DropdownNotification from './DropdownNotification';
 import DropdownUser from './DropdownUser';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const Navbar = () => {
   const { toggleMenu } = useContext(MenuContext);
@@ -15,11 +16,12 @@ const Navbar = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
-        const response = await axios.get('/api/user/profile', {
+        const token = Cookies.get('jwt');
+        const response = await axios.get('http://localhost:4000/api/profile/current', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(response.data);
+        
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {

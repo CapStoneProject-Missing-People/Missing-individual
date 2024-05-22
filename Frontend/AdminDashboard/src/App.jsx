@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import MainLayout from './components/layouts/MainLayout';
 import MenuContextProvider from './context/MenuContext';
 import MainDashboard from './components/page/Dashboard/MainDashboard';
 import MainUserManagement from './components/page/UserManagement/MainUserManagement';
+import MainAdminManagement from './components/page/AdminManagement/MainAdminManagement';
 import MainMissingPeople from './components/page/MissingPeople/MainMissingPeople';
 import Profile from './components/page/Profile';
 import MainFeedback from './components/page/Feedback/MainFeedback';
@@ -12,10 +13,12 @@ import Login from './components/page/Login';
 import PrivateRoute from './components/PrivateRoute';
 
 const App = () => {
+  const [user, setUser] = useState(null);
+
   return (
     <MenuContextProvider>
       <Routes>
-        <Route path="/" element={<Login />} /> {/* Render Login page by default */}
+        <Route path="/" element={<Login setUser={setUser}/>} /> {/* Render Login page by default */}
         <Route
           path="/dashboard"
           element={
@@ -32,6 +35,16 @@ const App = () => {
             <PrivateRoute>
               <MainLayout>
                 <MainUserManagement />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin-management"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainAdminManagement />
               </MainLayout>
             </PrivateRoute>
           }

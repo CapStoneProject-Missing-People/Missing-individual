@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class MissingPersonDetails extends StatefulWidget {
-  final MissingPerson missingPerson;
+  final MissingPersonAdd missingPerson;
 
   const MissingPersonDetails({super.key, required this.missingPerson});
 

@@ -7,7 +7,6 @@ import { CiLogout } from 'react-icons/ci';
 const DropdownUser = ({ user }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
-
   const trigger = useRef(null);
   const dropdown = useRef(null);
 
@@ -18,7 +17,7 @@ const DropdownUser = ({ user }) => {
     // Redirect to the login page
     navigate('/');
   };
-
+  
   // Close on click outside
   useEffect(() => {
     const clickHandler = ({ target }) => {
@@ -41,7 +40,7 @@ const DropdownUser = ({ user }) => {
   }, [dropdownOpen]);
 
   return (
-    <div className="relative">
+    <div className="relative z-50">
       <Link
         ref={trigger}
         onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -49,10 +48,10 @@ const DropdownUser = ({ user }) => {
         to="#"
       >
         <span className="hidden text-right lg:block">
-          <span className="block text-xs text-white dark:text-white">
-            {user.firstName} {user.lastName}
+          <span className="block text-center text-sm text-white dark:text-white">
+            {user.name} {user.lastName}
           </span>
-          <span className="block text-xs">Admin</span>
+          <span className="block text-xs">{user.role}</span>
         </span>
 
         <div className="h-8 w-8 mr-1 rounded-full bg-gray-300 text-gray-700 flex items-center justify-center font-bold">
@@ -63,7 +62,7 @@ const DropdownUser = ({ user }) => {
               alt="User"
             />
           ) : (
-            <span className="text-white text-lg">A</span>
+            <span className="text-white text-lg">{user.name.charAt(0)}</span>
           )}
         </div>
       </Link>
