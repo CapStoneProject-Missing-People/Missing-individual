@@ -19,6 +19,6 @@ class MyApp extends StatelessWidget {
                 onBackground: Colors.black,
                 primary: Colors.blue,
                 onPrimary: Colors.white)),
-        home: MissingPersonPage());
+        home: MissingPersonMatchPage());
   }
 }

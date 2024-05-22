@@ -1,7 +1,6 @@
 import 'package:findme/features/matchedCase/models/missing_person1.dart' as mp;
 import 'package:findme/features/matchedCase/screens/matched_sample.dart';
 import 'package:flutter/material.dart';
-import 'package:missingpersonapp/features/matchedCase/screens/matched_sample.dart';
 
 class MissingPersonCard extends StatelessWidget {
   final mp.MissingPersonAdd missingPerson;
