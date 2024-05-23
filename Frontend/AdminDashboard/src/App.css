@@ -1,146 +1,38 @@
-/* Main  */  
-.main-container {
-  grid-area: main;
-  overflow-y: auto;
-  padding: 20px 20px;
-  color: rgba(255, 255, 255, 0.95);
+.App {
+  text-align: center;
 }
 
-.main-title {
-  display: flex;
-  justify-content: space-between;
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
 }
 
-.main-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 20px;
-  margin: 15px 0;
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
 }
 
-.card {
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  padding: 8px 15px;
-  border-radius: 20px;
-  text-decoration: none;
-}
-
-.card:first-child {
-  background-color: #296dff;
-}
-
-.card:nth-child(2) {
-  background-color: #ea00ff;
-}
-
-.card:nth-child(3) {
-  background-color: #293529;
-}
-
-.card:nth-child(4) {
-  background-color: #f81818;
-}
-
-.card-inner {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
 }
 
-.card-inner > .card_icon {
-  font-size: 25px;
+.App-link {
+  color: #61dafb;
 }
 
-.charts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 60px;
-  height: 300px;
-}
-/* Feedback style */ 
-
-label {
-  font-weight: bold;
-}
-
-input[type='text'],
-input[type='email'],
-textarea {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-}
-
-textarea {
-  height: 150px;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 150px;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-
-/* End Main  */
-
-
-/* Medium <= 992px */
-  
-@media screen and (max-width: 992px) {
-  .grid-container {
-    grid-template-columns: 1fr;
-    grid-template-rows: 0.2fr 3fr;
-    grid-template-areas:
-      'header'
-      'main';
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
   }
-
-  #sidebar {
-    display: none;
-  }
-
-  .menu-icon {
-    display: inline;
-  }
-
-  .sidebar-title > span {
-    display: inline;
-  }
-}
-/* Small <= 768px */
-  
-@media screen and (max-width: 768px) {
-  .main-cards {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-bottom: 0;
-  }
-
-  .charts {
-    grid-template-columns: 1fr;
-    margin-top: 30px;
-  }
-}
-
-/* Extra Small <= 576px */
-
-@media screen and (max-width: 576px) {
-  .search-bar {
-    display: none;
+  to {
+    transform: rotate(360deg);
   }
 }

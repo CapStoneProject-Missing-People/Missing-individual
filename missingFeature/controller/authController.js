@@ -82,7 +82,7 @@ export const login_post = async (req, res) => {
     const errors = handleErrors(err);
     res.status(400).json({ errors });
   }
-};
+}
 
 export const token_valid = async (req, res) => {
   try {
@@ -91,7 +91,6 @@ export const token_valid = async (req, res) => {
     if (!token) return res.json(false);
     const verified = jwt.verify(token, process.env.PRIV_KEY);
     if (!verified) return res.json(false);
-
     const user = await User.findById(verified.id);
     if (!user) return res.json(false);
     res.json(true);
@@ -101,6 +100,25 @@ export const token_valid = async (req, res) => {
   }
 };
 
+export const admin_login_post = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.adminlogin(email, password);
+    const token = createToken(user._id);
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      maxAge: maxAge * 1000,
+    });
+    res.status(200).json({ user, token: token });
+  } catch (err) {
+    const errors = handleErrors(err);
+    console.log("the error is:",errors);
+    res.status(400).json({ errors });
+  }
+};
+
+
+    
 export const getUserData = async (req, res) => {
   const user = await User.findById(req.user);
   res.json({ ...user._doc, token: req.user.token });

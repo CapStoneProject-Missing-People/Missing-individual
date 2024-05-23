@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 
 const connectToDb = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGO_URL, {
+        const conn = await mongoose.connect(process.env.dbUri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
             useCreateIndex: true,
         });
-        console.log(`Mongodb connected successfully on: ${conn.connection.host}`);
+        console.log(`Mongodb connected successfully on: ${conn.connection.name}`);
     } catch (error) {
         console.log(error);
         console.log("error: ", error);
