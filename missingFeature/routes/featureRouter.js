@@ -1,13 +1,23 @@
-import express from "express"
-import { compareFeature, createFeature, getFeatures, updateFeature, getSimilarityScore, getFeature} from "../controller/featureController.js"
+import express from "express";
+import { requireAuth } from "../middleware/authMiddleware.js";
+import {
+  compareFeature,
+  getFeatures,
+  getSimilarityScore,
+  getFeature,
+  deleteFeature,
+  update,
+  searchFeature,
+  getOwnFeatures,
+} from "../controller/featureController.js";
 
-export const router = express.Router()
+export const featureRouter = express.Router();
 
-router.route('/getAll').get(getFeatures)
-router.route('/getSingle/:id').get(getFeature)
-router.route('/similarity/:caseId').get(getSimilarityScore)
-router.route('/create').post(createFeature)
-router.route('/compare').post(compareFeature)
-router.route('/update/:id').put(updateFeature)
-
-
+featureRouter.route("/getAll").get(getFeatures);
+featureRouter.route("/getOwnFeatures").get(requireAuth, getOwnFeatures)
+featureRouter.route("/getSingle/:caseId").get(getFeature);
+featureRouter.route("/similarity/:caseId").get(getSimilarityScore);
+featureRouter.route("/compare/:timeSinceDisappearance").post(compareFeature);
+featureRouter.route("/updateFeature/:caseId").put(requireAuth, update)
+featureRouter.route("/delete/:caseId").delete(requireAuth, deleteFeature);
+featureRouter.route("/search/:timeSinceDisappearance").post(searchFeature)
