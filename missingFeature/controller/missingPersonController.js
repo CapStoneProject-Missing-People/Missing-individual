@@ -116,15 +116,15 @@ export const CreateMissingPerson = async (req, res) => {
     result.mergedFeature.missing_case_id = newMissingPerson._id;
     await result.createdFeature.save();
     await result.mergedFeature.save();
-    await sendPushNotificationFunc(
-          {
-            title: "New Missing Person",
-            body:String(result['name']['firstName']),
-            caseID: String(newMissingPerson._id),
-            orderDate: new Date().toISOString(),
-            fcmToken: "c9UznfvDSB-R2ocU30yARQ:APA91bEhK8JDntwHGFhVGgOI5Tcb_Hd16ilmVJ1s3Y6HVNlltCZNH_4KeKhrP5l0XQZ2PSY5j4ZY1sxf7AvRtoC2cLwpD4-T2s_rLZoQGb_WU_Wivh2Z0ID0-2fb9SErsHz63QeVzL2A"
-    }
-    )
+    // await sendPushNotificationFunc(
+    //       {
+    //         title: "New Missing Person",
+    //         body:String(result['name']['firstName']),
+    //         caseID: String(newMissingPerson._id),
+    //         orderDate: new Date().toISOString(),
+    //         fcmToken: "c9UznfvDSB-R2ocU30yARQ:APA91bEhK8JDntwHGFhVGgOI5Tcb_Hd16ilmVJ1s3Y6HVNlltCZNH_4KeKhrP5l0XQZ2PSY5j4ZY1sxf7AvRtoC2cLwpD4-T2s_rLZoQGb_WU_Wivh2Z0ID0-2fb9SErsHz63QeVzL2A"
+    // }
+    // )
     return res
       .status(201)
       .json({ message: "Missing person record created successfully.", createdFeatures: result });
