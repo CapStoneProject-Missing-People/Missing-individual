@@ -5,7 +5,7 @@ const {Schema, model} = mongoose
 const embeddingSchema = Schema({
     caseId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Feature'
+        ref: 'Feature',
     },
     embedding: [Number],
     similarity: [{

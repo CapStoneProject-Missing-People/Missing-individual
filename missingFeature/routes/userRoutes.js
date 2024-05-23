@@ -7,3 +7,6 @@ userRouter.route("/signup").post(authController.signup_post);
 userRouter.route("/login").post(authController.login_post);
 userRouter.route("/tokenIsValid").post(authController.token_valid);
 userRouter.route("/getUser").post(requireAuth, authController.getUserData);
+userRouter.route("/logout").get(authController.logout_get);
+userRouter.route("/adminLogin").post(authController.admin_login_post);
+
