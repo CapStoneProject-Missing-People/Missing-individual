@@ -84,6 +84,11 @@ export const login_post = async (req, res) => {
   }
 }
 
+export const logout_get = (req, res) => {
+  res.cookie("jwt", "", { maxAge: 1 });
+  res.send("logged out");
+};
+
 export const token_valid = async (req, res) => {
   try {
     const authHeader = req.header("authorization");
