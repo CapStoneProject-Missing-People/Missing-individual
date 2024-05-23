@@ -8,16 +8,28 @@ import { features } from "process";
 
 export const getOwnFeatures = async (req, res) => {
   try {
-    const filterCriteria = {}
-    const features = await MergedFeaturesModel.find(filterCriteria).lean().populate({path: 'missing_case_id', select:['status', 'imageBuffers', 'dateReported']});
-    console.log("features", features);
+    //console.log(req.user);
+    const filterCriteria = {};
+    if (req.user) {
+      // Check if the user wants to view their own features
+      filterCriteria.user_id = req.user.userId;
+    }
+    //console.log(filterCriteria);
+    //console.log(req.user.userId);
+    const features = await MergedFeaturesModel.find(filterCriteria)
+      .lean()
+      .populate({
+        path: "missing_case_id",
+        select: ["status", "imageBuffers", "dateReported"],
+      });
+    console.log(features);
 
     res.status(200).json(features);
-  } catch (error){
+  } catch (error) {
     res.status(500).json({ error: "Server error" });
     console.log("Error ferching features: ", error);
-}
-}
+  }
+};
 
 //@desc Get all Features
 //@route GET /api/features/getAll
