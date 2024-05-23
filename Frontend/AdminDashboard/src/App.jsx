@@ -1,26 +1,98 @@
-import { BrowserRouter as Router } from 'react-router-dom';
-import { useState } from 'react'
-import './App.css'
-import Header from './components/Header'
-import Sidebar from './components/Sidebar'
-import Routes from './Routes'
+import React, { useState } from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import MainLayout from './components/layouts/MainLayout';
+import MenuContextProvider from './context/MenuContext';
+import MainDashboard from './components/page/Dashboard/MainDashboard';
+import MainUserManagement from './components/page/UserManagement/MainUserManagement';
+import MainAdminManagement from './components/page/AdminManagement/MainAdminManagement';
+import MainMissingPeople from './components/page/MissingPeople/MainMissingPeople';
+import Profile from './components/page/Profile';
+import MainFeedback from './components/page/Feedback/MainFeedback';
+import MainLogManagement from './components/page/LogManagement/MainLogManagement';
+import Login from './components/page/Login';
+import PrivateRoute from './components/PrivateRoute';
 
-function App() {
-  const [openSidebarToggle, setOpenSidebarToggle] = useState(false)
-
-  const OpenSidebar = () => {
-    setOpenSidebarToggle(!openSidebarToggle)
-  }
+const App = () => {
+  const [user, setUser] = useState(null);
 
   return (
-    <Router>
-      <div className='grid-container'>
-        <Header OpenSidebar={OpenSidebar} />
-        <Sidebar openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar} />
-        <Routes/>
-      </div>
-    </Router>
+    <MenuContextProvider>
+      <Routes>
+        <Route path="/" element={<Login setUser={setUser}/>} /> {/* Render Login page by default */}
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainDashboard />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/user-management"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainUserManagement />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin-management"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainAdminManagement />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/missing-people"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainMissingPeople />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profiles"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <Profile />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/feedbacks"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainFeedback />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/log-management"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainLogManagement />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} /> {/* Redirect to Login page for any other route */}
+      </Routes>
+    </MenuContextProvider>
   );
-}
+};
 
-export default App
+export default App;

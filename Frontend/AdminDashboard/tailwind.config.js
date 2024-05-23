@@ -1,13 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.{html,js,jsx}"],
+  content: ["./index.html","./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      fontFamily:{
-        inter:['Inter', 'system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'],
-      }
+      fontFamily: {
+        poppins: "Poppins",
+        kaushan: "Kaushan Script",
+        Montserrat: ['Inter', 'system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'],
+      },
     },
   },
-  plugins: [],
+  plugins: [require("tailwind-scrollbar")],
 }
 
