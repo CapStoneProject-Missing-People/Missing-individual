@@ -72,6 +72,7 @@ export const login_post = async (req, res) => {
   try {
     const user = await User.login(email, password);
     const token = createToken(user._id);
+    //console.log(token);
     res.cookie("jwt", token, {
       httpOnly: true,
       maxAge: maxAge * 1000,
@@ -85,7 +86,8 @@ export const login_post = async (req, res) => {
 
 export const token_valid = async (req, res) => {
   try {
-    const token = req.header("authorization");
+    const authHeader = req.header("authorization");
+    const token = authHeader.split(" ")[1];
     if (!token) return res.json(false);
     const verified = jwt.verify(token, process.env.PRIV_KEY);
     if (!verified) return res.json(false);
