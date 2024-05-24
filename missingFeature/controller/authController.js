@@ -51,10 +51,6 @@ const createToken = (id) => {
   });
 };
 
-export const signup_get = (req, res) => {
-  res.send("signup");
-};
-
 export const signup_post = async (req, res) => {
   const { name, email, phoneNo, password, role } = req.body;
   try {
@@ -71,14 +67,48 @@ export const signup_post = async (req, res) => {
   }
 };
 
-export const login_get = (req, res) => {
-  res.send("login");
-};
-
 export const login_post = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.login(email, password);
+    const token = createToken(user._id);
+    //console.log(token);
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      maxAge: maxAge * 1000,
+    });
+    res.status(200).json({ ...user._doc, token });
+  } catch (err) {
+    const errors = handleErrors(err);
+    res.status(400).json({ errors });
+  }
+}
+
+export const logout_get = (req, res) => {
+  res.cookie("jwt", "", { maxAge: 1 });
+  res.send("logged out");
+};
+
+export const token_valid = async (req, res) => {
+  try {
+    const authHeader = req.header("authorization");
+    const token = authHeader.split(" ")[1];
+    if (!token) return res.json(false);
+    const verified = jwt.verify(token, process.env.PRIV_KEY);
+    if (!verified) return res.json(false);
+    const user = await User.findById(verified.id);
+    if (!user) return res.json(false);
+    res.json(true);
+  } catch (err) {
+    const errors = handleErrors(err);
+    res.status(500).json({ errors });
+  }
+};
+
+export const admin_login_post = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.adminlogin(email, password);
     const token = createToken(user._id);
     res.cookie("jwt", token, {
       httpOnly: true,
@@ -87,19 +117,14 @@ export const login_post = async (req, res) => {
     res.status(200).json({ user, token: token });
   } catch (err) {
     const errors = handleErrors(err);
+    console.log("the error is:",errors);
     res.status(400).json({ errors });
   }
 };
 
-export const logout_get = (req, res) => {
-  res.cookie("jwt", "", { maxAge: 1 });
-  res.send("logged out");
-};
 
-export const protected_get = (req, res) => {
-  res.send("protected route");
-};
-
-export const admin_get = (req, res) => {
-  res.send("admin route");
+    
+export const getUserData = async (req, res) => {
+  const user = await User.findById(req.user);
+  res.json({ ...user._doc, token: req.user.token });
 };
