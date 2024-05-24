@@ -24,7 +24,7 @@ export const requireAuth = (req, res, next) => {
           if (!user) {
             return res.status(401).json({ msg: "unauthorized login first" });
           }
-          req.user = { userId: user._id, role: user.role };
+          req.user = { userId: user._id, role: user.role, token: token };
           return next();
         } catch (error) {
           console.error(error.message);

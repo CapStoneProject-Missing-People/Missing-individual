@@ -15,7 +15,7 @@ const Login = ({ setUser }) => {
     setErrors({ email: '', password: '' });
 
     try {
-      const res = await axios.post('http://localhost:4000/api/users/login', {
+      const res = await axios.post('http://localhost:4000/api/users/adminLogin', {
         email,
         password
       }, {

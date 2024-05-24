@@ -119,7 +119,7 @@ const Table = ({ data }) => {
       columns,
       data: tableData,
       initialState: { pageSize: 5 },
-      globalFilter: globalFilterFunction,
+     
     },
     useGlobalFilter,
     useSortBy,
@@ -155,7 +155,7 @@ const Table = ({ data }) => {
       <div className="w-full  flex flex-col sm:flex-row justify-between gap-2">
         <GlobalSearchFilter1
           className="sm:w-64"
-          globalFilter={globalFilter}
+          globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
         <SelectMenu1
