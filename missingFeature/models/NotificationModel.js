@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const { Schema, model } = mongoose;
 
@@ -32,6 +32,13 @@ const notificationSchema = new Schema(
     timestamps: true,
   }
 );
+
+notificationSchema.statics.deleteOldNotifications = async function () {
+  const oneDayAgo = new Date();
+  oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+
+  await this.deleteMany({ createdAt: { $lt: oneDayAgo } });
+};
 
 const Notification = model("notification", notificationSchema);
 
