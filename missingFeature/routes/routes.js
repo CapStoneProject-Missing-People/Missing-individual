@@ -5,8 +5,8 @@ import { CreateMissingPerson } from "../controller/missingPersonController.js";
 import { AddActionLogGateWay, getActionLogByID, getAllActionLogs, getActionLogByUser } from '../controller/logging.js';
 import {sendPushNotification}  from "../controller/push-notification.controller.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
-
-
+import { StoreGuestFCM } from '../controller/push-notification.controller.js';
+import { UpdateUserFCM } from '../controller/push-notification.controller.js';
 
 // Create an instance of Express Router
 export const routers = express.Router();
@@ -29,4 +29,6 @@ routers.route('/get-user-action-log/:userId').get(getActionLogByUser);
 
 // Routes for Notification
 routers.route('/send-notification').post(sendPushNotification);
+routers.route('/store-guest-fcm-token').post(StoreGuestFCM);
+routers.route('/update-user-fcm-token').put(requireAuth, UpdateUserFCM);
 
