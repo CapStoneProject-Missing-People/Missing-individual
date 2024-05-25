@@ -187,6 +187,7 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
     if (existingFeature) {
       return 'duplicate feature already exist'
     }
+    featureData.timeSinceDisappearance = timeSinceDisappearance
     const feature = await Features.create( featureData );
     console.log("feature stored successfully");
     const existingFeatureMerged = await MergedFeaturesModel.findOne({ inputHash: featureData.inputHash });
