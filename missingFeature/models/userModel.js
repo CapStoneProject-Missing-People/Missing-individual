@@ -34,6 +34,14 @@ const userSchema = new Schema(
       enum: ["user", "admin", "superAdmin"],
       default: "user",
     },
+    fcmToken: {
+      type: String,
+      default: null,
+    },
+    notificationsEnabled: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
