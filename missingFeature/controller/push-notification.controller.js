@@ -62,7 +62,7 @@ export const sendPushNotificationFunc = async ({
 
 export const sendNotificationToAllUsersAndGuests = async (title, body, caseID) => {
   try {
-    console.log("sending notification to all")
+    console.log("sending notification to all");
     const users = await User.find({ notificationsEnabled: true });
     const guestTokens = await GuestFcmToken.find({});
 
@@ -161,3 +161,39 @@ const DelelteUserFCM = async (fcmToken) => {
     throw new Error("Error deleting user FCM token");
   }
 };
+
+export const FetchNotifications = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const notifications = await Notification.find({ user: userId }).sort({ createdAt: -1 });
+        res.status(200).json(notifications);
+      } catch (error) {
+        console.error('Error fetching notifications for user:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+}
+
+export const FetchNotificationUser = async (req, res) => {
+    try {
+        const notificationId = req.params.id;
+        await Notification.findByIdAndUpdate(notificationId, { isRead: true });
+        res.status(200).json({ message: 'Notification marked as read' });
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+}
+
+export const guestNotification = async (req, res) => {
+    try {
+        const { fcmToken } = req.query;
+        if (!fcmToken) {
+          return res.status(400).json({ error: 'FCM Token is required' });
+        }
+        const notifications = await Notification.find({ guestToken: fcmToken }).sort({ createdAt: -1 });
+        res.status(200).json(notifications);
+      } catch (error) {
+        console.error('Error fetching notifications for guest:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+}
