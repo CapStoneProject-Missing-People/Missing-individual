@@ -4,7 +4,14 @@ import 'package:missingpersonapp/features/home/data/missing_person_fetch.dart';
 import 'package:missingpersonapp/features/home/utils/missingPeopleDisplayCard.dart';
 
 class HomePageContent extends StatefulWidget {
-  const HomePageContent({super.key});
+  final String searchText;
+  final ValueChanged<List<MissingPerson>> onMissingPeopleFetched;
+
+  const HomePageContent({
+    Key? key,
+    required this.searchText,
+    required this.onMissingPeopleFetched,
+  }) : super(key: key);
 
   @override
   _HomePageContentState createState() => _HomePageContentState();
@@ -23,6 +30,14 @@ class _HomePageContentState extends State<HomePageContent> {
     _fetchAllMissingPeople();
   }
 
+  @override
+  void didUpdateWidget(covariant HomePageContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.searchText != widget.searchText) {
+      _loadPageItems();
+    }
+  }
+
   Future<void> _fetchAllMissingPeople() async {
     setState(() {
       _isLoading = true;
@@ -32,6 +47,7 @@ class _HomePageContentState extends State<HomePageContent> {
       final List<MissingPerson> missingPeople = await fetchMissingPeople();
       setState(() {
         _allMissingPeople.addAll(missingPeople);
+        widget.onMissingPeopleFetched(_allMissingPeople);
         _loadPageItems();
       });
     } catch (e) {
@@ -45,22 +61,30 @@ class _HomePageContentState extends State<HomePageContent> {
   void _loadPageItems() {
     setState(() {
       _displayedMissingPeople.clear();
+      final List<MissingPerson> filteredPeople = _applySearch();
       final int startIndex = (_currentPage - 1) * _itemsPerPage;
       final int endIndex = startIndex + _itemsPerPage;
       _displayedMissingPeople.addAll(
-        _allMissingPeople.sublist(
+        filteredPeople.sublist(
           startIndex,
-          endIndex > _allMissingPeople.length
-              ? _allMissingPeople.length
-              : endIndex,
+          endIndex > filteredPeople.length ? filteredPeople.length : endIndex,
         ),
       );
       _isLoading = false;
     });
   }
 
+  List<MissingPerson> _applySearch() {
+    return _allMissingPeople.where((person) {
+      final searchText = widget.searchText.toLowerCase();
+      return widget.searchText.isEmpty ||
+          person.name.toLowerCase().contains(searchText) ||
+          person.age.toString().contains(searchText);
+    }).toList();
+  }
+
   void _goToNextPage() {
-    if (_currentPage * _itemsPerPage < _allMissingPeople.length) {
+    if (_currentPage * _itemsPerPage < _applySearch().length) {
       setState(() {
         _currentPage++;
         _loadPageItems();
@@ -114,14 +138,15 @@ class _HomePageContentState extends State<HomePageContent> {
               ),
               Text('Page $_currentPage'),
               TextButton(
-                onPressed:
-                    _currentPage * _itemsPerPage < _allMissingPeople.length
-                        ? _goToNextPage
-                        : null,
+                onPressed: _currentPage * _itemsPerPage < _applySearch().length
+                    ? _goToNextPage
+                    : null,
                 child: Text(
                   'Next',
                   style: TextStyle(
-                    color: _currentPage * _itemsPerPage < _allMissingPeople.length ? Colors.blue : Colors.grey,
+                    color: _currentPage * _itemsPerPage < _applySearch().length
+                        ? Colors.blue
+                        : Colors.grey,
                   ),
                 ),
               ),
