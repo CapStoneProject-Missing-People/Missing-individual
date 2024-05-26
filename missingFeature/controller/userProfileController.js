@@ -68,7 +68,7 @@ export const deleteUserProfile = async (req, res) => {
   try {
     const userID = req.user.userId;
     //remove posts made by the user
-    await MissingPerson.deleteMany({ userID });
+    // await MissingPerson.deleteMany({ userID });
     //remove user
     await User.findOneAndDelete({ _id: userID });
     res.json({ msg: "user deleted" });
