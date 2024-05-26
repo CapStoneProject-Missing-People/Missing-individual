@@ -199,6 +199,7 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
     if (existingFeature) {
       return 'duplicate feature already exist'
     }
+    featureData.timeSinceDisappearance = timeSinceDisappearance
     const feature = await Features.create( featureData );
     console.log("feature stored successfully");
     const existingFeatureMerged = await MergedFeaturesModel.findOne({ inputHash: featureData.inputHash });
@@ -302,7 +303,7 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
 //@access public
 export const compareFeature = async (req, res) => {
   try {
-    let { timeSinceDisappearance } = req.params
+    let { timeSinceDisappearance } = req.params;
     const descriptionTypes = [
       "eyeDescription",
       "noseDescription",
@@ -312,9 +313,8 @@ export const compareFeature = async (req, res) => {
 
     let descriptions = "";
     for (const descType of descriptionTypes) {
-      descriptions += req.body.description[descType];
+      descriptions += req.body[descType];
     }
-    // console.log(descriptions)
 
     const existingEmbeddingsCount = await embeddings.countDocuments();
 
@@ -323,9 +323,10 @@ export const compareFeature = async (req, res) => {
       res.json({ message: "nothing in database" });
       return;
     } else {
-      let response = []
+      let response = [];
       let featureData = {};
-      
+      let featureModelName = "";
+
       if (timeSinceDisappearance > 2) {
         featureModelName = "Features_GT_2";
         featureData = {
@@ -335,56 +336,51 @@ export const compareFeature = async (req, res) => {
         };
       } else {
         featureModelName = "Features_LTE_2";
-        console.log(req.body.clothing.lower.clothType)
         featureData = {
-          "clothing.upper.clothType": req.body.clothing.upper.clothType,
-          "clothing.upper.clothColor": req.body.clothing.upper.clothColor,
-          "clothing.lower.clothType": req.body.clothing.lower.clothType,
-          "clothing.lower.clothColor": req.body.clothing.lower.clothColor,
+          "clothing.upper.clothType": req.body.clothingUpperClothType,
+          "clothing.upper.clothColor": req.body.clothingUpperClothColor,
+          "clothing.lower.clothType": req.body.clothingLowerClothType,
+          "clothing.lower.clothColor": req.body.clothingLowerClothColor,
           body_size: req.body.body_size,
         };
       }
-      
-      const Features = await initializeFeaturesModel(timeSinceDisappearance)
-     
+
+      const Features = await initializeFeaturesModel(timeSinceDisappearance);
+
       // Find all embeddings in the database
       const existingEmbeddings = await embeddings.find();
       const pipelineModel = await generateEmbeddings();
-      const output = await pipelineModel(data.description, {
+      const output = await pipelineModel(descriptions, {
         pooling: "mean",
         normalize: true,
       });
       const embeddingData = output.data;
-
       const embeddingArray = [...embeddingData];
+
       // Calculate cosine similarity with each existing embedding
-      const similarityScores = await existingEmbeddings.map(
-        (existingEmbedding) => {
-          const similarity = calculateSimilarity(
-            embeddingData,
-            existingEmbedding.embedding
-          );
-          return {
-            existingCaseId: existingEmbedding.caseId,
-            similarityScore: similarity,
-          };
-        }
-      );
+      const similarityScores = existingEmbeddings.map((existingEmbedding) => {
+        const similarity = calculateSimilarity(
+          embeddingData,
+          existingEmbedding.embedding
+        );
+        return {
+          existingCaseId: existingEmbedding.caseId,
+          similarityScore: similarity,
+        };
+      });
 
       similarityScores.sort((a, b) => b.similarityScore - a.similarityScore);
-      // console.log(similarityScores);
 
-   // Construct criteria based on the request body
+      // Construct criteria based on the request body
       const criteria = {
         age: req.body.age,
-        "name.firstName": req.body.name.firstName,
-        "name.middleName": req.body.name.middleName,
-        "name.lastName": req.body.name.lastName,
+        "name.firstName": req.body.firstName,
+        "name.middleName": req.body.middleName,
+        "name.lastName": req.body.lastName,
         skin_color: req.body.skin_color,
         ...featureData, // Include feature-specific data
       };
 
-      console.log(criteria)
       const ageRanges = {
         "1-4": { $gte: 1, $lte: 4 },
         "5-10": { $gte: 5, $lte: 10 },
@@ -402,15 +398,14 @@ export const compareFeature = async (req, res) => {
       matchingCases.forEach((caseData) => {
         const matchingStatus = { id: caseData._id };
         for (const key in criteria) {
-          // var featurePercentValue = 0
           const value = criteria[key];
           if (key === "age") {
             if (caseData.age === value) {
               matchingStatus.age = 100;
             } else {
-              var ageRangeMatch = false;
-              var caseDataAgeRange = "";
-              var newReqAge = "";
+              let ageRangeMatch = false;
+              let caseDataAgeRange = "";
+              let newReqAge = "";
               for (const rangeKey of ageRangeKeys) {
                 const range = ageRanges[rangeKey];
                 if (caseData.age >= range.$gte && caseData.age <= range.$lte) {
@@ -423,7 +418,6 @@ export const compareFeature = async (req, res) => {
 
               if (caseDataAgeRange === newReqAge) {
                 console.log("potential age match");
-                // featurePercentValue = 85
                 ageRangeMatch = true;
                 matchingStatus.age = 85;
               }
