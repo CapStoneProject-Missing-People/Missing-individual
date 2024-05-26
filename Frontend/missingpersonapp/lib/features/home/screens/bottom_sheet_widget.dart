@@ -87,7 +87,7 @@ class _MyDraggableSheetState extends State<MyDraggableSheet> {
       child: LayoutBuilder(builder: (context, constraints) {
         return DraggableScrollableSheet(
           key: sheet,
-          initialChildSize: 0.05,
+          initialChildSize: 0.6,
           maxChildSize: 0.95,
           minChildSize: 0,
           expand: true,
