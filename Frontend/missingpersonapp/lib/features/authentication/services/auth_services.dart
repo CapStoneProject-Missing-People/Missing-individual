@@ -32,7 +32,7 @@ class AuthService {
       );
 
       http.Response res = await http.post(
-        Uri.parse('${Constants.uri}/api/users/signup'),
+        Uri.parse('${Constants.postUri}/api/users/signup'),
         body: user.toJson(),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -64,7 +64,7 @@ class AuthService {
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       final navigator = Navigator.of(context);
       http.Response res = await http.post(
-        Uri.parse('${Constants.uri}/api/users/login'),
+        Uri.parse('${Constants.postUri}/api/users/login'),
         body: jsonEncode({
           'email': email,
           'password': password,
@@ -115,7 +115,7 @@ class AuthService {
       }
 
       var tokenRes = await http.post(
-        Uri.parse('${Constants.uri}/api/users/tokenIsValid'),
+        Uri.parse('${Constants.postUri}/api/users/tokenIsValid'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'authorization': "Bearer $token",
@@ -126,7 +126,7 @@ class AuthService {
 
       if (response == true) {
         http.Response userRes = await http.get(
-          Uri.parse('${Constants.uri}/api/users/getUser'),
+          Uri.parse('${Constants.postUri}/api/users/getUser'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
             'authorization': "Bearer $token"
@@ -158,7 +158,8 @@ class AuthService {
     print('token at logout $fcmToken');
     print('logging out');
     if (fcmToken != null) {
-      await _fcmService.sendTokenToBackend(fcmToken); // Store the token as a guest token on logout
+      await _fcmService.sendTokenToBackend(
+          fcmToken); // Store the token as a guest token on logout
     }
 
     navigator.pushAndRemoveUntil(

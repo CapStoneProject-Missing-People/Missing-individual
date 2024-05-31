@@ -9,7 +9,7 @@ import 'package:missingpersonapp/features/home/screens/profile_drawer.dart';
 import 'package:missingpersonapp/features/home/utils/missingPersonDisplayContent.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({Key? key});
 
   void signOutUser(BuildContext context) {
     AuthService().signOut(context);
@@ -21,19 +21,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
   int _selectedIndex = 0;
   String _searchText = '';
   bool _isFilterVisible = false;
   final TextEditingController _searchController = TextEditingController();
-
-  static final List<Widget> _pages = <Widget>[
-    HomePageContent(
-      searchText: '',
-      onMissingPeopleFetched: (missingPeople) {},
-    ),
-    const MissingPersonAddPage(),
-    const NotificationPage(),
-  ];
+  Map<String, dynamic> _filters = {};
 
   void _onItemTapped(int index) {
     setState(() {
@@ -44,16 +37,18 @@ class _HomePageState extends State<HomePage> {
   void _updateSearchText(String text) {
     setState(() {
       _searchText = text;
-      _pages[0] = HomePageContent(
-        searchText: _searchText,
-        onMissingPeopleFetched: (missingPeople) {},
-      );
     });
   }
 
   void _toggleFilterVisibility() {
     setState(() {
       _isFilterVisible = !_isFilterVisible;
+    });
+  }
+
+  void _onFilterChanged(Map<String, dynamic> filterData) {
+    setState(() {
+      _filters = filterData;
     });
   }
 
@@ -123,12 +118,19 @@ class _HomePageState extends State<HomePage> {
       drawer: const ProfileDrawer(),
       body: Stack(
         children: [
-          _pages[_selectedIndex],
+          _selectedIndex == 0
+              ? HomePageContent(
+                  searchText: _searchText,
+                  filters: _filters,
+                  onMissingPeopleFetched: (missingPeople) {},
+                )
+              : _selectedIndex == 1
+                  ? const MissingPersonAddPage()
+                  : const NotificationPage(),
           MyDraggableSheet(
             visible: _isFilterVisible,
-            onFilterChanged: (filters) {
-              // Handle the filters here
-            },
+            onFilterChanged: _onFilterChanged,
+            onClose: () => setState(() => _isFilterVisible = false),
             child: Container(
               child: Center(
                 child: Text(
@@ -179,9 +181,11 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () => Navigator.pop(context, ImageSource.camera),
                   child: const Row(
                     children: [
-                      Icon(Icons.camera_alt_outlined, color: Colors.blue, size: 32),
+                      Icon(Icons.camera_alt_outlined,
+                          color: Colors.blue, size: 32),
                       SizedBox(width: 8),
-                      Text('Camera', style: TextStyle(color: Colors.blue, fontSize: 20)),
+                      Text('Camera',
+                          style: TextStyle(color: Colors.blue, fontSize: 20)),
                     ],
                   ),
                 ),
@@ -189,9 +193,11 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () => Navigator.pop(context, ImageSource.gallery),
                   child: const Row(
                     children: [
-                      Icon(Icons.photo_camera_back_outlined, color: Colors.blue, size: 32),
+                      Icon(Icons.photo_camera_back_outlined,
+                          color: Colors.blue, size: 32),
                       SizedBox(width: 8),
-                      Text('Gallery', style: TextStyle(color: Colors.blue, fontSize: 20)),
+                      Text('Gallery',
+                          style: TextStyle(color: Colors.blue, fontSize: 20)),
                     ],
                   ),
                 ),
@@ -222,7 +228,7 @@ class _HomePageState extends State<HomePage> {
       case 1:
         return 'Add Post';
       case 2:
-        return 'Profile';
+        return 'Notification';
       default:
         return 'Missing Person App';
     }

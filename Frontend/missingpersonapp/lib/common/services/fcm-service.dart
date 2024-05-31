@@ -66,7 +66,7 @@ class FcmService {
   Future<void> storeGuestFcmToken(String token) async {
     print("Storing guest FCM token: $token");
     final response = await http.post(
-      Uri.parse('${Constants.uri}/api/store-guest-fcm-token'),
+      Uri.parse('${Constants.postUri}/api/store-guest-fcm-token'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -78,14 +78,15 @@ class FcmService {
     if (response.statusCode == 201) {
       print('Guest FCM Token stored successfully.');
     } else {
-      print('Failed to store Guest FCM Token. Response code: ${response.statusCode}');
+      print(
+          'Failed to store Guest FCM Token. Response code: ${response.statusCode}');
     }
   }
 
   Future<void> updateUserFcmToken(String token, String userToken) async {
     print("Updating user FCM token: $token");
     final response = await http.put(
-      Uri.parse('${Constants.uri}/api/update-user-fcm-token'),
+      Uri.parse('${Constants.postUri}/api/update-user-fcm-token'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $userToken',
@@ -98,14 +99,15 @@ class FcmService {
     if (response.statusCode == 200) {
       print('User FCM Token updated successfully.');
     } else {
-      print('Failed to update User FCM Token. Response code: ${response.statusCode}');
+      print(
+          'Failed to update User FCM Token. Response code: ${response.statusCode}');
     }
   }
 
   Future<void> deleteGuestFcmToken(String token) async {
     print("Deleting guest FCM token: $token");
     final response = await http.post(
-      Uri.parse('${Constants.uri}/delete-guest-fcm-token'),
+      Uri.parse('${Constants.postUri}/delete-guest-fcm-token'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -117,7 +119,8 @@ class FcmService {
     if (response.statusCode == 200) {
       print('Guest FCM Token deleted successfully.');
     } else {
-      print('Failed to delete Guest FCM Token. Response code: ${response.statusCode}');
+      print(
+          'Failed to delete Guest FCM Token. Response code: ${response.statusCode}');
     }
   }
 
