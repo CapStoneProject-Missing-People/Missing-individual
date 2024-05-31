@@ -37,18 +37,25 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
                 // Profile Details Section
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Profile Details',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  child: Card(
+                    color: Colors.blue[50],
+                    surfaceTintColor: Colors.yellowAccent,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0, 4.0, 0, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Profile Details',
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 10),
+                          ProfileDetailItem(label: 'Name', value: _userData.name),
+                          ProfileDetailItem(label: 'Email', value: _userData.email),
+                          ProfileDetailItem(label: 'Phone Number', value: _userData.phoneNo),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      ProfileDetailItem(label: 'Name', value: _userData.name),
-                      ProfileDetailItem(label: 'Email', value: _userData.email),
-                      ProfileDetailItem(label: 'Phone Number', value: _userData.phoneNo),
-                    ],
+                    ),
                   ),
                 ),
                 // Edit Profile Button
