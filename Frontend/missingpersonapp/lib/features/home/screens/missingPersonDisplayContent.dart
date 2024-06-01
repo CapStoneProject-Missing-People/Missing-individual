@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:missingpersonapp/common/models/missing_person.dart';
 import 'package:missingpersonapp/features/home/data/missing_person_fetch.dart';
-import 'package:missingpersonapp/features/home/utils/missingPeopleDisplayCard.dart';
+import 'package:missingpersonapp/features/home/screens/missingPeopleDisplayCard.dart';
 
 class HomePageContent extends StatefulWidget {
   final String searchText;
