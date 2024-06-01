@@ -6,7 +6,7 @@ import 'package:missingpersonapp/features/authentication/services/auth_services.
 import 'package:missingpersonapp/features/home/screens/bottom_sheet_widget.dart';
 import 'package:missingpersonapp/features/home/services/check_face.dart';
 import 'package:missingpersonapp/features/home/screens/profile_drawer.dart';
-import 'package:missingpersonapp/features/home/utils/missingPersonDisplayContent.dart';
+import 'package:missingpersonapp/features/home/screens/missingPersonDisplayContent.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key});
