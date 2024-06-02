@@ -11,7 +11,6 @@ import { adminRouters } from "./routes/adminRouter.js";
 import cors from "cors";
 // import cookieParser from "cookie-parser"
 // import { requireAuth, checkUser } from "./middleware/authMiddleware"
-dotenv.config()
 
 
 dotenv.config();
