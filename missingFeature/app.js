@@ -9,7 +9,7 @@ import { adminRouters } from "./routes/adminRouter.js";
 
 dotenv.config();
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 const app = express();
 
 connectionDb();
@@ -20,6 +20,11 @@ app.use("/api/users", userRouter);
 app.use("/api/profile", profileRouter);
 app.use("/api/admin", adminRouters);
 app.use("/api", router);
+
+// Handle 404 - Resource Not Found
+app.use((req, res, next) => {
+  res.status(404).json({ msg: "Route not found" });
+});
 
 app.listen(port, () => {
   console.log(`server listening on port ${port}`);

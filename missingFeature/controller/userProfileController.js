@@ -1,5 +1,5 @@
 import MissingPerson from "../models/missingPersonSchema.js";
-import User from "../models/userModel.js";
+import {User} from "../models/userModel.js";
 
 //@desc Get current user
 //@route GET /api/profile/current
@@ -10,32 +10,20 @@ export const getUserProfile = async (req, res) => {
       return res.status(401).json({ msg: "Not authorized! Login First" });
     }
     const userID = req.user.userId;
-    //const profile = await User.findOne({ _id: userID });
-    const profile = await User.findOne({ _id: userID }).select(
+    const profile = await User.findById({ userID }).select(
       "-_id -password -createdAt -updatedAt -__v"
     );
     if (!profile) {
       return res.status(400).json({ msg: "No profile found" });
-    } else {
-      const posts = await MissingPerson.find({ userID }).select(
-        "-_id -__v -userID -faceFeatureCreated -imagePaths"
-      );
-      if (!posts) {
-        res.json({ msg: "There are no posts", profile });
-      }
-      const combinedData = { profile, posts };
-      res.json(combinedData);
     }
+    res.json(profile);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
   }
 };
 
-//@desc update current user
-//@route PUT /api/profile/update
-//@access private
-export const updateUserProfile = async (req, res) => {
+/* export const updateUserProfile = async (req, res) => {
   const { name, email, phoneNo } = req.body;
   const profileFields = {};
   if (name) profileFields.name = name;
@@ -58,6 +46,39 @@ export const updateUserProfile = async (req, res) => {
     console.error(err);
     res.status(500).send("Server Error");
   }
+}; */
+//@desc update current user
+//@route PUT /api/profile/update
+//@access private
+export const updateUserProfile = async (req, res) => {
+  const userID = req.params.userId;
+  const { email, name, phoneNo } = req.body;
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(userID);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Check if at least one field is provided for update
+    if (!email && !name && !phoneNo) {
+      return res.status(400).json({ msg: "No fields provided for update" });
+    }
+
+    // Update user fields
+    if (email) user.email = email;
+    if (name) user.name = name;
+    if (phoneNo) user.phoneNo = phoneNo;
+
+    // Save updated user
+    await user.save();
+
+    res.json({ msg: "User profile updated successfully" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
 };
 
 //@desc delete current user
@@ -68,6 +89,10 @@ export const deleteUserProfile = async (req, res) => {
     const userID = req.user.userId;
     //remove posts made by the user
     await MissingPerson.deleteMany({ userID });
+
+    // remove post from merged features model (if any)
+    await MergedFeaturesModel.deleteMany({ user_id: userID });
+
     //remove user
     await User.findOneAndDelete({ _id: userID });
     res.json({ msg: "user deleted" });
