@@ -3,6 +3,7 @@ import admin from "firebase-admin";
 import GuestFcmToken from "../models/guestNotification.js";
 import User from "../models/userModel.js";
 import Notification from "../models/NotificationModel.js";
+import MissingPerson from "../models/missingPersonSchema.js";
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -32,6 +33,33 @@ export const sendPushNotification = async (req, res, next) => {
   }
 };
 
+export const getPushNotificationDetail = async (req, res, next) => {
+  try {
+    const { title, body, caseId } = req.body;
+
+    if (!title || !body || !caseId) {
+      return res.status(400).send({ message: "Missing required fields" });
+    }
+    const missingPerson = await MissingPerson.findById(caseId);
+    if (!missingPerson || !missingPerson.userID) {
+      return res.status(404).send({ message: "User associated with missing person not found" });
+    }
+    const userId = missingPerson.userID;
+    console.log("missing id" + userId);
+    const result = await sendNotificationToSingleUser(userId, title, body, caseId);
+
+    if (result.success) {
+      res.status(200).send({ message: result.message });
+    } else {
+      res.status(500).send({ message: result.message, error: result.error });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
+
 export const sendPushNotificationFunc = async ({
   title,
   body,
@@ -60,10 +88,17 @@ export const sendPushNotificationFunc = async ({
   }
 };
 
-export const sendNotificationToAllUsersAndGuests = async (title, body, caseID) => {
+export const sendNotificationToAllUsersAndGuests = async (
+  title,
+  body,
+  caseID
+) => {
   try {
     console.log("sending notification to all");
-    const users = await User.find({ notificationsEnabled: true });
+    const users = await User.find({
+      notificationsEnabled: true,
+      fcmToken: { $ne: null },
+    });
     const guestTokens = await GuestFcmToken.find({});
 
     const userTokens = users.map((user) => user.fcmToken);
@@ -110,6 +145,71 @@ export const sendNotificationToAllUsersAndGuests = async (title, body, caseID) =
   }
 };
 
+export const sendNotificationToSingleUser = async (
+  userId,
+  title,
+  body,
+  caseID
+) => {
+  try {
+    // Find the user by ID and check if notifications are enabled
+    const user = await User.findById(userId);
+    if (!user || !user.notificationsEnabled) {
+      console.error("User not found or notifications not enabled");
+      return {
+        success: false,
+        message: "User not found or notifications not enabled",
+      };
+    }
+
+    // Get the user's FCM token
+    const fcmToken = user.fcmToken;
+    if (!fcmToken) {
+      console.error("FCM token not found for the user");
+      return { success: false, message: "FCM token not found for the user" };
+    }
+
+    // Create a new notification in the database
+    const notification = new Notification({
+      user: user._id,
+      title,
+      body,
+      caseID,
+    });
+    await notification.save();
+
+    // Send the push notification using the FCM token
+    const result = await sendPushNotificationFunc({
+      title,
+      body,
+      caseID,
+      fcmToken,
+    });
+
+    if (result.success) {
+      console.log("Notification sent successfully to the user");
+      return {
+        success: true,
+        message: "Notification sent successfully to the user",
+      };
+    } else {
+      console.error("Error sending notification:", result.error);
+      return {
+        success: false,
+        message: "Error sending notification",
+        error: result.error,
+      };
+    }
+  } catch (error) {
+    console.error("Error sending notification to single user:", error);
+    return {
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    };
+  }
+};
+
 export const StoreGuestFCM = async (req, res) => {
   const { fcmToken } = req.body;
   console.log("guest token", fcmToken);
@@ -130,14 +230,20 @@ export const UpdateUserFCM = async (req, res) => {
   const userId = req.user.userId;
   console.log(userId);
   try {
-    const user = await User.findByIdAndUpdate(userId, { fcmToken }, { new: true });
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { fcmToken },
+      { new: true }
+    );
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     await DeleteGuestFCM(fcmToken);
-    res.status(200).json({ message: "User FCM token updated successfully", user });
+    res
+      .status(200)
+      .json({ message: "User FCM token updated successfully", user });
   } catch (error) {
-    console.error('Error updating user FCM token:', error);
+    console.error("Error updating user FCM token:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -163,37 +269,41 @@ const DelelteUserFCM = async (fcmToken) => {
 };
 
 export const FetchNotifications = async (req, res) => {
-    try {
-        const userId = req.user.userId;
-        const notifications = await Notification.find({ user: userId }).sort({ createdAt: -1 });
-        res.status(200).json(notifications);
-      } catch (error) {
-        console.error('Error fetching notifications for user:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-      }
-}
+  try {
+    const userId = req.user.userId;
+    const notifications = await Notification.find({ user: userId }).sort({
+      createdAt: -1,
+    });
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error("Error fetching notifications for user:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
-export const FetchNotificationUser = async (req, res) => {
-    try {
-        const notificationId = req.params.id;
-        await Notification.findByIdAndUpdate(notificationId, { isRead: true });
-        res.status(200).json({ message: 'Notification marked as read' });
-      } catch (error) {
-        console.error('Error marking notification as read:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-      }
-}
+export const MarkNotificationAsRead = async (req, res) => {
+  try {
+    const notificationId = req.params.id;
+    await Notification.findByIdAndUpdate(notificationId, { isRead: true });
+    res.status(200).json({ message: "Notification marked as read" });
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 export const guestNotification = async (req, res) => {
-    try {
-        const { fcmToken } = req.query;
-        if (!fcmToken) {
-          return res.status(400).json({ error: 'FCM Token is required' });
-        }
-        const notifications = await Notification.find({ guestToken: fcmToken }).sort({ createdAt: -1 });
-        res.status(200).json(notifications);
-      } catch (error) {
-        console.error('Error fetching notifications for guest:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-      }
-}
+  try {
+    const { fcmToken } = req.query;
+    if (!fcmToken) {
+      return res.status(400).json({ error: "FCM Token is required" });
+    }
+    const notifications = await Notification.find({
+      guestToken: fcmToken,
+    }).sort({ createdAt: -1 });
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error("Error fetching notifications for guest:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
