@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:missingpersonapp/features/Notifications/screens/show_push_notification_click.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:missingpersonapp/main.dart'; // Import the main.dart to access the navigatorKey
 
 class FcmService {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -42,8 +43,26 @@ class FcmService {
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('Message clicked!');
-      _handleMessageClick(context, message);
+      _handleMessageClick(message);
     });
+
+    // Check if the app was opened from a terminated state via a notification
+    RemoteMessage? initialMessage = await _messaging.getInitialMessage();
+    if (initialMessage != null) {
+      _handleMessageClick(initialMessage);
+    }
+  }
+
+  void _handleMessageClick(RemoteMessage message) {
+    final data = message.data;
+    print("clicked notification data ${data['caseID']}");
+    navigatorKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (context) => ShowPushNotificationTap(
+          theCase: data['caseID'],
+        ),
+      ),
+    );
   }
 
   Future<String?> getToken() async {
@@ -122,18 +141,6 @@ class FcmService {
       print(
           'Failed to delete Guest FCM Token. Response code: ${response.statusCode}');
     }
-  }
-
-  void _handleMessageClick(BuildContext context, RemoteMessage message) {
-    final data = message.data;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ShowPushNotificationTap(
-          caseId: '',
-        ),
-      ),
-    );
   }
 }
 

@@ -6,8 +6,10 @@ import 'dart:typed_data';
 
 class MissingPersonDetails extends StatefulWidget {
   final MissingPerson missingPerson;
+  final String header;
 
-  const MissingPersonDetails({Key? key, required this.missingPerson})
+  const MissingPersonDetails(
+      {Key? key, required this.missingPerson, required this.header})
       : super(key: key);
 
   @override
@@ -73,7 +75,7 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.background,
-        title: Text('Missing Person Details'),
+        title: Text(widget.header),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
