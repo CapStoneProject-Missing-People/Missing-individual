@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:missingpersonapp/common/models/missing_person.dart';
-import 'package:missingpersonapp/features/home/data/missing_person_fetch.dart';
+import 'package:missingpersonapp/features/home/provider/allMissingperson.dart';
 import 'package:missingpersonapp/features/home/screens/missingPeopleDisplayCard.dart';
+import 'package:provider/provider.dart';
 
 class HomePageContent extends StatefulWidget {
   final String searchText;
-  final ValueChanged<List<MissingPerson>> onMissingPeopleFetched;
-  final Map<String, dynamic> filters; // Added filters
+  final Map<String, dynamic> filters;
 
   const HomePageContent({
     Key? key,
     required this.searchText,
-    required this.onMissingPeopleFetched,
-    required this.filters, // Added filters
+    required this.filters,
   }) : super(key: key);
 
   @override
@@ -20,11 +19,9 @@ class HomePageContent extends StatefulWidget {
 }
 
 class _HomePageContentState extends State<HomePageContent> {
-  final List<MissingPerson> _allMissingPeople = [];
   final List<Map<String, dynamic>> _displayedMissingPeople = [];
   int _currentPage = 1;
   final int _itemsPerPage = 14;
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -42,29 +39,16 @@ class _HomePageContentState extends State<HomePageContent> {
   }
 
   Future<void> _fetchAllMissingPeople() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final List<MissingPerson> missingPeople = await fetchMissingPeople();
-      setState(() {
-        _allMissingPeople.addAll(missingPeople);
-        widget.onMissingPeopleFetched(_allMissingPeople);
-        _loadPageItems();
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      // Handle error
-    }
+    final provider = Provider.of<AllMissingPeopleProvider>(context, listen: false);
+    await provider.fetchMissingPersons();
+    _loadPageItems();
   }
 
   void _loadPageItems() {
+    final provider = Provider.of<AllMissingPeopleProvider>(context, listen: false);
+    final List<Map<String, dynamic>> filteredPeople = _applySearch(provider.missingPersons);
     setState(() {
       _displayedMissingPeople.clear();
-      final List<Map<String, dynamic>> filteredPeople = _applySearch();
       final int startIndex = (_currentPage - 1) * _itemsPerPage;
       final int endIndex = startIndex + _itemsPerPage;
       _displayedMissingPeople.addAll(
@@ -73,15 +57,14 @@ class _HomePageContentState extends State<HomePageContent> {
           endIndex > filteredPeople.length ? filteredPeople.length : endIndex,
         ),
       );
-      _isLoading = false;
     });
   }
 
-  List<Map<String, dynamic>> _applySearch() {
+  List<Map<String, dynamic>> _applySearch(List<MissingPerson> missingPersons) {
     final searchText = widget.searchText.toLowerCase();
     final filters = widget.filters;
 
-    return _allMissingPeople
+    return missingPersons
         .map((person) {
           final name = person.name;
           final skinColor = person.skin_color;
@@ -101,7 +84,7 @@ class _HomePageContentState extends State<HomePageContent> {
           final minAge = filters['minAge'];
           final maxAge = filters['maxAge'];
           final ageMatch = (minAge == null || person.age >= minAge) &&
-        (maxAge == null || person.age <= maxAge);
+              (maxAge == null || person.age <= maxAge);
 
           final skinColorMatch =
               filters['skinColor'] == null || filters['skinColor'] == skinColor;
@@ -152,6 +135,7 @@ class _HomePageContentState extends State<HomePageContent> {
         text: source.substring(match.start, match.end),
         style: const TextStyle(
           color: Colors.blue,
+          fontWeight: FontWeight.bold,
         ),
       ));
       start = match.end;
@@ -164,8 +148,79 @@ class _HomePageContentState extends State<HomePageContent> {
     return spans;
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<AllMissingPeopleProvider>(context);
+
+    if (provider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (provider.errorMessage.isNotEmpty) {
+      return Center(child: Text(provider.errorMessage));
+    }
+
+    if (_displayedMissingPeople.isEmpty) {
+      return const Center(child: Text('No missing persons found.'));
+    }
+
+    return Column(
+      children: [
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.all(12.0),
+            itemCount: _displayedMissingPeople.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              mainAxisExtent: 410,
+            ),
+            itemBuilder: (context, index) {
+              final item = _displayedMissingPeople[index];
+              return MissingPeopleDisplay(
+                missingPerson: item['person'],
+                highlightedName: item['textSpansName'],
+                highlightedSkinColor: item['textSpansSkinColor'],
+                highlightedAge: item['textSpansAge'],
+              );
+            },
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton(
+              onPressed: _currentPage > 1 ? _goToPreviousPage : null,
+              child: Text(
+                'Previous',
+                style: TextStyle(
+                  color: _currentPage > 1 ? Colors.blue : Colors.grey,
+                ),
+              ),
+            ),
+            Text('Page $_currentPage'),
+            TextButton(
+              onPressed: _currentPage * _itemsPerPage < _applySearch(provider.missingPersons).length
+                  ? _goToNextPage
+                  : null,
+              child: Text(
+                'Next',
+                style: TextStyle(
+                  color: _currentPage * _itemsPerPage < _applySearch(provider.missingPersons).length
+                      ? Colors.blue
+                      : Colors.grey,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   void _goToNextPage() {
-    if (_currentPage * _itemsPerPage < _applySearch().length) {
+    if (_currentPage * _itemsPerPage < _applySearch(Provider.of<AllMissingPeopleProvider>(context, listen: false).missingPersons).length) {
       setState(() {
         _currentPage++;
         _loadPageItems();
@@ -180,66 +235,6 @@ class _HomePageContentState extends State<HomePageContent> {
         _loadPageItems();
       });
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : GridView.builder(
-                  padding: const EdgeInsets.all(12.0),
-                  itemCount: _displayedMissingPeople.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    mainAxisExtent: 410,
-                  ),
-                  itemBuilder: (context, index) {
-                    final item = _displayedMissingPeople[index];
-                    return MissingPeopleDisplay(
-                      missingPerson: item['person'],
-                      highlightedName: item['textSpansName'],
-                      highlightedSkinColor: item['textSpansSkinColor'],
-                      highlightedAge: item['textSpansAge'],
-                    );
-                  },
-                ),
-        ),
-        if (!_isLoading)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                onPressed: _currentPage > 1 ? _goToPreviousPage : null,
-                child: Text(
-                  'Previous',
-                  style: TextStyle(
-                    color: _currentPage > 1 ? Colors.blue : Colors.grey,
-                  ),
-                ),
-              ),
-              Text('Page $_currentPage'),
-              TextButton(
-                onPressed: _currentPage * _itemsPerPage < _applySearch().length
-                    ? _goToNextPage
-                    : null,
-                child: Text(
-                  'Next',
-                  style: TextStyle(
-                    color: _currentPage * _itemsPerPage < _applySearch().length
-                        ? Colors.blue
-                        : Colors.grey,
-                  ),
-                ),
-              ),
-            ],
-          ),
-      ],
-    );
   }
 }
 

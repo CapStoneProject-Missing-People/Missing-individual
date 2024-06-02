@@ -181,48 +181,7 @@ class _MyDraggableSheetState extends State<MyDraggableSheet> {
                                         'Max Age: ${_maxAge?.toString() ?? 'Any'}'),
                                   ],
                                 ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      padding:
-                                          EdgeInsets.fromLTRB(2, 0, 1.0, 0),
-                                      decoration:
-                                          BoxDecoration(border: Border.all()),
-                                      width: 50,
-                                      height: 30,
-                                      child: TextField(
-                                        controller: _minAgeController,
-                                        keyboardType: TextInputType.number,
-                                        onChanged: (value) {
-                                          final int? parsedValue =
-                                              int.tryParse(value);
-                                          if (parsedValue != null) {
-                                            if (parsedValue < 0 ||
-                                                parsedValue > 150) {
-                                              Fluttertoast.showToast(
-                                                msg:
-                                                    'Age must be between 0 and 150',
-                                                toastLength: Toast.LENGTH_SHORT,
-                                                gravity: ToastGravity.BOTTOM,
-                                              );
-                                            } else {
-                                              setState(() {
-                                                _minAge = parsedValue;
-                                                if (_maxAge != null &&
-                                                    _minAge! >= _maxAge!) {
-                                                  _maxAge = _minAge! + 1;
-                                                }
-                                                _applyFilter();
-                                              });
-                                            }
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: RangeSlider(
+                                RangeSlider(
                                         activeColor: Colors.blueAccent,
                                         values: RangeValues(
                                           (_minAge?.toDouble() ?? 0)
@@ -259,45 +218,7 @@ class _MyDraggableSheetState extends State<MyDraggableSheet> {
                                           }
                                         },
                                       ),
-                                    ),
-                                    Container(
-                                      padding:
-                                          EdgeInsets.fromLTRB(2, 0, 1.0, 0),
-                                      decoration:
-                                          BoxDecoration(border: Border.all()),
-                                      width: 50,
-                                      height: 30,
-                                      child: TextField(
-                                        controller: _maxAgeController,
-                                        keyboardType: TextInputType.number,
-                                        onChanged: (value) {
-                                          final int? parsedValue =
-                                              int.tryParse(value);
-                                          if (parsedValue != null) {
-                                            if (parsedValue < 0 ||
-                                                parsedValue > 150) {
-                                              Fluttertoast.showToast(
-                                                msg:
-                                                    'Age must be between 0 and 150',
-                                                toastLength: Toast.LENGTH_SHORT,
-                                                gravity: ToastGravity.BOTTOM,
-                                              );
-                                            } else {
-                                              setState(() {
-                                                _maxAge = parsedValue;
-                                                if (_minAge != null &&
-                                                    _maxAge! <= _minAge!) {
-                                                  _minAge = _maxAge! - 1;
-                                                }
-                                                _applyFilter();
-                                              });
-                                            }
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                    
                               ],
                             ),
                           ),

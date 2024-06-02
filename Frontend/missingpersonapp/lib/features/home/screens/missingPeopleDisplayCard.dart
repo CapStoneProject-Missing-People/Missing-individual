@@ -53,7 +53,7 @@ Age: ${missingPerson.age}
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  MissingPersonDetails(missingPerson: missingPerson),
+                  MissingPersonDetails(missingPerson: missingPerson, header: "Missing Person Details"),
             ),
           );
         },

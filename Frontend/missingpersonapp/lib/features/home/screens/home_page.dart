@@ -5,11 +5,11 @@ import 'package:missingpersonapp/features/PostAdd/screens/addpost.dart';
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/home/screens/bottom_sheet_widget.dart';
 import 'package:missingpersonapp/features/home/services/check_face.dart';
-import 'package:missingpersonapp/features/home/screens/profile_drawer.dart';
+import 'package:missingpersonapp/common/screens/profile_drawer.dart';
 import 'package:missingpersonapp/features/home/screens/missingPersonDisplayContent.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key});
+  const HomePage({super.key});
 
   void signOutUser(BuildContext context) {
     AuthService().signOut(context);
@@ -122,7 +122,6 @@ class _HomePageState extends State<HomePage> {
               ? HomePageContent(
                   searchText: _searchText,
                   filters: _filters,
-                  onMissingPeopleFetched: (missingPeople) {},
                 )
               : _selectedIndex == 1
                   ? const MissingPersonAddPage()
@@ -131,12 +130,10 @@ class _HomePageState extends State<HomePage> {
             visible: _isFilterVisible,
             onFilterChanged: _onFilterChanged,
             onClose: () => setState(() => _isFilterVisible = false),
-            child: Container(
-              child: Center(
-                child: Text(
-                  'Filter Options',
-                  style: TextStyle(fontSize: 24),
-                ),
+            child: const Center(
+              child: Text(
+                'Filter Options',
+                style: TextStyle(fontSize: 24),
               ),
             ),
           ),
