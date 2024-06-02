@@ -3,7 +3,7 @@ import express from 'express';
 import multer from 'multer';
 import { CreateMissingPerson } from "../controller/missingPersonController.js";
 import { AddActionLogGateWay, getActionLogByID, getAllActionLogs, getActionLogByUser } from '../controller/logging.js';
-import {sendPushNotification, StoreGuestFCM, UpdateUserFCM, FetchNotifications, FetchNotificationUser, guestNotification }  from "../controller/push-notification.controller.js";
+import {sendPushNotification, StoreGuestFCM, UpdateUserFCM, FetchNotifications, MarkNotificationAsRead, guestNotification, getPushNotificationDetail }  from "../controller/push-notification.controller.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 
 
@@ -30,7 +30,8 @@ routers.route('/get-user-action-log/:userId').get(getActionLogByUser);
 routers.route('/send-notification').post(sendPushNotification);
 routers.route('/store-guest-fcm-token').post(StoreGuestFCM);
 routers.route('/update-user-fcm-token').put(requireAuth, UpdateUserFCM);
+routers.route('/notificationToSingleUser').post(getPushNotificationDetail)
 
 routers.route('/notifications').get(requireAuth, FetchNotifications)
-routers.route('/notifications/:id/read').get(requireAuth, FetchNotificationUser)
+routers.route('/notifications/:id/read').get(requireAuth, MarkNotificationAsRead)
 routers.route('/guest-notifications').get(guestNotification)
