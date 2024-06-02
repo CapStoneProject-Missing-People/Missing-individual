@@ -86,7 +86,7 @@ userSchema.statics.login = async function (email, password) {
 userSchema.statics.adminlogin = async function (email, password) {
   const user = await this.findOne({ email });
   if (user) {
-    if (user.role !== "admin" && user.role !== "superAdmin") {
+    if (user.role !== 'admin' && user.role !== 'superAdmin') {
       throw new Error("unauthorized access");
     }
     const auth = await bcrypt.compare(password, user.password);
