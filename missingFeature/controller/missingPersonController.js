@@ -117,7 +117,7 @@ export const CreateMissingPerson = async (req, res) => {
     await sendNotificationToAllUsersAndGuests(
       "New Missing Person",
       `A new person named ${parsedData.name.firstName} ${parsedData.name.lastName} has been Added To the missing List.\n Click to see the detail`,
-      newMissingPerson._id.toString()
+      result.mergedFeature._id.toString()
     );
 
     return res
