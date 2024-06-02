@@ -1,22 +1,45 @@
-
 import 'package:flutter/material.dart';
+import 'package:missingpersonapp/common/models/missing_person.dart';
+import 'package:missingpersonapp/common/screens/missing_person_detail1.dart';
+import 'package:missingpersonapp/features/Notifications/provider/missingcase-provider.dart';
+import 'package:provider/provider.dart';
 
 class ShowPushNotificationTap extends StatelessWidget {
-  final String caseId;
+  final String theCase;
 
-  const ShowPushNotificationTap({Key? key, required this.caseId}) : super(key: key);
+  const ShowPushNotificationTap({Key? key, required this.theCase})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Notification')),
-      body: Center(
-          child: caseId.length == 0
-              ? Text("No notification found")
-              : Text('Case ID: $caseId')), // Example display
+    return ChangeNotifierProvider(
+      create: (_) => CaseProvider()..fetchCaseById(theCase),
+      child: Consumer<CaseProvider>(
+        builder: (context, provider, child) {
+          if (provider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (provider.errorMessage.isNotEmpty) {
+            return Center(child: Text(provider.errorMessage));
+          }
+
+          if (provider.theCase == null) {
+            return const Center(child: Text("No notification found"));
+          }
+
+          final MissingPerson theCase = provider.theCase!;
+
+          return MissingPersonDetails(
+              missingPerson: theCase, header: "Notification");
+        },
+      ),
     );
   }
 }
+
+
+
 
 
 // import 'dart:convert';
@@ -26,16 +49,16 @@ class ShowPushNotificationTap extends StatelessWidget {
 // import 'package:missingpersonapp/common/models/missing_person.dart';
 // import 'package:missingpersonapp/features/home/utils/missingPeopleDisplayCard.dart';
 
-// class NotificationPage extends StatefulWidget {
+// class ShowPushNotificationTap extends StatefulWidget {
 //   final String caseId;
 
-//   const NotificationPage({super.key, required this.caseId});
+//   const ShowPushNotificationTap({super.key, required this.caseId});
 
 //   @override
-//   _NotificationPageState createState() => _NotificationPageState();
+//   _ShowPushNotificationTapState createState() => _ShowPushNotificationTapState();
 // }
 
-// class _NotificationPageState extends State<NotificationPage> {
+// class _ShowPushNotificationTapState extends State<ShowPushNotificationTap> {
 //   late Future<MissingPerson> futureMissingPerson;
 
 //   get http => null;
