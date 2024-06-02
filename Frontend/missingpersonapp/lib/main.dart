@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:missingpersonapp/common/services/fcm-service.dart';
+import 'package:missingpersonapp/features/Notifications/provider/missingcase-provider.dart';
 import 'package:missingpersonapp/features/Notifications/screens/display_notification.dart';
 import 'package:missingpersonapp/features/PostAdd/screens/addpost.dart';
 import 'package:missingpersonapp/features/Profile/screens/profile_page.dart';
@@ -11,6 +12,7 @@ import 'package:missingpersonapp/features/authentication/screens/login_page.dart
 import 'package:missingpersonapp/features/authentication/screens/missing_person_page.dart';
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/feedback/screens/feedback.dart';
+import 'package:missingpersonapp/features/home/provider/allMissingperson.dart';
 import 'package:missingpersonapp/features/home/screens/home_page.dart';
 import 'package:missingpersonapp/features/matchedCase/screens/missing_person_page1.dart';
 import 'package:missingpersonapp/firebase_options.dart';
@@ -23,6 +25,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Handle the message data here as needed
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -34,6 +38,8 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
+      ChangeNotifierProvider(create: (_) => AllMissingPeopleProvider()),
+      ChangeNotifierProvider(create: (_) => CaseProvider()),
       ChangeNotifierProxyProvider<UserProvider, MissingPersonProvider>(
         create: (context) {
           final user = Provider.of<UserProvider>(context, listen: false).user;
@@ -47,8 +53,6 @@ void main() async {
     child: const MyApp(),
   ));
 }
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
