@@ -1,6 +1,7 @@
 import { uploadFaceFeature, checkFaceMatch } from "../face.js";
 import FaceMatchResult from "../schema/faceMatch.js";
 import { logData } from "../helper/helpers.js";
+import axios from 'axios';
 
 export const RecognizeFace = async (req, res) => {
   const startTime = Date.now(); // Start timer
@@ -30,6 +31,14 @@ export const RecognizeFace = async (req, res) => {
       status: 200,
       logLevel: "info"
     });
+    const notificationData = {
+      title: "Face Recognition Match",
+      body: `A potential match has been found for missing person ID: ${result.person_id}`,
+      caseId: result.person_id
+    }
+    
+    await axios.post('http://localhost:4000/api/notificationToSingleUser', notificationData);
+
     res.json({
       person_id: result.person_id,
       distance: result.distance,
