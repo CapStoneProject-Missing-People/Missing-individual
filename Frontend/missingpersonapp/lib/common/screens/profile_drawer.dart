@@ -88,7 +88,7 @@ class ProfileDrawer extends StatelessWidget {
             },
           ),
           CustomListTile(
-            icon: Icons.group,
+            icon: Icons.post_add_outlined,
             title: 'Your Posts',
             onTap: () {
               Navigator.pop(context); // Close the drawer

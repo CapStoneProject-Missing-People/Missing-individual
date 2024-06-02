@@ -31,73 +31,82 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
       ),
       body: _userData.name.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Profile Details Section
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Profile Details',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          : SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Profile Details Section
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Card(
+                      color: Colors.blue[50],
+                      surfaceTintColor: Colors.yellowAccent,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(8.0, 4.0, 0, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Profile Details',
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 10),
+                            ProfileDetailItem(label: 'Name', value: _userData.name),
+                            ProfileDetailItem(label: 'Email', value: _userData.email),
+                            ProfileDetailItem(label: 'Phone Number', value: _userData.phoneNo),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 10),
-                      ProfileDetailItem(label: 'Name', value: _userData.name),
-                      ProfileDetailItem(label: 'Email', value: _userData.email),
-                      ProfileDetailItem(label: 'Phone Number', value: _userData.phoneNo),
-                    ],
-                  ),
-                ),
-                // Edit Profile Button
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: TextButton(
-                    onPressed: () {
-                      _showEditDialog();
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.blue,
                     ),
-                    child: const Text('Edit Profile'),
                   ),
-                ),
-                
-                // Action Buttons Section
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Delete Account Button
-                      ElevatedButton(
-                        onPressed: () {
-                          _confirmAndDeleteAccount();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.redAccent,
-                        ),
-                        child: const Text('Delete Account'),
+                  // Edit Profile Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: TextButton(
+                      onPressed: () {
+                        _showEditDialog();
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.blue,
                       ),
-                      // Deactivate Button
-                      ElevatedButton(
-                        onPressed: () {
-                          // Handle deactivation
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: Colors.orange[400],
-                        ),
-                        child: const Text('Deactivate'),
-                      ),
-                    ],
+                      child: const Text('Edit Profile'),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                  
+                  // Action Buttons Section
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Delete Account Button
+                        ElevatedButton(
+                          onPressed: () {
+                            _confirmAndDeleteAccount();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.redAccent,
+                          ),
+                          child: const Text('Delete Account'),
+                        ),
+                        // Deactivate Button
+                        ElevatedButton(
+                          onPressed: () {
+                            // Handle deactivation
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.orange[400],
+                          ),
+                          child: const Text('Deactivate'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+          ),
     );
   }
 
