@@ -89,17 +89,24 @@ export const getFeatures = async (req, res) => {
 //@route GET /api/features/getSingle/:id
 //@access public
 export const getFeature = async (req, res) => {
+  console.log(req.params.caseId)
   try {
-    const feature = await MergedFeaturesModel.findById(req.params.id);
+    const feature = await MergedFeaturesModel.findById(req.params.caseId).lean().populate({
+      path: 'missing_case_id',
+      select: ['status', 'imageBuffers', 'dateReported']
+    });
+
     if (!feature) {
-      res.status(404);
-      throw new Error("Feature not found");
+      res.status(404).json({ message: "Feature not found" });
+      return;
     }
+
     res.status(200).json(feature);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 //@desc Get similarity score
 //@route GET /api/features/similarity/caseId
