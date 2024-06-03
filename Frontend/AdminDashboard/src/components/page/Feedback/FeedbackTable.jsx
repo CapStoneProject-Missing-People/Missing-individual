@@ -16,7 +16,7 @@ const FeedbackTable = ({ feedbackData }) => {
     if (selectedResponse) {
       try {
         const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
-        const feedbackId = feedbackData[index].id;
+        const feedbackId = feedbackData[index]._id;
         await axios.post(`/api/feedback/${feedbackId}/respond`, { response: selectedResponse }, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -58,11 +58,8 @@ const FeedbackTable = ({ feedbackData }) => {
             <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
-                  <div className="flex-shrink-0 h-10 w-10">
-                    <img className="h-10 w-10 rounded-full" src={feedback.profileImage} alt={feedback.name} />
-                  </div>
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">{feedback.name}</div>
+                    <div className="text-sm font-medium text-gray-900">{feedback.user_id.name}</div>
                   </div>
                 </div>
               </td>

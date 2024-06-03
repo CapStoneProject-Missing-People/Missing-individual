@@ -151,6 +151,14 @@ class AuthService {
 
     final navigator = Navigator.of(context);
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('authorization');
+     await http.get(
+        Uri.parse('${Constants.postUri}/api/users/tokenIsValid'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'authorization': "Bearer $token",
+        },
+      );
     prefs.setString('authorization', '');
     print('signing out: ${prefs.getString('authorization')}');
 

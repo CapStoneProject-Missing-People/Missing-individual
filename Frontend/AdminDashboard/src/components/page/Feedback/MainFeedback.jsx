@@ -12,13 +12,9 @@ const MainFeedback = () => {
     const fetchFeedback = async () => {
       try {
         const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
-        // const response = await axios.get('/api/feedback', {
-        //   headers: { Authorization: `Bearer ${token}` },
-        // });
-        const response = {
-          name : "kaleb tesfaye",
-          feedback : "it was nice App!"
-        }
+        const response = await axios.get('http://localhost:4000/api/getFeedBacks', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setFeedbackData(response.data);
         setLoading(false);
       } catch (error) {
@@ -37,7 +33,7 @@ const MainFeedback = () => {
   return (
     <div className='h-96'>
       <Title pageName="Feedback" />
-      <FeedbackList />
+      {/* <FeedbackList feedbackData={feedbackData} /> */}
       <FeedbackTable feedbackData={feedbackData} />
     </div>
   );

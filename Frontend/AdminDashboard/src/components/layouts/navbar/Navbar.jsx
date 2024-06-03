@@ -40,7 +40,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gray-800 text-white h-16 w-full flex items-center justify-between px-2 md:px-2">
+    <nav className="bg-gray-800 text-white h-16 w-full z-[999] flex items-center justify-between px-2 md:px-2">
       {/* Left Sidebar */}
       <div className="flex items-center">
         <div
