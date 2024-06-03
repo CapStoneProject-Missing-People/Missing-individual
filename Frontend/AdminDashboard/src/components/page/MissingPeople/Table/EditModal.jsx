@@ -51,21 +51,20 @@ const EditModal = ({ isOpen, onClose, user }) => {
   }
 
   return (
-    <Modal isOpen={isOpen} onRequestClose={onClose}>
-      <div className="fixed inset-0 flex items-center justify-center z-50">
-        <div
-          className="absolute inset-0 bg-black opacity-50"
-          onClick={onClose}
-        ></div>
-        <div className="relative bg-white px-5 py-3 w-2/5 rounded-lg shadow-lg">
-          <button
-            className="absolute top-2 right-2 text-gray-500 hover:text-red-600"
-            onClick={onClose}
-          >
-            <IoIosCloseCircle className="h-6 w-6 ml-auto" />
-          </button>
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-4">Edit Missing Person</h2>
+    <Modal isOpen={isOpen} onRequestClose={onClose} ariaHideApp={false} className="edit-modal">
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4 sm:p-6 md:p-8">
+        <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
+        <div className="relative bg-white mt-14 w-full max-w-sm sm:max-w-md md:max-w-2xl lg:max-w-4xl h-auto md:h-4/5 rounded-lg shadow-lg z-50 overflow-hidden">
+          <div className="relative z-10 bg-white px-5 py-3 border-b border-gray-200 flex justify-between items-center">
+            <h2 className="text-xl font-semibold">Edit Missing Person</h2>
+            <button
+              className="text-gray-500 hover:text-red-600"
+              onClick={onClose}
+            >
+              <IoIosCloseCircle className="h-6 w-6" />
+            </button>
+          </div>
+          <div className="p-5 overflow-y-auto h-[calc(100%-3rem)]">
             <form onSubmit={handleSubmit}>
               <div className="flex flex-wrap -mx-2">
                 <div className="w-full lg:w-1/2 px-2">
@@ -200,18 +199,18 @@ const EditModal = ({ isOpen, onClose, user }) => {
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center">
+              <div className="flex flex-col mt-8 sm:flex-row justify-center">
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="px-4 py-2 mr-5 w-36 font-inter bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                  className="mb-2 sm:mb-0 sm:mr-5 px-4 py-2 w-full sm:w-36 font-inter bg-blue-500 text-white rounded-md hover:bg-blue-600"
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="ml-2 px-4 py-2 w-36 font-inter bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                  className="px-4 py-2 w-full sm:w-36 font-inter bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
                 >
                   Cancel
                 </button>
