@@ -24,30 +24,6 @@ export const getUserProfile = async (req, res) => {
   }
 };
 
-/* export const updateUserProfile = async (req, res) => {
-  const { name, email, phoneNo } = req.body;
-  const profileFields = {};
-  if (name) profileFields.name = name;
-  if (email) profileFields.email = email;
-  if (phoneNo) profileFields.phoneNo = phoneNo;
-
-  try {
-    const userID = req.user.userId;
-    let profile = await User.findOne({ _id: userID });
-    if (profile) {
-      profile = await User.findOneAndUpdate(
-        { _id: userID },
-        { $set: profileFields },
-        { new: true }
-      ).select("-_id -password -createdAt -updatedAt -__v");
-      return res.json(profile);
-    }
-    return res.status(400).json({ msg: "No profile found" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
-  }
-}; */
 //@desc update current user
 //@route PUT /api/profile/update
 //@access private
@@ -89,11 +65,7 @@ export const deleteUserProfile = async (req, res) => {
   try {
     const userID = req.user.userId;
     //remove posts made by the user
-    await MissingPerson.deleteMany({ userID });
-
-    // remove post from merged features model (if any)
-    await MergedFeaturesModel.deleteMany({ user_id: userID });
-
+    // await MissingPerson.deleteMany({ userID });
     //remove user
     await User.findOneAndDelete({ _id: userID });
     res.json({ msg: "user deleted" });

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "190884749765",
+    "project_id": "missingpersonnotification",
+    "storage_bucket": "missingpersonnotification.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190884749765:android:7e7b351127ed9a69a46bac",
+        "android_client_info": {
+          "package_name": "com.example.missingpersonapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVRr4EePdD0CyZAVYdcdyGjruumlXvGIQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

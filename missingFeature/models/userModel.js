@@ -53,6 +53,14 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    fcmToken: {
+      type: String,
+      default: null,
+    },
+    notificationsEnabled: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
