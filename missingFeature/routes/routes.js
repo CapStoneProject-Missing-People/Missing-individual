@@ -5,6 +5,7 @@ import { CreateMissingPerson } from "../controller/missingPersonController.js";
 import { AddActionLogGateWay, getActionLogByID, getAllActionLogs, getActionLogByUser } from '../controller/logging.js';
 import {sendPushNotification, StoreGuestFCM, UpdateUserFCM, FetchNotifications, MarkNotificationAsRead, guestNotification, getPushNotificationDetail }  from "../controller/push-notification.controller.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
+import { getOverallStatistics } from '../controller/stastisticsController.js';
 
 
 // Create an instance of Express Router
@@ -25,6 +26,7 @@ routers.route('/add_log_data').post(AddActionLogGateWay);
 routers.route('/get-action-logs').get(getAllActionLogs);
 routers.route('/get-action-log/:logId').get(getActionLogByID);
 routers.route('/get-user-action-log/:userId').get(getActionLogByUser);
+routers.route('/getStats').get(getOverallStatistics);
 
 // Routes for Notification
 routers.route('/send-notification').post(sendPushNotification);

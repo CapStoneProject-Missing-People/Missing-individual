@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter3/components/my_button.dart';
+import 'package:flutter3/components/my_button.dart'; 
 import 'package:flutter3/components/my_textfield.dart';
 import 'package:flutter3/pages/register_page.dart';
 import 'package:flutter3/services/auth_services.dart';
