@@ -1,10 +1,10 @@
-import mergedFeatureSchema from "../models/mergedFeatureSchema.js";
+import mergedFeaturesSchema from "../models/mergedFeaturesSchema.js";
 import MissingPerson from "../models/missingPersonSchema.js";
 
 export const fetchAllMissingPeopleWithNames = async (req, res) => {
   try {
     // Fetch all MergedFeatures documents and populate the missing_case_id field
-    const mergedFeaturesList = await mergedFeatureSchema
+    const mergedFeaturesList = await mergedFeaturesSchema
       .find()
       .populate("missing_case_id");
 
