@@ -54,39 +54,72 @@ const Table = ({ data }) => {
         width: "240px",
         disableSortBy: true,
       },
-      {
-        Header: "Actions",
-        accessor: "actions",
-        Cell: ({ row }) => (
-          <button 
-            onClick={() => handleDeleteClick(row.original._id)}
-            className="bg-red-600 text-white px-4 py-2 rounded-full"
-          >
-            Delete
-          </button>
-        ),
-        disableSortBy: true,
-        width: "100px",
-      },
     ];
+
     if (isSuperAdmin) {
-      cols.splice(3, 0, {
-        Header: "Admin Privilege",
-        accessor: "adminPrivilege",
-        Cell: ({ row }) => (
-          <button 
-            onClick={() => handleAdminPrivilegeToggle(row.original._id, row.original.role)}
-            className={`px-4 py-2 rounded-full ${
-              row.original.role === 'admin' ? "bg-green-600" : "bg-red-600"
-            } text-white`}
-          >
-            {row.original.role === 'admin' ? "On" : "Off"}
-          </button>
-        ),
-        disableSortBy: true,
-        width: "150px",
-      });
+      cols.push(
+        {
+          Header: "Admin Privilege",
+          accessor: "adminPrivilege",
+          Cell: ({ row }) => (
+            <button 
+              onClick={() => handleAdminPrivilegeToggle(row.original._id, row.original.role)}
+              className={`px-4 py-2 rounded-full ${
+                row.original.role === 'admin' ? "bg-green-600" : "bg-red-600"
+              } text-white`}
+            >
+              {row.original.role === 'admin' ? "On" : "Off"}
+            </button>
+          ),
+          disableSortBy: true,
+          width: "150px",
+        },
+        {
+          Header: "Read",
+          accessor: "read",
+          Cell: ({ row }) => (
+            <button 
+              onClick={() => handleReadClick(row.original._id)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-full"
+            >
+              Read
+            </button>
+          ),
+          disableSortBy: true,
+          width: "100px",
+        },
+        {
+          Header: "Update",
+          accessor: "update",
+          Cell: ({ row }) => (
+            <button 
+              onClick={() => handleUpdateClick(row.original._id)}
+              className="bg-yellow-600 text-white px-4 py-2 rounded-full"
+            >
+              Update
+            </button>
+          ),
+          disableSortBy: true,
+          width: "100px",
+        }
+      );
     }
+
+    cols.push({
+      Header: "Remove",
+      accessor: "actions",
+      Cell: ({ row }) => (
+        <button 
+          onClick={() => handleDeleteClick(row.original._id)}
+          className="bg-red-600 text-white px-4 py-2 rounded-full"
+        >
+          Delete
+        </button>
+      ),
+      disableSortBy: true,
+      width: "100px",
+    });
+
     return cols;
   }, [loggedInUserRole]);
 

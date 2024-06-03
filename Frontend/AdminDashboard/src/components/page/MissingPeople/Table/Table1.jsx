@@ -10,7 +10,7 @@ import GlobalSearchFilter1 from './GlobalSearchFilter1';
 import SelectMenu1 from './SelectMenu1';
 import PaginationNav1 from './PaginationNav1';
 import TableComponent from './TableComponent';
-import Modal from './Modal';
+import Modals from './Modal';
 import axios from 'axios';
 
 const globalFilterFunction = (rows, columns, filterValue) => {
@@ -91,6 +91,20 @@ const Table = ({ data }) => {
         disableSortBy: true,
         Cell: ({ value }) => new Date(value).toLocaleDateString(),
       },
+      {
+        Header: "Delete Post",
+        accessor: "actions",
+        Cell: ({ row }) => (
+          <button 
+            onClick={() => handleDeleteClick(row.original._id)}
+            className="bg-red-600 text-white px-4 py-2 rounded-full"
+          >
+            Delete
+          </button>
+        ),
+        disableSortBy: true,
+        width: "100px",
+      },
     ],
     []
   );
@@ -128,27 +142,27 @@ const Table = ({ data }) => {
 
   const { globalFilter, pageIndex, pageSize } = state;
 
-  // const handleDeleteClick = (_id) => {
-  //   setCurrentId(_id);
-  //   setShowModal(true);
-  // };
+  const handleDeleteClick = (_id) => {
+    setCurrentId(_id);
+    setShowModal(true);
+  };
 
-  // const confirmDelete = async () => {
-  //   setShowModal(false);
-  //   try {
-  //     const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
-  //     // Include token in request headers
-  //     const headers = {
-  //       Authorization: `Bearer ${token}`,
-  //     };
-  //     // Send a DELETE request to the backend endpoint
-  //     await axios.delete(`http://localhost:4000/api/admin/deleteUser/${currentId}`, { headers });
-  //     // If the request is successful, update the state to remove the deleted row
-  //     setTableData(prevData => prevData.filter(row => row._id !== currentId));
-  //   } catch (error) {
-  //     console.error("Error deleting row:", error);
-  //   }
-  // };
+  const confirmDelete = async () => {
+    setShowModal(false);
+    try {
+      const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
+      // Include token in request headers
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      // Send a DELETE request to the backend endpoint
+      await axios.delete(`http://localhost:4000/api/admin/deleteUser/${currentId}`, { headers });
+      // If the request is successful, update the state to remove the deleted row
+      setTableData(prevData => prevData.filter(row => row._id !== currentId));
+    } catch (error) {
+      console.error("Error deleting row:", error);
+    }
+  };
 
   return (
     <div className="w-full flex flex-col items-center gap-4">
@@ -186,11 +200,11 @@ const Table = ({ data }) => {
           pageIndex={pageIndex}
         />
       </div>
-      {/* <Modal 
+       <Modals 
         show={showModal}
         onClose={() => setShowModal(false)}
         onConfirm={confirmDelete}
-      /> */}
+      /> 
     </div>
   );
 };
