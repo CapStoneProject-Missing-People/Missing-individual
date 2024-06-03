@@ -137,6 +137,12 @@ class AuthService {
     final navigator = Navigator.of(context);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('x-auth-token', '');
+    await http.get(
+        Uri.parse('${Constants.uri}/api/users/logout'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
     navigator.pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (context) => RegisterPage(),
