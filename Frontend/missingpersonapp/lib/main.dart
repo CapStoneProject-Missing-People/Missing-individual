@@ -14,7 +14,7 @@ import 'package:missingpersonapp/features/authentication/services/auth_services.
 import 'package:missingpersonapp/features/feedback/screens/feedback.dart';
 import 'package:missingpersonapp/features/home/provider/allMissingperson.dart';
 import 'package:missingpersonapp/features/home/screens/home_page.dart';
-import 'package:missingpersonapp/features/matchedCase/screens/missing_person_page1.dart';
+import 'package:missingpersonapp/features/matchedCase/screens/matchedCase.dart';
 import 'package:missingpersonapp/firebase_options.dart';
 import 'package:provider/provider.dart';
 
@@ -92,7 +92,7 @@ class _MyAppState extends State<MyApp> {
         '/manageProfile': (context) => const ManageProfilePage(),
         '/addPost': (context) => const MissingPersonAddPage(),
         '/feedBack': (context) => const FeedbackPage(),
-        '/matchedPeople': (context) => MissingPersonMatchPage(),
+        '/matchedPeople': (context) => const MatchedCases(),
         '/notification': (context) => const NotificationPage(),
         '/missingPersonPosted': (context) => MissingPersonPage(),
       },
