@@ -144,6 +144,7 @@ export const login_post = async (req, res) => {
   }
 };
 
+
 export const logout_get = async (req, res) => {
   const id = req.user.userId;
   console.log(id);
@@ -158,6 +159,7 @@ export const logout_get = async (req, res) => {
   });
   res.send("logged out");
 };
+
 
 export const token_valid = async (req, res) => {
   try {
