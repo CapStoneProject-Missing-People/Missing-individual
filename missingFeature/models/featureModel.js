@@ -79,8 +79,8 @@ const baseAttributes = {
     type: String,
     required: false,
   },
-  featureType: {
-    type: String
+  timeSinceDisappearance: {
+    type: Number
   },
   inputHash: {
     type: String,
