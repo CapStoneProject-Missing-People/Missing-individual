@@ -1,7 +1,7 @@
 import { serviceAccount } from "../config/push-notification-key.js";
 import admin from "firebase-admin";
 import GuestFcmToken from "../models/guestNotification.js";
-import User from "../models/userModel.js";
+import { User } from "../models/userModel.js";
 import Notification from "../models/NotificationModel.js";
 import MissingPerson from "../models/missingPersonSchema.js";
 
@@ -42,11 +42,18 @@ export const getPushNotificationDetail = async (req, res, next) => {
     }
     const missingPerson = await MissingPerson.findById(caseId);
     if (!missingPerson || !missingPerson.userID) {
-      return res.status(404).send({ message: "User associated with missing person not found" });
+      return res
+        .status(404)
+        .send({ message: "User associated with missing person not found" });
     }
     const userId = missingPerson.userID;
     console.log("missing id" + userId);
-    const result = await sendNotificationToSingleUser(userId, title, body, caseId);
+    const result = await sendNotificationToSingleUser(
+      userId,
+      title,
+      body,
+      caseId
+    );
 
     if (result.success) {
       res.status(200).send({ message: result.message });
@@ -58,7 +65,6 @@ export const getPushNotificationDetail = async (req, res, next) => {
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
-
 
 export const sendPushNotificationFunc = async ({
   title,
