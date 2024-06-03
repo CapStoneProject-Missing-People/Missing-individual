@@ -3,7 +3,7 @@ import crypto from "crypto";
 import embeddings from "../models/embeddingsModel.js";
 import { pipeline } from "@xenova/transformers";
 import mongoose from "mongoose";
-import MergedFeaturesModel from "../models/mergedFeatureSchema.js"
+import MergedFeaturesModel from "../models/mergedFeaturesSchema.js";
 import { features } from "process";
 
 export const getOwnFeatures = async (req, res) => {
@@ -75,11 +75,16 @@ export const getFeatures = async (req, res) => {
         filterCriteria.user_id = req.user.userId;
       }
     }
-    const features = await MergedFeaturesModel.find(filterCriteria).lean().populate({path: 'missing_case_id', select:['status', 'imageBuffers', 'dateReported']});
+    const features = await MergedFeaturesModel.find(filterCriteria)
+      .lean()
+      .populate({
+        path: "missing_case_id",
+        select: ["status", "imageBuffers", "dateReported"],
+      });
     console.log("features: ", features);
 
     res.status(200).json(features);
-  } catch (error){
+  } catch (error) {
     res.status(500).json({ error: "Server error" });
     console.log("Error ferching features: ", error);
   }
@@ -118,7 +123,6 @@ export const getSimilarityScore = async (req, res) => {
     //Find the embeddings document for the provided case ID
     const embedding = await embeddings.findOne({ caseId });
     if (!embedding) {
-      
       return res
         .status(404)
         .json({ error: "Embeddings not found for the given case ID" });
@@ -193,33 +197,42 @@ const updateSimilarityField = async (
 //@desc create new Feature
 //@route POST /api/features/create
 //@access private
-export const createFeature = async (data, timeSinceDisappearance, userId, res) => {
+export const createFeature = async (
+  data,
+  timeSinceDisappearance,
+  userId,
+  res
+) => {
   try {
-    const Features = await initializeFeaturesModel(timeSinceDisappearance)
+    const Features = await initializeFeaturesModel(timeSinceDisappearance);
     const featureData = {
       ...data,
       inputHash: calculateHash(data),
-      user_id: userId
-    }
+      user_id: userId,
+    };
 
-    const existingFeature = await Features.findOne({inputHash: featureData.inputHash });
+    const existingFeature = await Features.findOne({
+      inputHash: featureData.inputHash,
+    });
     if (existingFeature) {
-      return 'duplicate feature already exist'
+      return "duplicate feature already exist";
     }
     featureData.timeSinceDisappearance = timeSinceDisappearance
     const feature = await Features.create( featureData );
     console.log("feature stored successfully");
-    const existingFeatureMerged = await MergedFeaturesModel.findOne({ inputHash: featureData.inputHash });
+    const existingFeatureMerged = await MergedFeaturesModel.findOne({
+      inputHash: featureData.inputHash,
+    });
     if (existingFeatureMerged) {
-      return 'Duplicate feature already exists in MergedFeatures collection'
+      return "Duplicate feature already exists in MergedFeatures collection";
     }
 
-    const mergedFeatures = await MergedFeaturesModel.create( featureData )
+    const mergedFeatures = await MergedFeaturesModel.create(featureData);
     console.log("Feature stored successfully in MergedFeatures collection.");
-    console.log("mergedFeatures: ", mergedFeatures)
-    const mergedFeatureCaseId = mergedFeatures._id
-    feature.mergedFeatureId = mergedFeatureCaseId
-    feature.save()
+    console.log("mergedFeatures: ", mergedFeatures);
+    const mergedFeatureCaseId = mergedFeatures._id;
+    feature.mergedFeatureId = mergedFeatureCaseId;
+    feature.save();
     const existingEmbeddingsCount = await embeddings.countDocuments();
     if (existingEmbeddingsCount < 1) {
       const caseId = feature._id;
@@ -297,13 +310,16 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
         );
       }
     }
-   return {message: " feature stored succeffully", createdFeature: feature, mergedFeature: mergedFeatures}
+    return {
+      message: " feature stored succeffully",
+      createdFeature: feature,
+      mergedFeature: mergedFeatures,
+    };
   } catch (error) {
     console.error("Error creating feature:", error);
-    throw new Error(error)
+    throw new Error(error);
   }
 };
-
 
 //@desc compare Feature
 //@route POST /api/features/compare
@@ -480,12 +496,11 @@ export const compareFeature = async (req, res) => {
   }
 };
 
-
 export const update = async (req, res) => {
   try {
     const { updateBy, updateTerm } = req.body;
     const timeSinceDisappearance = req.query.timeSinceDisappearance;
-    
+
     if (!updateBy || !updateTerm) {
       return res.status(400).json({ error: "Update criteria not provided" });
     }
@@ -493,14 +508,19 @@ export const update = async (req, res) => {
     const updateObject = {};
     updateObject[`name.${updateBy}`] = updateTerm;
     const Features = await initializeFeaturesModel(timeSinceDisappearance);
-    console.log(req.params.caseId)
+    console.log(req.params.caseId);
     const mergedFeature = await MergedFeaturesModel.findById(req.params.caseId);
     if (!mergedFeature) {
       return res.status(404).json({ error: "Feature not found" });
     }
 
     if (mergedFeature.user_id.toString() !== req.user.userId.toString()) {
-      return res.status(403).json({ error: "User doesn't have permission to update other users' features!" });
+      return res
+        .status(403)
+        .json({
+          error:
+            "User doesn't have permission to update other users' features!",
+        });
     }
 
     // Update the feature in the primary collection
@@ -524,7 +544,6 @@ export const update = async (req, res) => {
   }
 };
 
-
 //@desc updare Feature
 //@route PUT /api/features
 //@access private
@@ -533,17 +552,17 @@ export const updateFeature = async (req, res) => {
     const timeSinceDisappearance = req.query.timeSinceDisappearance;
     const Features = await initializeFeaturesModel(timeSinceDisappearance);
     const feature = await Features.findById(req.params.id);
-    console.log('id: ', req.params.id)
+    console.log("id: ", req.params.id);
     if (!feature) {
       res.status(404);
       throw new Error("Feature not found");
     }
 
-    console.log(feature.user_id)
-    console.log(req.user.userId)
+    console.log(feature.user_id);
+    console.log(req.user.userId);
     // console.log(req.user)
     if (feature.user_id.toString() !== req.user.userId.toString()) {
-      console.log('not here')
+      console.log("not here");
       res.status(403);
       throw new Error(
         "User doesn't have permission to update other users' features!"
@@ -552,10 +571,27 @@ export const updateFeature = async (req, res) => {
 
     let baseReq;
     if (timeSinceDisappearance > 2) {
-      const { lastSeenLocation, medicalInformation, circumstanceOfDisappearance, ...base } = req.body;
-      baseReq = { ...base, lastSeenLocation, medicalInformation, circumstanceOfDisappearance }
+      const {
+        lastSeenLocation,
+        medicalInformation,
+        circumstanceOfDisappearance,
+        ...base
+      } = req.body;
+      baseReq = {
+        ...base,
+        lastSeenLocation,
+        medicalInformation,
+        circumstanceOfDisappearance,
+      };
     } else {
-      const { clothing: { upper: { clothType: upperClothType, clothColor: upperClothColor }, lower: { clothType: lowerClothType, clothColor: lowerClothColor } }, body_size, ...base } = req.body;
+      const {
+        clothing: {
+          upper: { clothType: upperClothType, clothColor: upperClothColor },
+          lower: { clothType: lowerClothType, clothColor: lowerClothColor },
+        },
+        body_size,
+        ...base
+      } = req.body;
       baseReq = base;
     }
 
@@ -565,18 +601,28 @@ export const updateFeature = async (req, res) => {
       age: req.body.age,
       name: req.body.name,
       skin_color: req.body.skin_color,
-      clothing: req.body.clothing ? {
-        upper: { clothType: req.body.clothing.upper.clothType, clothColor: req.body.clothing.upper.clothColor },
-        lower: { clothType: req.body.clothing.lower.clothType, clothColor: req.body.clothing.lower.clothColor }
-      } : undefined,
+      clothing: req.body.clothing
+        ? {
+            upper: {
+              clothType: req.body.clothing.upper.clothType,
+              clothColor: req.body.clothing.upper.clothColor,
+            },
+            lower: {
+              clothType: req.body.clothing.lower.clothType,
+              clothColor: req.body.clothing.lower.clothColor,
+            },
+          }
+        : undefined,
       body_size: req.body.body_size,
       description: concatenatedDescription,
       inputHash: calculateHash(req.body),
-      user_id: req.user.id
+      user_id: req.user.id,
     };
 
     // Check if a feature with the same inputHash already exists
-    const existingFeature = await Features.findOne({ inputHash: featureData.inputHash });
+    const existingFeature = await Features.findOne({
+      inputHash: featureData.inputHash,
+    });
     if (existingFeature && existingFeature._id.toString() !== req.params.id) {
       // If the existing feature has a different ID, it's a duplicate
       return res.status(400).json({ error: "already updated" });
@@ -588,7 +634,7 @@ export const updateFeature = async (req, res) => {
       featureData,
       { new: true }
     );
-    console.log(MergedFeaturesModel.featureId)
+    console.log(MergedFeaturesModel.featureId);
     await MergedFeaturesModel.findByIdAndUpdate(
       MergedFeaturesModel.featureId,
       featureData,
@@ -610,14 +656,14 @@ export const deleteFeature = async (req, res) => {
   try {
     const timeSinceDisappearance = req.query.timeSinceDisappearance;
     const Features = await initializeFeaturesModel(timeSinceDisappearance);
-    console.log(req.params.caseId)
-    const mergedFeature = await MergedFeaturesModel.findById(req.params.caseId)
-    console.log(mergedFeature)
+    console.log(req.params.caseId);
+    const mergedFeature = await MergedFeaturesModel.findById(req.params.caseId);
+    console.log(mergedFeature);
     // const feature = await Features.findById(req.params.id);
     if (!mergedFeature) {
-      res.status(404).json({message: "feature not found"});
+      res.status(404).json({ message: "feature not found" });
     }
-    
+
     if (mergedFeature.user_id.toString() !== req.user.userId.toString()) {
       res.status(403);
       throw new Error(
@@ -625,10 +671,12 @@ export const deleteFeature = async (req, res) => {
       );
     }
     await mergedFeature.deleteOne();
-    Features.deleteOne(Features.mergedFeatureId)
-    res.status(200).json({ message: "feature deleted succussfully", mergedFeature });
+    Features.deleteOne(Features.mergedFeatureId);
+    res
+      .status(200)
+      .json({ message: "feature deleted succussfully", mergedFeature });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.json({ title: "UNAUTHORIZED", message: error.message });
   }
 };
@@ -650,7 +698,7 @@ export const searchFeature = async (req, res) => {
     let searchCriteria = {};
     if (searchBy === "firstName") {
       searchCriteria["name.firstName"] = { $regex: searchTerm, $options: "i" };
-      console.log(searchCriteria)
+      console.log(searchCriteria);
     } else if (searchBy === "middleName") {
       searchCriteria["name.middleName"] = { $regex: searchTerm, $options: "i" };
     } else if (searchBy === "lastName") {
@@ -659,7 +707,7 @@ export const searchFeature = async (req, res) => {
       return res.status(400).json({ error: "Invalid searchBy parameter." });
     }
     const features = await MergedFeaturesModel.find(searchCriteria).lean();
-    console.log(features)
+    console.log(features);
     res.status(200).json(features);
   } catch (error) {
     console.error("Error fetching features:", error.message);

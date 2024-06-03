@@ -1,19 +1,40 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { FaMessage } from 'react-icons/fa6';
-import userSix from '../../../images/user/userImage-min.png';
 import { MdOutlineFeedback } from "react-icons/md";
-import FeedbackList from '../../page/Feedback/FeedbackList';
-import userData from '../../page/Feedback/data';
+import axios from 'axios';
 
 const DropdownFeedback = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
+  const [feedbackData, setFeedbackData] = useState([]);
 
   const trigger = useRef(null);
   const dropdown = useRef(null);
 
-  // close on click outside
+  // Fetch feedback data
+  useEffect(() => {
+    const fetchFeedback = async () => {
+      try {
+        const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
+        const response = await axios.get('http://localhost:4000/api/getFeedBacks', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        // Ensure the response data is an array
+        if (Array.isArray(response.data)) {
+          setFeedbackData(response.data.slice(0, 5)); // Get the first 5 feedbacks
+        } else {
+          setFeedbackData([]);
+        }
+      } catch (error) {
+        console.error('Error fetching feedback data:', error);
+        setFeedbackData([]);
+      }
+    };
+
+    fetchFeedback();
+  }, []);
+
+  // Close on click outside
   useEffect(() => {
     const clickHandler = ({ target }) => {
       if (!dropdown.current) return;
@@ -24,7 +45,7 @@ const DropdownFeedback = () => {
     return () => document.removeEventListener('click', clickHandler);
   }, [dropdownOpen]);
 
-  // close if the esc key is pressed
+  // Close if the esc key is pressed
   useEffect(() => {
     const keyHandler = ({ keyCode }) => {
       if (!dropdownOpen || keyCode !== 27) return;
@@ -41,7 +62,6 @@ const DropdownFeedback = () => {
         onClick={() => {
           setNotifying(false);
           setDropdownOpen(!dropdownOpen);
-
         }}
         className="relative flex items-center justify-center rounded-full bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
       >
@@ -67,7 +87,19 @@ const DropdownFeedback = () => {
           <h5 className="text-sm font-medium text-slate-500">Feedbacks</h5>
         </div>
 
-        <FeedbackList feedbackData={userData}/>
+        <div className="px-4.5 py-3 overflow-y-auto">
+          {feedbackData.length > 0 ? (
+            feedbackData.map((feedback, index) => (
+              <div key={index} className="mb-2">
+                <p className="text-sm text-gray-700"><span className='font-medium text-gray-900'>Name: </span> {feedback.user_id.name}</p>
+                <p className="text-sm mb-2 text-gray-700"><span className='font-medium text-gray-900'>Feedback: </span> {feedback.feedback}</p>
+                <hr />
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-700">No feedback available</p>
+          )}
+        </div>
       </div>
       {/* <!-- Dropdown End --> */}
     </li>

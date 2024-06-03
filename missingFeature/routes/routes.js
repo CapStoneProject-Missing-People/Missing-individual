@@ -6,6 +6,7 @@ import { AddActionLogGateWay, getActionLogByID, getAllActionLogs, getActionLogBy
 import {sendPushNotification, StoreGuestFCM, UpdateUserFCM, FetchNotifications, MarkNotificationAsRead, guestNotification, getPushNotificationDetail }  from "../controller/push-notification.controller.js";
 import { requireAuth, isAdmin } from "../middleware/authMiddleware.js";
 import { fetchAllMissingPeopleWithNames, updateImageBuffers } from '../controller/ImageController.js';
+import { getOverallStatistics } from '../controller/stastisticsController.js';
 
 // Create an instance of Express Router
 export const routers = express.Router();
@@ -25,6 +26,7 @@ routers.route('/add_log_data').post(AddActionLogGateWay);
 routers.route('/get-action-logs').get(getAllActionLogs);
 routers.route('/get-action-log/:logId').get(getActionLogByID);
 routers.route('/get-user-action-log/:userId').get(getActionLogByUser);
+routers.route('/getStats').get(getOverallStatistics);
 
 // Routes for Notification
 routers.route('/send-notification').post(sendPushNotification);
