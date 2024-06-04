@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
-const MergedFeatures = {
+const MergedFeatures = new Schema({
   user_id: {
-    type: Schema.Types.ObjectId ,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: "User",
   },
@@ -13,7 +13,7 @@ const MergedFeatures = {
     required: false,
     ref: "MissingPerson"
   },
-  name: Schema({
+  name: {
     firstName: {
       type: String,
     },
@@ -24,7 +24,7 @@ const MergedFeatures = {
       type: String,
     },
     _id: false,
-  }),
+  },
   gender: {
     type: String,
     enum: ["male", "female"],
@@ -39,7 +39,7 @@ const MergedFeatures = {
     enum: ["fair", "black", "white", "tseyim"],
     required: true,
   },
-  clothing: Schema({
+  clothing: {
     upper: {
       clothType: {
         type: String,
@@ -65,7 +65,7 @@ const MergedFeatures = {
       },
     },
     _id: false,
-  }),
+  },
   body_size: {
     type: String,
     enum: ["thin", "average", "muscular", "overweight", "obese", "fit", "athletic", "curvy", "petite", "fat"],
@@ -89,12 +89,12 @@ const MergedFeatures = {
   },
   medicalInformation: { 
     type: String,
-  required: false
-},
+    required: false
+  },
   circumstanceOfDisappearance: {
     type: String,
     required: false
   }
-};
+}, { timestamps: true });
 
 export default model("MergedFeaturesModel", MergedFeatures)
