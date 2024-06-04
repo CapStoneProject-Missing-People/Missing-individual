@@ -41,5 +41,5 @@ routers.route('/notifications/:id/read').get(requireAuth, MarkNotificationAsRead
 routers.route('/guest-notifications').get(guestNotification)
 
 // Routes for Image
-routers.route('/get-images-with-names').get(requireAuth,  fetchAllMissingPeopleWithNames);
+routers.route('/get-images-with-names').get(requireAuth, isAdmin(["admin", "superAdmin"]), fetchAllMissingPeopleWithNames);
 routers.route('/update-image').put(requireAuth, isAdmin(["admin", "superAdmin"]), updateImageBuffers);
