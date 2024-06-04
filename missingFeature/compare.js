@@ -1,6 +1,7 @@
-import SimilarityScore from './similarityScoreModel'; // Import the new model
+import { compareFeatures } from './compareFunction'; // Adjust import as needed
+import SimilarityScore from './similarityScoreModel'; // Adjust import as needed
 
-export const createFeature = async (data, timeSinceDisappearance, userId, res) => {
+export const createFeature = async (data, timeSinceDisappearance, userId) => {
   try {
     const Features = await initializeFeaturesModel(timeSinceDisappearance);
     const featureData = {
@@ -13,57 +14,31 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
     if (existingFeature) {
       return 'duplicate feature already exists';
     }
+
     featureData.timeSinceDisappearance = timeSinceDisappearance;
     const feature = await Features.create(featureData);
     console.log("Feature stored successfully");
 
-    const existingEmbeddingsCount = await embeddings.countDocuments();
-    const similarityDetails = [];
+    // Get the similarity scores
+    const similarityScores = await compareFeatures(data, timeSinceDisappearance);
 
-    if (existingEmbeddingsCount > 0) {
-      const existingEmbeddings = await embeddings.find();
-      const pipelineModel = await generateEmbeddings();
-      const output = await pipelineModel(data.description, {
-        pooling: "mean",
-        normalize: true,
-      });
-      const embeddingData = output.data;
-      const embeddingArray = [...embeddingData];
+    // Prepare similarity details for the new feature
+    const similarityDetails = similarityScores.map((score) => ({
+      caseId: score.caseId,
+      similarities: {
+        firstName: score.firstName || 0,
+        middleName: score.middleName || 0,
+        lastName: score.lastName || 0,
+        gender: score.gender || 0,
+        skin_color: score.skin_color || 0,
+        description: score.similarityScore || 0,
+        lastSeenLocation: score.lastSeenLocation || 0,
+        medicalInformation: score.medicalInformation || 0,
+        circumstanceOfDisappearance: score.circumstanceOfDisappearance || 0,
+      },
+    }));
 
-      const similarityScores = existingEmbeddings.map(existingEmbedding => {
-        const similarity = calculateSimilarity(embeddingData, existingEmbedding.embedding);
-        return {
-          existingCaseId: existingEmbedding.caseId,
-          similarityScore: similarity * 100,
-        };
-      });
-
-      similarityScores.sort((a, b) => b.similarityScore - a.similarityScore);
-
-      for (let score of similarityScores) {
-        const caseId = score.existingCaseId;
-        const existingFeatureData = await Features.findById(caseId).lean();
-        if (!existingFeatureData) continue;
-
-        const similarityDetail = {
-          caseId: caseId,
-          similarities: {
-            firstName: existingFeatureData.name.firstName === data.firstName ? 100 : 0,
-            middleName: existingFeatureData.name.middleName === data.middleName ? 100 : 0,
-            lastName: existingFeatureData.name.lastName === data.lastName ? 100 : 0,
-            gender: existingFeatureData.gender === data.gender ? 100 : 0,
-            skin_color: existingFeatureData.skin_color === data.skin_color ? 100 : 0,
-            description: score.similarityScore,
-            lastSeenLocation: existingFeatureData.lastSeenLocation === data.lastSeenLocation ? 100 : 0,
-            medicalInformation: existingFeatureData.medicalInformation === data.medicalInformation ? 100 : 0,
-            circumstanceOfDisappearance: existingFeatureData.circumstanceOfDisappearance === data.circumstanceOfDisappearance ? 100 : 0,
-          },
-        };
-
-        similarityDetails.push(similarityDetail);
-      }
-    }
-
+    // Store the similarity scores
     await SimilarityScore.create({
       caseId: feature._id,
       similarities: similarityDetails,
@@ -128,7 +103,7 @@ export const createFeature = async (data, timeSinceDisappearance, userId, res) =
       }
     }
 
-    return { message: "Feature stored successfully", createdFeature: feature, mergedFeature: mergedFeatures };
+    return { message: "Feature stored successfully", createdFeature: feature };
 
   } catch (error) {
     console.error("Error creating feature:", error);

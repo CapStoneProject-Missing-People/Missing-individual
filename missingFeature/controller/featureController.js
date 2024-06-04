@@ -5,12 +5,13 @@ import { pipeline } from "@xenova/transformers";
 import mongoose from "mongoose";
 import MergedFeaturesModel from "../models/mergedFeatureSchema.js"
 import { features } from "process";
+import MatchingStatus from '../models/matchingStatus.js'; // Adjust the path as needed
+
 
 export const getOwnFeatures = async (req, res) => {
   try {
-    const filterCriteria = {}
+    const filterCriteria = {user_id: req.user.userId}
     const features = await MergedFeaturesModel.find(filterCriteria).lean().populate({path: 'missing_case_id', select:['status', 'imageBuffers', 'dateReported']});
-    console.log(features);
 
     res.status(200).json(features);
   } catch (error){
@@ -174,117 +175,74 @@ const updateSimilarityField = async (
 //@desc create new Feature
 //@route POST /api/features/create
 //@access private
-export const createFeature = async (data, timeSinceDisappearance, userId, res) => {
+export const createFeature = async (parsedData, timeSinceDisappearance, userID, res) => {
   try {
-    const Features = await initializeFeaturesModel(timeSinceDisappearance)
-    const featureData = {
-      ...data,
-      inputHash: calculateHash(data),
-      user_id: userId
+    const Features = await initializeFeaturesModel(timeSinceDisappearance);
+    const newFeatureData = {
+      ...parsedData,
+      inputHash: calculateHash(parsedData),
+      user_id: userID,
+      timeSinceDisappearance,
+    };
+
+    const existingFeature = await Features.findOne({ inputHash: newFeatureData.inputHash });
+    if (existingFeature) {
+      return res.status(400).json({ message: 'Duplicate feature already exists' });
     }
 
-    const existingFeature = await Features.findOne({inputHash: featureData.inputHash });
-    if (existingFeature) {
-      return 'duplicate feature already exist'
-    }
-    featureData.timeSinceDisappearance = timeSinceDisappearance
-    const feature = await Features.create( featureData );
-    console.log("feature stored successfully");
-    const existingFeatureMerged = await MergedFeaturesModel.findOne({ inputHash: featureData.inputHash });
+    const feature = await Features.create(newFeatureData);
+    newFeatureData._id = feature._id;  // Ensure the newFeatureData contains the _id of the created feature
+    console.log("Feature stored successfully");
+    const existingFeatureMerged = await MergedFeaturesModel.findOne({ inputHash: newFeatureData.inputHash });
     if (existingFeatureMerged) {
       return 'Duplicate feature already exists in MergedFeatures collection'
     }
-
-    const mergedFeatures = await MergedFeaturesModel.create( featureData )
+    const mergedFeatures = await MergedFeaturesModel.create( newFeatureData )
     console.log("Feature stored successfully in MergedFeatures collection.");
     console.log("mergedFeatures: ", mergedFeatures)
     const mergedFeatureCaseId = mergedFeatures._id
     feature.mergedFeatureId = mergedFeatureCaseId
     feature.save()
-    const existingEmbeddingsCount = await embeddings.countDocuments();
-    if (existingEmbeddingsCount < 1) {
-      const caseId = feature._id;
-      const pipelineModel = await generateEmbeddings();
-      const output = await pipelineModel(data.description, {
-        pooling: "mean",
-        normalize: true,
-      });
-      const embeddingData = output.data;
 
-      const embeddingArray = [...embeddingData];
-      // Store the new embedding directly if no existing data in embeddings collection
-      await embeddings.create({
-        caseId,
-        embedding: embeddingArray,
-        similarity: {},
-      });
-      console.log("initial embedding stored successfully");
+    const pipelineModel = await generateEmbeddings();
+    const output = await pipelineModel(newFeatureData.description, { pooling: "mean", normalize: true });
+    const embeddingData = output.data;
+    const embeddingArray = [...embeddingData];
+
+    const existingEmbeddings = await embeddings.find();
+    if (existingEmbeddings.length < 1) {
+      await embeddings.create({ caseId: feature._id, embedding: embeddingArray, similarity: {} });
+      console.log("Initial embedding stored successfully");
     } else {
-      // Find all embeddings in the database
-      const existingEmbeddings = await embeddings.find();
-      const caseId = feature._id;
-      const pipelineModel = await generateEmbeddings();
-      const output = await pipelineModel(data.description, {
-        pooling: "mean",
-        normalize: true,
+      var similarityScores = existingEmbeddings.map(existingEmbedding => {
+        const similarity = calculateSimilarity(embeddingData, existingEmbedding.embedding);
+        return { existingCaseId: existingEmbedding.caseId, existingEmbeddingId: existingEmbedding._id, similarityScore: similarity * 100 };
       });
-      const embeddingData = output.data;
 
-      const embeddingArray = [...embeddingData];
-      // Calculate cosine similarity with each existing embedding
-      const similarityScores = await existingEmbeddings.map(
-        (existingEmbedding) => {
-          const similarity = calculateSimilarity(
-            embeddingData,
-            existingEmbedding.embedding
-          );
-          return {
-            existingCaseId: existingEmbedding.caseId,
-            existingEmbeddingId: existingEmbedding._id,
-            similarityScore: similarity * 100,
-          };
-        }
-      );
-
-      // Create an array of similarity objects
-      const similarityObjects = similarityScores.map((item) => ({
-        CaseId: item.existingCaseId, // Corrected property name
+      const similarityObjects = similarityScores.map(item => ({
+        CaseId: item.existingCaseId,
         existingEmbId: item.existingEmbeddingId,
         similarityScore: item.similarityScore,
       }));
 
-      // Create the embeddings document with the similarity field
-      await embeddings.create({
-        caseId,
-        embedding: embeddingArray,
-        similarity: similarityObjects,
-      });
+      await embeddings.create({ caseId: feature._id, embedding: embeddingArray, similarity: similarityObjects });
 
       similarityScores.sort((a, b) => b.similarityScore - a.similarityScore);
-      // Prepare top 10 similarities with their respective case IDs for response
-      similarityScores.slice(0, 10).map((item) => ({
-        caseId: item.existingCaseId,
-        similarityScore: item.similarityScore,
-      }));
-      // Update similarity field for top 10 similar embeddings
-      const topNSimilarities = similarityScores.slice(0, 10); // Consider only the top 10 similar embeddings
+      const topNSimilarities = similarityScores.slice(0, 10);
       for (let i = 0; i < topNSimilarities.length; i++) {
-        const { existingCaseId, existingEmbeddingId, similarityScore } =
-          topNSimilarities[i];
-        await updateSimilarityField(
-          caseId,
-          existingEmbeddingId,
-          similarityScore
-        );
+        const { existingCaseId, existingEmbeddingId, similarityScore } = topNSimilarities[i];
+        await updateSimilarityField(feature._id, existingEmbeddingId, similarityScore);
       }
     }
-   return {message: " feature stored succeffully", createdFeature: feature, mergedFeature: mergedFeatures}
+    const comparisonScore = await compareFeatures(newFeatureData, timeSinceDisappearance, similarityScores);
+    console.log(comparisonScore)
+
+    return {message: "Feature stored successfully", createdFeature: feature, mergedFeature: mergedFeatures}
   } catch (error) {
     console.error("Error creating feature:", error);
-    throw new Error(error)
+    throw new Error('Can not create Feature, Please Try again!')
   }
 };
-
 
 //@desc compare Feature
 //@route POST /api/features/compare
@@ -313,17 +271,14 @@ export const compareFeature = async (req, res) => {
     } else {
       let response = [];
       let featureData = {};
-      let featureModelName = "";
 
       if (timeSinceDisappearance > 2) {
-        featureModelName = "Features_GT_2";
         featureData = {
           lastSeenLocation: req.body.lastSeenLocation,
           medicalInformation: req.body.medicalInformation,
           circumstanceOfDisappearance: req.body.circumstanceOfDisappearance,
         };
       } else {
-        featureModelName = "Features_LTE_2";
         featureData = {
           "clothing.upper.clothType": req.body.clothingUpperClothType,
           "clothing.upper.clothColor": req.body.clothingUpperClothColor,
@@ -365,6 +320,7 @@ export const compareFeature = async (req, res) => {
         "name.firstName": req.body.firstName,
         "name.middleName": req.body.middleName,
         "name.lastName": req.body.lastName,
+        gender: req.body.gender,
         skin_color: req.body.skin_color,
         ...featureData, // Include feature-specific data
       };
@@ -506,6 +462,8 @@ export const update = async (req, res) => {
 };
 
 
+
+
 //@desc updare Feature
 //@route PUT /api/features
 //@access private
@@ -645,5 +603,121 @@ export const searchFeature = async (req, res) => {
   } catch (error) {
     console.error("Error fetching features:", error.message);
     res.status(500).json({ error: "Server error" });
+  }
+};
+
+
+export const compareFeatures = async (newFeatureData, timeSinceDisappearance, similarityScores) => {
+  try {
+    const Features = await initializeFeaturesModel(timeSinceDisappearance)
+    const existingFeatures = await Features.find()
+
+    var criteria = {}
+    if (timeSinceDisappearance > 2) {
+       criteria = {
+        age: newFeatureData.age,
+        "name.firstName": newFeatureData.name.firstName,
+        "name.middleName": newFeatureData.name.middleName,
+        "name.lastName": newFeatureData.name.lastName,
+        gender: newFeatureData.gender,
+        skin_color: newFeatureData.skin_color,
+        body_size: newFeatureData.body_size,
+        descriptions: newFeatureData.descriptions,
+        lastSeenLocation: newFeatureData.lastSeenLocation,
+        medicalInformation: newFeatureData.medicalInformation,
+        circumstanceOfDisappearance: newFeatureData.circumstanceOfDisappearance
+      };
+    } else if(timeSinceDisappearance < 2) {
+       criteria = {
+        age: newFeatureData.age,
+        "name.firstName": newFeatureData.name.firstName,
+        "name.middleName": newFeatureData.name.middleName,
+        "name.lastName": newFeatureData.name.lastName,
+        gender: newFeatureData.gender,
+        skin_color: newFeatureData.skin_color,
+        "clothing.upper.clothType": newFeatureData.clothing.upper.clothType,
+        "clothing.upper.clothColor": newFeatureData.clothing.upper.clothColor,
+        "clothing.lower.clothType": newFeatureData.clothing.lower.clothType,
+        "clothing.lower.clothColor": newFeatureData.clothing.lower.clothColor,
+        body_size: newFeatureData.body_size,
+        descriptions: newFeatureData.descriptions
+      };
+    }
+
+    const ageRanges = {
+      "1-4": { $gte: 1, $lte: 4 },
+      "5-10": { $gte: 5, $lte: 10 },
+      "11-15": { $gte: 11, $lte: 15 },
+      "16-20": { $gte: 16, $lte: 20 },
+      "21-30": { $gte: 21, $lte: 30 },
+      "31-40": { $gte: 31, $lte: 40 },
+      "41-50": { $gte: 41, $lte: 50 },
+      ">51": { $gt: 51 },
+    };
+
+    const response = [];
+    console.log(existingFeatures.length)
+    if (existingFeatures.length < 2) {
+      return {message: 'nothing to compare'}
+    }
+
+    for (const feature of existingFeatures) {
+      if(feature._id.equals(newFeatureData._id)) {
+        continue
+      }
+    
+      const matchingStatus = { id: feature._id };
+
+      for (const key in criteria) {
+        const value = criteria[key];
+
+        if (key === "age") {
+          const featureAge = feature.age;
+          if (featureAge === value) {
+            matchingStatus.age = 100;
+          } else {
+            const newReqAgeRange = Object.keys(ageRanges).find(range => ageRanges[range].$gte <= value && ageRanges[range].$lte >= value);
+            const featureAgeRange = Object.keys(ageRanges).find(range => ageRanges[range].$gte <= featureAge && ageRanges[range].$lte >= featureAge);
+
+            matchingStatus.age = newReqAgeRange === featureAgeRange ? 85 : 0;
+          }
+        } else if (key.startsWith("name.")) {
+          const namePart = key.split(".")[1];
+          matchingStatus[namePart] = feature.name[namePart] === value ? 100 : 0;
+        } else if (key.startsWith("clothing.")) {
+          const [_, clothingType, clothKey] = key.split(".");
+          const featureClothing = feature.clothing[clothingType][clothKey];
+
+          if ((featureClothing === "blue" && value === "light blue") || (featureClothing === "light blue" && value === "blue") ||
+              (featureClothing === "yellow" && value === "orange") || (featureClothing === "orange" && value === "yellow")) {
+            matchingStatus[`${clothingType} ${clothKey}`] = 85;
+          } else {
+            matchingStatus[`${clothingType} ${clothKey}`] = featureClothing === value ? 100 : 0;
+          }
+        } else {
+          matchingStatus[key] = feature[key] === value ? 100 : 0;
+        }
+      }
+
+      similarityScores.forEach((score) => {
+        if (score.existingCaseId.equals(newFeatureData._id)) {
+          matchingStatus.similarityScore = score.similarityScore * 100;
+        }
+      });
+
+      // Store matchingStatus in the new collection
+      await MatchingStatus.create({
+        newCaseId: newFeatureData._id,
+        existingCaseId: feature._id,
+        matchingStatus,
+      });
+
+      response.push(matchingStatus);
+    }
+
+    return response;
+  } catch (error) {
+    console.error("Error comparing features:", error);
+    throw new Error("Error comparing features");
   }
 };
