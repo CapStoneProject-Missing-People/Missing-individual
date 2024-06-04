@@ -28,12 +28,12 @@ export const getUserProfile = async (req, res) => {
 //@route PUT /api/profile/update
 //@access private
 export const updateUserProfile = async (req, res) => {
-  const userID = req.params.userId;
+  const userID = req.user.userId;
   const { email, name, phoneNo } = req.body;
 
   try {
     // Find the user by ID
-    const user = await User.findById(userID);
+    const user = await User.findById({ _id: userID });
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
