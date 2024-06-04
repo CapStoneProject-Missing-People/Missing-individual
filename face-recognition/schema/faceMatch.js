@@ -19,6 +19,12 @@ const faceMatchSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  imageBuffers: [{ type: Buffer }],
+  faceFeautre: {
+    type: String,
+    required: true,
+  },
+
   isMatch: {
     type: String,
     enum: ['match', 'potential', 'nomatch'],
