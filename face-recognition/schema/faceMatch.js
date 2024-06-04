@@ -18,7 +18,12 @@ const faceMatchSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-  }
+  },
+  isMatch: {
+    type: String,
+    enum: ['match', 'potential', 'nomatch'],
+    default: 'potential',
+  },
 });
 
 faceMatchSchema.index({person_id: 1});
