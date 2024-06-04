@@ -2,6 +2,7 @@ import {User} from "../models/userModel.js";
 import MissingPerson from "../models/missingPersonSchema.js";
 import MergedFeaturesModel from "../models/mergedFeaturesSchema.js";
 import initializeFeaturesModel from "../models/featureModel.js";
+import ActionLog from "../models/logSchema.js";
 
 //@desc Get all user
 //@route GET /api/admin/getAll
@@ -24,6 +25,19 @@ export const getAllAdmins = async (req, res) => {
   try {
     const users = await User.find({ role: 3244 }).select("-__v -password");
     res.json(users);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
+//@desc Get all the data of logged in users from ActionLog database
+//@route GET /api/admin/getlogInData
+//@access admins only
+export const getLoggedInUserData = async (req, res) => {
+  try {
+    const data = await ActionLog.find({action: "Login", logLevel: "info"});
+    res.json(data);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

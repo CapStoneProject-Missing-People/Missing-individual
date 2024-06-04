@@ -9,6 +9,7 @@ import {
   updatePermissions,
   updateUserProfile,
   deleteAdmin,
+  getLoggedInUserData,
 } from "../controller/adminController.js";
 import {
   requireAuth,
@@ -30,6 +31,13 @@ adminRouters.get(
   requireAuth,
   isAdmin([5150]),
   getAllAdmins
+);
+
+adminRouters.get(
+  "/getLogInData",
+  requireAuth,
+  isAdmin([3244]),
+  getLoggedInUserData
 );
 
 adminRouters.put(
