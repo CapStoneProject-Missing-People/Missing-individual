@@ -94,6 +94,7 @@ export const checkFaceMatch = async (image) => {
       person_id: result[0]._label,
       distance: result[0]._distance,
       similarity: similarityPercentage,
+      faceFeautre: detection.descriptor
     };
   } catch (error) {
     console.error("Error detecting face:", error);

@@ -7,6 +7,7 @@ import {sendPushNotification, StoreGuestFCM, UpdateUserFCM, FetchNotifications, 
 import { requireAuth, isAdmin } from "../middleware/authMiddleware.js";
 import { fetchAllMissingPeopleWithNames, updateImageBuffers } from '../controller/ImageController.js';
 import { getOverallStatistics } from '../controller/stastisticsController.js';
+import { GetMissingPerson } from '../controller/missingPersonController.js';
 
 // Create an instance of Express Router
 export const routers = express.Router();
@@ -20,6 +21,7 @@ routers
   .route("/createMissingPerson/:timeSinceDisappearance")
 
   .post(upload.any(), requireAuth, CreateMissingPerson);
+routers.route('/get-missing-person').get(requireAuth, GetMissingPerson)
 
 // Routes for Logging
 routers.route('/add_log_data').post(AddActionLogGateWay);
@@ -39,5 +41,5 @@ routers.route('/notifications/:id/read').get(requireAuth, MarkNotificationAsRead
 routers.route('/guest-notifications').get(guestNotification)
 
 // Routes for Image
-routers.route('/get-images-with-names').get(requireAuth, isAdmin(["admin", "superAdmin"]), fetchAllMissingPeopleWithNames);
+routers.route('/get-images-with-names').get(requireAuth,  fetchAllMissingPeopleWithNames);
 routers.route('/update-image').put(requireAuth, isAdmin(["admin", "superAdmin"]), updateImageBuffers);
