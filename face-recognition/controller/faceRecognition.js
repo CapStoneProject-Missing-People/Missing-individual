@@ -2,6 +2,7 @@ import { uploadFaceFeature, checkFaceMatch } from "../face.js";
 import FaceMatchResult from "../schema/faceMatch.js";
 import { logData } from "../helper/helpers.js";
 import axios from 'axios';
+import FaceModel from "../schema/face-feature.js";
 
 export const RecognizeFace = async (req, res) => {
   const startTime = Date.now(); // Start timer
@@ -16,10 +17,13 @@ export const RecognizeFace = async (req, res) => {
     if (result.error) {
       return res.status(400).json({ error: result.error });
     }
+    console.log("image buffer: " + file1)
     await FaceMatchResult.create({
       person_id: result.person_id,
       distance: result.distance,
       similarity: result.similarity,
+      faceFeautre: result.faceFeautre,
+      imageBuffers: file1
     });
     
     await logData({
