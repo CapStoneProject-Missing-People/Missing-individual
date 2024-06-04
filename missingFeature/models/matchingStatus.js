@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const matchingStatusSchema = new mongoose.Schema({
+  user_id: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
   newCaseId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Feature' },
   existingCaseId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Feature' },
   matchingStatus: {

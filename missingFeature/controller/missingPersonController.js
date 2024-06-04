@@ -1,9 +1,5 @@
 import MissingPerson from "../models/missingPersonSchema.js";
 import axios from "axios";
-import fs from "fs";
-import path, { parse } from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
 import { createFeature } from "./featureController.js";
 
 export const CreateMissingPerson = async (req, res) => {
@@ -33,6 +29,14 @@ export const CreateMissingPerson = async (req, res) => {
         body_size,
         ...base
       } = req.body;
+      baseReq = {
+        ...base,
+        clothingUpperClothType,
+        clothingUpperClothColor,
+        clothingLowerClothType,
+        clothingLowerClothColor,
+        body_size,
+      };
     }
 
     const parsedData = {};
@@ -81,25 +85,16 @@ export const CreateMissingPerson = async (req, res) => {
       }
     }
     parsedData.clothing = clothing;
-    console.log('parsed data  ')
-    console.log(parsedData)
-    let userID = req.user.userId;
+    console.log('Parsed Data: ', parsedData); // Debugging line
 
-    //integration with push notification
-    // // Calculate the average similarity score
-    // const averageSimilarity = await calculateAverageSimilarity(parsedData, timeSinceDisappearance);
-    
-    // // Send notification if average similarity is greater than 85
-    // if (averageSimilarity > 85) {
-    //   await sendNotification(`New feature created with high similarity (${averageSimilarity}%) to existing cases.`);
-    // }
+    let userID = req.user.userId;
 
     // Handling feature creation
     const result = await createFeature(parsedData, timeSinceDisappearance, userID, res);
     if (typeof(result) === "string") {
-      return {message: result, status: 404}
+      return res.status(404).json({ message: result });
     }
-
+    console.log('result')
     console.log(result);
 
     const images = req.files;
@@ -124,20 +119,18 @@ export const CreateMissingPerson = async (req, res) => {
       // change the faceFeatureCreated to true
       newMissingPerson.faceFeatureCreated = true;
     }
-    console.log('result')
-    console.log(result)
-
+  
     await newMissingPerson.save();
-    console.log(newMissingPerson._id)
+    console.log(newMissingPerson._id);
     result.createdFeature.missing_case_id = newMissingPerson._id;
     result.mergedFeature.missing_case_id = newMissingPerson._id;
-    console.log('here')
+
     await result.createdFeature.save();
     await result.mergedFeature.save();
-    res.status(200).json({ message: "Missing person record created successfully.", createdFeatures: result })
+    res.status(200).json({ message: "Missing person record created successfully.", createdFeatures: result });
   } catch (error) {
     // Handle unexpected errors
     console.error('Error occurred:', error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ message: 'Feature cannot be created, Please try again!' });
   }
 };

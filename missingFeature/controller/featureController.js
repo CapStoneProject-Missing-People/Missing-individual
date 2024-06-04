@@ -187,11 +187,12 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
 
     const existingFeature = await Features.findOne({ inputHash: newFeatureData.inputHash });
     if (existingFeature) {
-      return res.status(400).json({ message: 'Duplicate feature already exists' });
+      return { message: 'Duplicate feature already exists' }
     }
 
     const feature = await Features.create(newFeatureData);
     newFeatureData._id = feature._id;  // Ensure the newFeatureData contains the _id of the created feature
+    newFeatureData.user_id = feature.user_id
     console.log("Feature stored successfully");
     const existingFeatureMerged = await MergedFeaturesModel.findOne({ inputHash: newFeatureData.inputHash });
     if (existingFeatureMerged) {
@@ -609,12 +610,12 @@ export const searchFeature = async (req, res) => {
 
 export const compareFeatures = async (newFeatureData, timeSinceDisappearance, similarityScores) => {
   try {
-    const Features = await initializeFeaturesModel(timeSinceDisappearance)
-    const existingFeatures = await Features.find()
+    const Features = await initializeFeaturesModel(timeSinceDisappearance);
+    const existingFeatures = await Features.find();
 
-    var criteria = {}
+    let criteria = {};
     if (timeSinceDisappearance > 2) {
-       criteria = {
+      criteria = {
         age: newFeatureData.age,
         "name.firstName": newFeatureData.name.firstName,
         "name.middleName": newFeatureData.name.middleName,
@@ -622,13 +623,13 @@ export const compareFeatures = async (newFeatureData, timeSinceDisappearance, si
         gender: newFeatureData.gender,
         skin_color: newFeatureData.skin_color,
         body_size: newFeatureData.body_size,
-        descriptions: newFeatureData.descriptions,
+        description: newFeatureData.description,
         lastSeenLocation: newFeatureData.lastSeenLocation,
         medicalInformation: newFeatureData.medicalInformation,
         circumstanceOfDisappearance: newFeatureData.circumstanceOfDisappearance
       };
-    } else if(timeSinceDisappearance < 2) {
-       criteria = {
+    } else if(timeSinceDisappearance <= 2) {
+      criteria = {
         age: newFeatureData.age,
         "name.firstName": newFeatureData.name.firstName,
         "name.middleName": newFeatureData.name.middleName,
@@ -640,7 +641,7 @@ export const compareFeatures = async (newFeatureData, timeSinceDisappearance, si
         "clothing.lower.clothType": newFeatureData.clothing.lower.clothType,
         "clothing.lower.clothColor": newFeatureData.clothing.lower.clothColor,
         body_size: newFeatureData.body_size,
-        descriptions: newFeatureData.descriptions
+        description: newFeatureData.description
       };
     }
 
@@ -656,16 +657,15 @@ export const compareFeatures = async (newFeatureData, timeSinceDisappearance, si
     };
 
     const response = [];
-    console.log(existingFeatures.length)
     if (existingFeatures.length < 2) {
-      return {message: 'nothing to compare'}
+      return { message: 'Nothing to compare' };
     }
 
     for (const feature of existingFeatures) {
-      if(feature._id.equals(newFeatureData._id)) {
-        continue
+      if (feature._id.equals(newFeatureData._id)) {
+        continue;
       }
-    
+      
       const matchingStatus = { id: feature._id };
 
       for (const key in criteria) {
@@ -690,10 +690,9 @@ export const compareFeatures = async (newFeatureData, timeSinceDisappearance, si
 
           if ((featureClothing === "blue" && value === "light blue") || (featureClothing === "light blue" && value === "blue") ||
               (featureClothing === "yellow" && value === "orange") || (featureClothing === "orange" && value === "yellow")) {
-            matchingStatus[`${clothingType} ${clothKey}`] = 85;
+              matchingStatus[`${clothingType}${clothKey.charAt(0).toUpperCase() + clothKey.slice(1)}`] = 85;
           } else {
-            matchingStatus[`${clothingType} ${clothKey}`] = featureClothing === value ? 100 : 0;
-          }
+            matchingStatus[`${clothingType}${clothKey.charAt(0).toUpperCase() + clothKey.slice(1)}`] = featureClothing === value ? 100 : 0;          }
         } else {
           matchingStatus[key] = feature[key] === value ? 100 : 0;
         }
@@ -701,20 +700,25 @@ export const compareFeatures = async (newFeatureData, timeSinceDisappearance, si
 
       similarityScores.forEach((score) => {
         if (score.existingCaseId.equals(newFeatureData._id)) {
-          matchingStatus.similarityScore = score.similarityScore * 100;
+          matchingStatus.similarityScore = score.similarityScore;
         }
       });
 
       // Store matchingStatus in the new collection
       await MatchingStatus.create({
+        user_id: newFeatureData.user_id,
         newCaseId: newFeatureData._id,
         existingCaseId: feature._id,
         matchingStatus,
       });
 
+      console.log('maching status')
+      console.log(matchingStatus)
+
       response.push(matchingStatus);
     }
 
+    console.log('response: ', response)
     return response;
   } catch (error) {
     console.error("Error comparing features:", error);
