@@ -1,6 +1,19 @@
 import {User} from "../models/userModel.js";
 import MissingPerson from "../models/missingPersonSchema.js";
 import MergedFeaturesModel from "../models/mergedFeaturesSchema.js";
+import initializeFeaturesModel from "../models/featureModel.js"
+import feedBackModel from "../models/feedBackModel.js";
+import ActionLog from "../models/logSchema.js";
+
+export const getLoggedInUserData = async (req, res) => {
+  try {
+    const data = await ActionLog.find({action: "Login", logLevel: "info"});
+    res.json(data);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
 
 //@desc Get all user
 //@route GET /api/admin/getAll
@@ -66,28 +79,42 @@ export const updateUserProfile = async (req, res) => {
 //@desc delete any user
 //@route DELETE /api/admin/delete/:userId
 //@access admin
+
 export const deleteUserProfile = async (req, res) => {
   const userID = req.params.userId;
-
+  
   try {
     // Find the user by ID
     const user = await User.findById(userID);
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
-
+    
     // Check if the user's role is "user" or "admin"
     if (user.role !== 2001) {
       return res
-        .status(403)
-        .json({ msg: "Cannot delete user with role: " + user.role });
+      .status(403)
+      .json({ msg: "Cannot delete user with role: " + user.role });
     }
-
+    
+    const feedbackToDelete = await feedBackModel.findOne({ user_id: userID})
+    if (feedbackToDelete){
+      const feedbackId = feedbackToDelete._id
+      await feedBackModel.deleteOne(feedbackId)
+    }
+    const mergedFeatureToDelete = await MergedFeaturesModel.findOne({ user_id: userID })
+    console.log(mergedFeatureToDelete)
+    const timeSinceDisappearance = await mergedFeatureToDelete.timeSinceDisappearance
+    console.log(timeSinceDisappearance)
+    const Features = await initializeFeaturesModel(timeSinceDisappearance)
+    console.log(Features)
     // Remove posts made by the user (if any)
     await MissingPerson.deleteMany({ userID });
     // remove post from merged features model(if any)
-    await MergedFeaturesModel.deleteMany({ user_id: userID });
 
+
+    await MergedFeaturesModel.deleteMany({ user_id: userID });
+    await Features.deleteMany({ user_id: userID });
     // Remove the user
     await User.findOneAndDelete({ _id: userID });
 
@@ -139,8 +166,18 @@ export const deleteUserPost = async (req, res) => {
   const postID = req.params.postId;
 
   try {
-    //remove posts made by the user
-    await MissingPerson.deleteMany({ _id: postID });
+    const post = await MergedFeaturesModel.findById({_id: postID});
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+    const missingPeopleId = post.missing_case_id;
+
+    // remove post from merged features model
+    await MergedFeaturesModel.deleteOne({ _id: postID });
+
+    // remove post from merged features model
+    await MissingPerson.deleteOne({ _id: missingPeopleId });
+
     res.json({ msg: "user post deleted" });
   } catch (err) {
     console.error(err.message);

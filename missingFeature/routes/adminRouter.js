@@ -9,6 +9,7 @@ import {
   updatePermissions,
   updateUserProfile,
   deleteAdmin,
+  getLoggedInUserData,
 } from "../controller/adminController.js";
 import {
   requireAuth,
@@ -17,7 +18,12 @@ import {
 } from "../middleware/authMiddleware.js";
 
 export const adminRouters = express.Router();
-
+adminRouters.get(
+  "/getLogInData",
+  requireAuth,
+  isAdmin([3244]),
+  getLoggedInUserData
+);
 adminRouters.get(
   "/getAllUsers",
   requireAuth,
@@ -39,7 +45,7 @@ adminRouters.put(
   requirePermission("update"),
   updateUserProfile
 );
-
+  
 adminRouters.delete(
   "/deleteUser/:userId",
   requireAuth,
