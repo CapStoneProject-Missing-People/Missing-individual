@@ -140,7 +140,19 @@ export const login_post = async (req, res) => {
   }
 };
 
-export const logout_get = (req, res) => {
+
+export const logout_get = async (req, res) => {
+  const id = req.user.userId;
+  console.log(id);
+  await AddActionLog({
+    action: "Logout",
+    user_id: id || "",
+    user_agent: req.headers["user-agent"],
+    method: req.method,
+    ip: req.socket.remoteAddress,
+    status: 200,
+    logLevel: "info",
+  });
   res.send("logged out");
 };
 
@@ -170,8 +182,27 @@ export const admin_login_post = async (req, res) => {
       httpOnly: true,
       maxAge: maxAge * 1000,
     });
+    await AddActionLog({
+      action: "admin_login",
+      user_id: user._id || "",
+      user_agent: req.headers["user-agent"],
+      method: req.method,
+      ip: req.socket.remoteAddress,
+      status: 200,
+      logLevel: "info",
+    });
     res.status(200).json({ user, token: token });
   } catch (err) {
+    AddActionLog({
+      action: "admin_login",
+      user_id: email || "",
+      user_agent: req.headers["User-Agent"],
+      method: req.method,
+      ip: req.ip,
+      status: 500,
+      error: err.message || "Internal Server Error",
+      logLevel: "error",
+    });
     const errors = handleErrors(err);
     console.log("the error is:", err);
     res.status(400).json({ errors });

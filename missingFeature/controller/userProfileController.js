@@ -1,12 +1,12 @@
 import MissingPerson from "../models/missingPersonSchema.js";
-import {User} from "../models/userModel.js";
+import { User } from "../models/userModel.js";
 
 //@desc Get current user
 //@route GET /api/profile/current
 //@access private
 export const getUserProfile = async (req, res) => {
   try {
-    console.log("in")
+    console.log("in");
     if (!req.user) {
       return res.status(401).json({ msg: "Not authorized! Login First" });
     }
