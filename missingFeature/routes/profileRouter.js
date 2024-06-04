@@ -11,5 +11,5 @@ const upload = multer();
 export const profileRouter = express.Router();
 
 profileRouter.route("/current").get(requireAuth, getUserProfile);
-profileRouter.route("/update").put(requireAuth, updateUserProfile);
+profileRouter.route("/update/:userId").put(requireAuth, updateUserProfile);
 profileRouter.route("/delete").delete(requireAuth, deleteUserProfile);

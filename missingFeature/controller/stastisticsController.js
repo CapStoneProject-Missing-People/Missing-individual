@@ -5,7 +5,7 @@ import MissingPerson from "../models/missingPersonSchema.js";
 
 export const getOverallStatistics = async (req, res) => {
   try {
-    const userCount = await User.countDocuments();
+    const userCount = await User.countDocuments({role: 2001});
     const postCount = await MergedFeaturesModel.countDocuments();
     const missingCount = await MissingPerson.countDocuments({status: "missing"});
     const foundCount = await MissingPerson.countDocuments({status: "found"});
