@@ -34,8 +34,6 @@ Future<List<MissingPerson>> fetchMissingPeople() async {
                     .map((imageUrl) => base64Decode(imageUrl))
                     .toList();
 
-            print("Decoded image buffers for ${data['name']['firstName']}");
-
             return MissingPerson(
               name: data['name']['firstName'],
               age: data['age'],

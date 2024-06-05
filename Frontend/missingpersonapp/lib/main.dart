@@ -14,7 +14,8 @@ import 'package:missingpersonapp/features/authentication/services/auth_services.
 import 'package:missingpersonapp/features/feedback/screens/feedback.dart';
 import 'package:missingpersonapp/features/home/provider/allMissingperson.dart';
 import 'package:missingpersonapp/features/home/screens/home_page.dart';
-import 'package:missingpersonapp/features/matchedCase/screens/matchedCase.dart';
+import 'package:missingpersonapp/features/matchedCase/provider/matched_case_provider.dart';
+import 'package:missingpersonapp/features/matchedCase/screens/matched_case.dart';
 import 'package:missingpersonapp/firebase_options.dart';
 import 'package:provider/provider.dart';
 
@@ -40,6 +41,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => UserProvider()),
       ChangeNotifierProvider(create: (_) => AllMissingPeopleProvider()),
       ChangeNotifierProvider(create: (_) => CaseProvider()),
+      ChangeNotifierProvider(create: (_) => MatchedCaseProvider()),
       ChangeNotifierProxyProvider<UserProvider, MissingPersonProvider>(
         create: (context) {
           final user = Provider.of<UserProvider>(context, listen: false).user;

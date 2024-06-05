@@ -10,6 +10,6 @@ const upload = multer();
 // face recognition routes
 router.route("/recognize").post( upload.any(), RecognizeFace);
 router.route("/add-face-feature").post(addFaceFeature);
-router.route("/get-face-matches").get(FaceMatch);
+router.route("/get-face-matches").post(FaceMatch);
 
 export default router;
