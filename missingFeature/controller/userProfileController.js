@@ -33,7 +33,7 @@ export const updateUserProfile = async (req, res) => {
 
   try {
     // Find the user by ID
-      const user = await User.findById({_id: userID});
+    const user = await User.findById({ _id: userID });
     if (!user) {
       return res.status(404).json({ msg: "User not found" });
     }
