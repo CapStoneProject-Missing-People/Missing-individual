@@ -1,4 +1,3 @@
-
 import express from "express";
 import {
   getAllUsers,
@@ -10,6 +9,7 @@ import {
   updateUserProfile,
   deleteAdmin,
   getLoggedInUserData,
+  getAllPosts,
 } from "../controller/adminController.js";
 import {
   requireAuth,
@@ -27,11 +27,13 @@ adminRouters.get(
   getAllUsers
 );
 adminRouters.get(
-  "/getAllAdmins",
+  "/getAllPost",
   requireAuth,
-  isAdmin([5150]),
-  getAllAdmins
+  isAdmin([3244, 5150]),
+  requirePermission("read"),
+  getAllPosts
 );
+adminRouters.get("/getAllAdmins", requireAuth, isAdmin([5150]), getAllAdmins);
 
 adminRouters.get(
   "/getLogInData",
