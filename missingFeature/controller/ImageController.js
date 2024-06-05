@@ -14,7 +14,6 @@ export const fetchAllMissingPeopleWithNames = async (req, res) => {
 
     const results = mergedFeaturesList.map((mergedFeatures) => {
       const missingPerson = mergedFeatures.missing_case_id;
-
       if (missingPerson) {
         // Extract imageBuffers from the MissingPerson document
         const imageBuffers = missingPerson.imageBuffers;
@@ -37,6 +36,8 @@ export const fetchAllMissingPeopleWithNames = async (req, res) => {
       }
     });
 
+    console.log(results[0]['id'])
+    console.log(results[1]['id'])
     res.status(200).json(results);
   } catch (error) {
     console.error("Error fetching missing people with names:", error);
