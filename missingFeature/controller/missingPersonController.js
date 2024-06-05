@@ -129,3 +129,32 @@ export const CreateMissingPerson = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+export const GetMissingPerson = async (req, res) => {
+  console.log('Getting missing person');
+  try {
+    const userId = req.user.userId;
+    const missingPeople = await MissingPerson.find({ userID: userId });
+
+    const missingPersonIds = missingPeople.map(person => person._id);
+    // console.log(missingPersonIds);
+
+    const matchesResponse = await axios.post('http://localhost:6000/get-face-matches', {
+      personIds: missingPersonIds,
+    });
+
+    if (matchesResponse.status !== 200) {
+      throw new Error('Failed to get face matches from external API');
+    }
+
+    const matchesData = matchesResponse.data;
+    console.log(matchesData.matches)
+    const matchedPeopleResults = missingPeople.map(person => ({
+      ...person.toObject(),
+      matches: matchesData.facematch[person._id] || [],
+    }));
+    res.json(matchedPeopleResults);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

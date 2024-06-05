@@ -148,6 +148,7 @@ const Table = ({ data }) => {
   };
 
   const confirmDelete = async () => {
+    console.log("hiiiiii")
     setShowModal(false);
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
@@ -156,7 +157,7 @@ const Table = ({ data }) => {
         Authorization: `Bearer ${token}`,
       };
       // Send a DELETE request to the backend endpoint
-      await axios.delete(`http://localhost:4000/api/admin/deleteUser/${currentId}`, { headers });
+      await axios.delete(`http://localhost:4000/api/admin/deletePost/${currentId}`, { headers });
       // If the request is successful, update the state to remove the deleted row
       setTableData(prevData => prevData.filter(row => row._id !== currentId));
     } catch (error) {

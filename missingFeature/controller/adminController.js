@@ -1,8 +1,11 @@
 import {User} from "../models/userModel.js";
 import MissingPerson from "../models/missingPersonSchema.js";
 import MergedFeaturesModel from "../models/mergedFeaturesSchema.js";
-import initializeFeaturesModel from "../models/featureModel.js";
+import initializeFeaturesModel from "../models/featureModel.js"
+import feedBackModel from "../models/feedBackModel.js";
 import ActionLog from "../models/logSchema.js";
+
+
 
 //@desc Get all user
 //@route GET /api/admin/getAll
@@ -139,6 +142,7 @@ export const updateUserProfile = async (req, res) => {
 //@desc delete any user
 //@route DELETE /api/admin/delete/:userId
 //@access admin
+
 export const deleteUserProfile = async (req, res) => {
   const userID = req.params.userId;
   
@@ -156,17 +160,24 @@ export const deleteUserProfile = async (req, res) => {
       .json({ msg: "Cannot delete user with role: " + user.role });
     }
     
+    const feedbackToDelete = await feedBackModel.findOne({ user_id: userID})
+    if (feedbackToDelete){
+      const feedbackId = feedbackToDelete._id
+      await feedBackModel.deleteOne(feedbackId)
+    }
     const mergedFeatureToDelete = await MergedFeaturesModel.findOne({ user_id: userID })
+    console.log(mergedFeatureToDelete)
     const timeSinceDisappearance = await mergedFeatureToDelete.timeSinceDisappearance
+    console.log(timeSinceDisappearance)
     const Features = await initializeFeaturesModel(timeSinceDisappearance)
-    Features.deleteOne(Features.MergedFeatureId)
+    console.log(Features)
     // Remove posts made by the user (if any)
     await MissingPerson.deleteMany({ userID });
     // remove post from merged features model(if any)
 
 
     await MergedFeaturesModel.deleteMany({ user_id: userID });
-    Features.deleteOne(Features.MergedFeatureId)
+    await Features.deleteMany({ user_id: userID });
     // Remove the user
     await User.findOneAndDelete({ _id: userID });
 
@@ -218,7 +229,7 @@ export const deleteUserPost = async (req, res) => {
   const postID = req.params.postId;
 
   try {
-    const post = await MergedFeaturesModel.findById({postID});
+    const post = await MergedFeaturesModel.findById({_id: postID});
     if (!post) {
       return res.status(404).json({ msg: "Post not found" });
     }

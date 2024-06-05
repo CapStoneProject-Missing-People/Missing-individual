@@ -163,7 +163,7 @@ const Sidebar = () => {
                 User Management
               </NavLink>
             </li>
-            {loggedInUserRole === 'superAdmin' && (
+            {loggedInUserRole === 5150 && (
               <li>
                 <NavLink to={"/admin-management"} className={({ isActive }) =>
                     `link text-gray-200 hover:bg-sky-700 ${isActive ? "bg-sky-600" : ""}`
@@ -206,9 +206,20 @@ const Sidebar = () => {
                 Feedbacks
               </NavLink>
             </li>
+            <li>
+              <NavLink to={"/img-recognitions"} className={({ isActive }) =>
+                  `link text-gray-200 hover:bg-sky-700 ${isActive ? "bg-sky-600" : ""}`
+                }>
+                <TbTextRecognition
+                  size={23}
+                  className="min-w-max text-gray-200"
+                />
+                Image Recognition
+              </NavLink>
+            </li>
             
 
-            {(isOpen || isTabletMid) && (
+            {/* {(isOpen || isTabletMid) && (
               <div className="border-y py-5 border-slate-300 ">
                 
                 {subMenusList?.map((menu) => (
@@ -221,7 +232,7 @@ const Sidebar = () => {
                   </div>
                 ))}
               </div>
-            )}
+            )} */}
             
           </ul>
           
