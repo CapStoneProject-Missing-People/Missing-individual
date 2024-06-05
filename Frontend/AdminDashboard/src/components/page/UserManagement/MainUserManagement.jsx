@@ -5,7 +5,7 @@ import TableComponentPresentation from './Table/TableComponentPresentation'
 
 export default function MainUserManagement() {
   return (
-    <div className="mx-40 h-96">
+    <div className=" h-96">
       <Title pageName="User Management" />
       <TableComponentPresentation/>
     </div>

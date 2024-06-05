@@ -182,6 +182,7 @@ export const admin_login_post = async (req, res) => {
       httpOnly: true,
       maxAge: maxAge * 1000,
     });
+    console.log("ip: " + req.ip)
     await AddActionLog({
       action: "admin_login",
       user_id: user._id || "",

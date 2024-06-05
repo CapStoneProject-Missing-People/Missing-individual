@@ -17,6 +17,52 @@ function MainDashboard() {
     registeredUsers: [],
     userPosts: [],
   });
+  const [logs, setLogs] = useState([]);
+
+  useEffect(() => {
+    // Fetch logs data
+    const fetchLogs = async () => {
+      try {
+        const response = await axios.get('http://localhost:4000/api/get-action-logs');
+        setLogs(response.data);
+      } catch (error) {
+        console.error('Error fetching logs:', error);
+      }
+    };
+
+    fetchLogs();
+  }, []);
+
+  useEffect(() => {
+    // Calculate the number of logs dynamically
+    setStats((prevStats) => ({
+      ...prevStats,
+      logManagement: logs.length,
+    }));
+  }, [logs]);
+  const [feedbackData, setFeedbackData] = useState([]);
+
+  useEffect(() => {
+    // Fetch feedback data
+    const fetchFeedback = async () => {
+      try {
+        const response = await axios.get('http://localhost:4000/api/getFeedBacks');
+        setFeedbackData(response.data);
+      } catch (error) {
+        console.error('Error fetching feedback:', error);
+      }
+    };
+
+    fetchFeedback();
+  }, []);
+
+  useEffect(() => {
+    // Calculate the number of feedbacks dynamically
+    setStats((prevStats) => ({
+      ...prevStats,
+      feedbackCollection: feedbackData.length,
+    }));
+  }, [feedbackData]);
 
   useEffect(() => {
     // Fetch data for each category and calculate the number of rows
@@ -34,8 +80,6 @@ function MainDashboard() {
         ]);
 
         setStats({
-          logManagement: 5, // Example static data, replace with real response if needed
-          feedbackCollection: 8, // Example static data, replace with real response if needed
           userManagement: userManagementResponse.data.length,
           alerts: 10, // Example static data, replace with real response if needed
         });
@@ -93,38 +137,50 @@ function MainDashboard() {
   }, []);
 
   return (
-    <main className="h-96">
+<main className="h-96">
       <div className="font-semibold mb-4">
         <h3>DASHBOARD</h3>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        <CardDataStats 
-          title="Log management" 
-          count={stats.logManagement} 
-          address="/log-management" 
+        <CardDataStats
+          title="Log management"
+          count={stats.logManagement}
+          address="/log-management"
         />
-        <CardDataStats 
-          title="Feedback Collection" 
-          count={stats.feedbackCollection} 
+        <CardDataStats
+          title="Feedback Collection"
+          count={stats.feedbackCollection}
           address="/feedbacks"
         />
-        <CardDataStats 
-          title="User Management" 
-          count={stats.userManagement} 
-          address="/user-management" 
+        <CardDataStats
+          title="User Management"
+          count={stats.userManagement}
+          address="/user-management"
         />
-        <CardDataStats 
-          title="Alerts" 
-          count={stats.alerts} 
-          address="/alerts" 
-        />
+        <CardDataStats title="Alerts" count={stats.alerts} address="/alerts" />
       </div>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 2xl:gap-7.5">
-        <Charts data={chartData} className="col-span-1" />
-        <Statistics className="col-span-1" />
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:gap-7.5">
+        <div className="col-span-1">
+          <Charts data={chartData} className="col-span-1" />
+        </div>
+        <div className="col-span-1">
+          <div className="max-w-full mx-auto px-5 pt-7.5 pb-5 mt-3 mb-4 h-max ">
+            <Statistics chartType="gender" />
+          </div>
+        </div>
+        <div className="col-span-1">
+          <div className="max-w-full mx-auto pt-7.5 pb-5 mt-3 mb-5 h-max ">
+            <Statistics chartType="status" />
+          </div>
+        </div>
+        <div className="col-span-1">
+          <div className="max-w-full mx-auto px-5 pt-7.5 pb-5 mt-3 mb-5 h-max ">
+            <Statistics chartType="age" />
+          </div>
+        </div>
       </div>
     </main>
   );
-}
+};
 
 export default MainDashboard;
