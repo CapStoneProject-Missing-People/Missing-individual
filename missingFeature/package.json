@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon app.js"
-  },
+    },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -28,6 +28,6 @@
     "validator": "^13.11.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.3"
   }
 }

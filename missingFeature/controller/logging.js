@@ -14,7 +14,7 @@ export const AddActionLog = async (logData) => {
 export const AddActionLogGateWay = async (req, res) => {
   try {
     const logData = req.body; // Expecting log data in the request body
-    await ActionLog.create(logData);
+    await AddActionLog(logData);
     console.log("Action logged successfully");
     res.status(200).json({ message: "Action logged successfully" });
   } catch (error) {

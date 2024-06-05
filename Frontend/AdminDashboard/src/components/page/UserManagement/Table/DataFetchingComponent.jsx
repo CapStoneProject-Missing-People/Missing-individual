@@ -12,7 +12,7 @@ const DataFetchingComponent = () => {
         const headers = {
           Authorization: `Bearer ${token}`,
         };
-        const response = await axios.get("http://localhost:4000/api/admin/getAll", { headers });
+        const response = await axios.get("http://localhost:4000/api/admin/getAllUsers", { headers });
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data: ", error);

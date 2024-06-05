@@ -12,7 +12,7 @@ function TableComponent({
 }) {
   return (
     <div className="w-full flex justify-center">
-      <div className="w-full max-w-[60rem] p-4 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.03)] overflow-x-auto">
+      <div className="w-full p-4 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.03)] overflow-x-auto">
         <table {...getTableProps()} className="w-full">
           <thead>
             {headerGroups.map((headerGroup) => (
