@@ -21,7 +21,7 @@ export const adminRouters = express.Router();
 adminRouters.get(
   "/getLogInData",
   requireAuth,
-  isAdmin([3244]),
+  isAdmin([3244,5150]),
   getLoggedInUserData
 );
 adminRouters.get(

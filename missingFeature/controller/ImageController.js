@@ -24,8 +24,9 @@ export const fetchAllMissingPeopleWithNames = async (req, res) => {
         const fullName = `${name.firstName} ${name.middleName || ""} ${
           name.lastName
         }`.trim();
-
+        const id = missingPerson._id
         return {
+          id,
           imageBuffers,
           name: fullName,
         };
