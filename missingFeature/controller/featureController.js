@@ -4,8 +4,8 @@ import embeddings from "../models/embeddingsModel.js";
 import { pipeline } from "@xenova/transformers";
 import mongoose from "mongoose";
 import MergedFeaturesModel from "../models/mergedFeatureSchema.js"
-import { features } from "process";
-import MatchingStatus from '../models/matchingStatus.js'; // Adjust the path as needed
+import { matchFeatures } from "../service/matchFeatures.js";
+import MatchingStatus from "../models/matchingStatus.js";
 
 
 export const getOwnFeatures = async (req, res) => {
@@ -235,7 +235,7 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
         await updateSimilarityField(feature._id, existingEmbeddingId, similarityScore);
       }
     }
-    const comparisonScore = await compareFeatures(newFeatureData, timeSinceDisappearance, similarityScores);
+    const comparisonScore = await matchFeatures(newFeatureData, timeSinceDisappearance, similarityScores);
     console.log(comparisonScore)
 
     return {message: "Feature stored successfully", createdFeature: feature, mergedFeature: mergedFeatures}
@@ -299,7 +299,6 @@ export const compareFeature = async (req, res) => {
         normalize: true,
       });
       const embeddingData = output.data;
-      const embeddingArray = [...embeddingData];
 
       // Calculate cosine similarity with each existing embedding
       const similarityScores = existingEmbeddings.map((existingEmbedding) => {
@@ -339,14 +338,21 @@ export const compareFeature = async (req, res) => {
 
       const ageRangeKeys = Object.keys(ageRanges);
 
-      const matchingCases = await Features.find({}).lean();
+      let matchingCases = await Features.find({}).lean();
       matchingCases.forEach((caseData) => {
         const matchingStatus = { id: caseData._id };
+        let aggregateSimilarity = 0;
+        let fieldCount = 0;
+        let highSimilarityFieldCount = 0;
+
         for (const key in criteria) {
           const value = criteria[key];
+          fieldCount++;
+          let matchScore = 0;
+          
           if (key === "age") {
             if (caseData.age === value) {
-              matchingStatus.age = 100;
+              matchScore = 100;
             } else {
               let ageRangeMatch = false;
               let caseDataAgeRange = "";
@@ -364,19 +370,13 @@ export const compareFeature = async (req, res) => {
               if (caseDataAgeRange === newReqAge) {
                 console.log("potential age match");
                 ageRangeMatch = true;
-                matchingStatus.age = 85;
-              }
-
-              if (!ageRangeMatch) {
-                console.log("did not match");
-                matchingStatus.age = 0;
+                matchScore = 85;
               }
             }
           } else if (key.startsWith("name.")) {
             const nameWritten = key.split(".");
             const nameType = nameWritten[1];
-            matchingStatus[nameType] =
-              caseData.name[nameType] === value ? 100 : 0;
+            matchScore = caseData.name[nameType] === value ? 100 : 0;
           } else if (key.startsWith("clothing.")) {
             const clothingParts = key.split(".");
             const clothingType = clothingParts[1];
@@ -387,36 +387,64 @@ export const compareFeature = async (req, res) => {
               (caseClothType === "light blue" && value === "blue")
             ) {
               console.log("85%");
-              matchingStatus[`${clothingType} ${clothKey}`] = 85;
+              matchScore = 85;
             } else if (
               (caseClothType === "yellow" && value === "orange") ||
               (caseClothType === "orange" && value === "yellow")
             ) {
-              matchingStatus[`${clothingType} ${clothKey}`] = 85;
+              matchScore = 85;
             } else {
-              matchingStatus[`${clothingType} ${clothKey}`] =
-                caseClothType === value ? 100 : 0;
+              matchScore = caseClothType === value ? 100 : 0;
             }
           } else {
-            matchingStatus[key] = caseData[key] === value ? 100 : 0;
+            matchScore = caseData[key] === value ? 100 : 0;
+          }
+          
+          matchingStatus[key] = matchScore;
+          aggregateSimilarity += matchScore;
+          if (matchScore >= 85) {
+            highSimilarityFieldCount++;
           }
         }
 
         similarityScores.forEach((score) => {
           if (score.existingCaseId.equals(caseData._id)) {
-            matchingStatus.similarityScore = score.similarityScore * 100;
+            const similarityScore = score.similarityScore * 100;
+            matchingStatus.similarityScore = similarityScore;
+            aggregateSimilarity += similarityScore;
+            fieldCount++;
+            if (similarityScore >= 85) {
+              highSimilarityFieldCount++;
+            }
           }
         });
 
-        response.push(matchingStatus);
+        matchingStatus.aggregateSimilarity = aggregateSimilarity / fieldCount;
+        console.log(aggregateSimilarity)
+        console.log(fieldCount)
+        console.log(highSimilarityFieldCount)
+
+        // Check if the case meets the criteria to be included in the response
+        if (
+          matchingStatus.aggregateSimilarity > 70 ||
+          highSimilarityFieldCount > 5
+        ) {
+          response.push(matchingStatus);
+        }
       });
-      res.json({ matchingStatus: response });
+
+      if (response.length > 0) {
+        res.json({ matchingStatus: response });
+      } else {
+        res.json({ message: "No matching case" });
+      }
     }
   } catch (error) {
     res.status(500).json({ error: "Server error" });
     console.error("Error comparing features:", error.message);
   }
 };
+
 
 
 export const update = async (req, res) => {
@@ -461,8 +489,6 @@ export const update = async (req, res) => {
     console.error(`Error updating feature: ${error}`);
   }
 };
-
-
 
 
 //@desc updare Feature
@@ -607,121 +633,15 @@ export const searchFeature = async (req, res) => {
   }
 };
 
-
-export const compareFeatures = async (newFeatureData, timeSinceDisappearance, similarityScores) => {
+export const getPotentialMatchs = async (req, res) => {
   try {
-    const Features = await initializeFeaturesModel(timeSinceDisappearance);
-    const existingFeatures = await Features.find();
-
-    let criteria = {};
-    if (timeSinceDisappearance > 2) {
-      criteria = {
-        age: newFeatureData.age,
-        "name.firstName": newFeatureData.name.firstName,
-        "name.middleName": newFeatureData.name.middleName,
-        "name.lastName": newFeatureData.name.lastName,
-        gender: newFeatureData.gender,
-        skin_color: newFeatureData.skin_color,
-        body_size: newFeatureData.body_size,
-        description: newFeatureData.description,
-        lastSeenLocation: newFeatureData.lastSeenLocation,
-        medicalInformation: newFeatureData.medicalInformation,
-        circumstanceOfDisappearance: newFeatureData.circumstanceOfDisappearance
-      };
-    } else if(timeSinceDisappearance <= 2) {
-      criteria = {
-        age: newFeatureData.age,
-        "name.firstName": newFeatureData.name.firstName,
-        "name.middleName": newFeatureData.name.middleName,
-        "name.lastName": newFeatureData.name.lastName,
-        gender: newFeatureData.gender,
-        skin_color: newFeatureData.skin_color,
-        "clothing.upper.clothType": newFeatureData.clothing.upper.clothType,
-        "clothing.upper.clothColor": newFeatureData.clothing.upper.clothColor,
-        "clothing.lower.clothType": newFeatureData.clothing.lower.clothType,
-        "clothing.lower.clothColor": newFeatureData.clothing.lower.clothColor,
-        body_size: newFeatureData.body_size,
-        description: newFeatureData.description
-      };
-    }
-
-    const ageRanges = {
-      "1-4": { $gte: 1, $lte: 4 },
-      "5-10": { $gte: 5, $lte: 10 },
-      "11-15": { $gte: 11, $lte: 15 },
-      "16-20": { $gte: 16, $lte: 20 },
-      "21-30": { $gte: 21, $lte: 30 },
-      "31-40": { $gte: 31, $lte: 40 },
-      "41-50": { $gte: 41, $lte: 50 },
-      ">51": { $gt: 51 },
-    };
-
-    const response = [];
-    if (existingFeatures.length < 2) {
-      return { message: 'Nothing to compare' };
-    }
-
-    for (const feature of existingFeatures) {
-      if (feature._id.equals(newFeatureData._id)) {
-        continue;
-      }
-      
-      const matchingStatus = { id: feature._id };
-
-      for (const key in criteria) {
-        const value = criteria[key];
-
-        if (key === "age") {
-          const featureAge = feature.age;
-          if (featureAge === value) {
-            matchingStatus.age = 100;
-          } else {
-            const newReqAgeRange = Object.keys(ageRanges).find(range => ageRanges[range].$gte <= value && ageRanges[range].$lte >= value);
-            const featureAgeRange = Object.keys(ageRanges).find(range => ageRanges[range].$gte <= featureAge && ageRanges[range].$lte >= featureAge);
-
-            matchingStatus.age = newReqAgeRange === featureAgeRange ? 85 : 0;
-          }
-        } else if (key.startsWith("name.")) {
-          const namePart = key.split(".")[1];
-          matchingStatus[namePart] = feature.name[namePart] === value ? 100 : 0;
-        } else if (key.startsWith("clothing.")) {
-          const [_, clothingType, clothKey] = key.split(".");
-          const featureClothing = feature.clothing[clothingType][clothKey];
-
-          if ((featureClothing === "blue" && value === "light blue") || (featureClothing === "light blue" && value === "blue") ||
-              (featureClothing === "yellow" && value === "orange") || (featureClothing === "orange" && value === "yellow")) {
-              matchingStatus[`${clothingType}${clothKey.charAt(0).toUpperCase() + clothKey.slice(1)}`] = 85;
-          } else {
-            matchingStatus[`${clothingType}${clothKey.charAt(0).toUpperCase() + clothKey.slice(1)}`] = featureClothing === value ? 100 : 0;          }
-        } else {
-          matchingStatus[key] = feature[key] === value ? 100 : 0;
-        }
-      }
-
-      similarityScores.forEach((score) => {
-        if (score.existingCaseId.equals(newFeatureData._id)) {
-          matchingStatus.similarityScore = score.similarityScore;
-        }
-      });
-
-      // Store matchingStatus in the new collection
-      await MatchingStatus.create({
-        user_id: newFeatureData.user_id,
-        newCaseId: newFeatureData._id,
-        existingCaseId: feature._id,
-        matchingStatus,
-      });
-
-      console.log('maching status')
-      console.log(matchingStatus)
-
-      response.push(matchingStatus);
-    }
-
-    console.log('response: ', response)
-    return response;
+    console.log(req.user.userId)
+    const user_id = req.user.userId
+    const potentialMatches = await MatchingStatus.find({ user_id: user_id });   
+    res.status(200).json({message: potentialMatches})
   } catch (error) {
-    console.error("Error comparing features:", error);
-    throw new Error("Error comparing features");
+    res.status(400).json({message: 'cant get'})
   }
-};
+}
+
+
