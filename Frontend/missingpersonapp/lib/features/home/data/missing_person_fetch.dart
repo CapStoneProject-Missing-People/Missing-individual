@@ -33,15 +33,20 @@ Future<List<MissingPerson>> fetchMissingPeople() async {
           }
 
           return MissingPerson(
-            name: data['name']['firstName'] ?? '',
-            age: data['age'] ?? 0,
-            userName: data['user_id']['name'] ?? '',
-            email: data['user_id']['email'] ?? '',
-            user_id: data['user_id']['_id'] ?? '',
-            skin_color: data['skin_color'] ?? '',
+            id: data['_id'] as String,
+            userId: data['user_id'] as String,
+            name: Name.fromJson(data['name'] != null ? data['name'] as Map<String, dynamic> : {}),
+            gender: data['gender'] as String? ?? 'Unknown',
+            age: data['age'] as int? ?? 0,
             photos: imageBuffers,
-            phoneNo: '123-456-7890', // Temporary placeholder
-            description: data['description'] ?? '',
+            skinColor: data['skin_color'] as String? ?? 'Unknown',
+            clothing: data['clothing'] != null ? Clothing.fromJson(data['clothing'] as Map<String, dynamic>) : Clothing(),
+            bodySize: data['body_size'] as String? ?? 'Unknown',
+            description: data['description'] as String? ?? 'No description available',
+            timeSinceDisappearance: data['timeSinceDisappearance'] as int? ?? 0,
+            inputHash: data['inputHash'] as String? ?? '',
+            version: data['__v'] as int? ?? 0,
+            missingCaseId: data['missing_case_id'] != null ? MissingCaseId.fromJson(data['missing_case_id'] as Map<String, dynamic>) : MissingCaseId(),
           );
         } catch (e) {
           print("Error mapping data item: $e");
@@ -49,6 +54,7 @@ Future<List<MissingPerson>> fetchMissingPeople() async {
         }
       }).toList();
 
+      print(missingPeople);
       print("Parsed missingPeople: $missingPeople");
       return missingPeople;
     } else {

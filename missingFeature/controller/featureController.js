@@ -2,6 +2,7 @@ import initializeFeaturesModel from "../models/featureModel.js";
 import crypto from "crypto";
 import embeddings from "../models/embeddingsModel.js";
 import { pipeline } from "@xenova/transformers";
+import matchingStatus from "../models/matchingStatus.js"
 import mongoose from "mongoose";
 
 import MergedFeaturesModel from "../models/mergedFeaturesSchema.js";
@@ -31,9 +32,6 @@ export const getOwnFeatures = async (req, res) => {
   }
 };
 
-//@desc Get all Features
-//@route GET /api/features/getAll
-//@access public
 export const getFeatures = async (req, res) => {
   try {
     let filterCriteria = {};
@@ -76,17 +74,12 @@ export const getFeatures = async (req, res) => {
       }
     }
     const features = await MergedFeaturesModel.find(filterCriteria)
-
+      .lean()
+      .populate({
+        path: "missing_case_id",
+        select: ["status", "imageBuffers", "dateReported"],
+      });
     console.log("features: ", features);
-    .lean()
-    .populate({
-      path: 'missing_case_id',
-      select: ['status', 'imageBuffers', 'dateReported']
-    })
-    .populate({
-      path: 'user_id',
-      select: ['name', 'email'] // Select fields you want to populate from User model
-    });    console.log(features);
 
     res.status(200).json(features);
   } catch (error) {
@@ -232,6 +225,7 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
     const mergedFeatureCaseId = mergedFeatures._id;
     feature.mergedFeatureId = mergedFeatureCaseId;
     feature.save();
+
     const existingEmbeddingsCount = await embeddings.countDocuments();
     if (existingEmbeddingsCount < 1) {
       const caseId = feature._id;
@@ -240,18 +234,13 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
         pooling: "mean",
         normalize: true,
       });
-      const embeddingData = output.data;
-
-    const pipelineModel = await generateEmbeddings();
-    const output = await pipelineModel(newFeatureData.description, { pooling: "mean", normalize: true });
     const embeddingData = output.data;
     const embeddingArray = [...embeddingData];
 
     const existingEmbeddings = await embeddings.find();
-    if (existingEmbeddings.length < 1) {
       await embeddings.create({ caseId: feature._id, embedding: embeddingArray, similarity: {} });
       console.log("Initial embedding stored successfully");
-    } else {
+    }else {
       var similarityScores = existingEmbeddings.map(existingEmbedding => {
         const similarity = calculateSimilarity(embeddingData, existingEmbedding.embedding);
         return { existingCaseId: existingEmbedding.caseId, existingEmbeddingId: existingEmbedding._id, similarityScore: similarity * 100 };
@@ -708,10 +697,11 @@ export const getPotentialMatchs = async (req, res) => {
   try {
     console.log(req.user.userId)
     const user_id = req.user.userId
-    const potentialMatches = await MatchingStatus.find({ user_id: user_id });   
+    const potentialMatches = await matchingStatus.find({ user_id: user_id });  
+    console.log('potential matches: ', potentialMatches) 
     res.status(200).json({message: potentialMatches})
   } catch (error) {
-    res.status(400).json({message: 'cant get'})
+    res.status(400).json({message: 'error getting potential matches'})
   }
 }
 

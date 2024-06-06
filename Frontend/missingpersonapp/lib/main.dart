@@ -20,7 +20,9 @@ import 'package:missingpersonapp/features/matchedCase/screens/matched_case.dart'
 import 'package:missingpersonapp/firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'package:missingpersonapp/features/chat/models/message.dart';
-import 'package:missingpersonapp/features/chat/screens/user_list_screen.dart';
+import 'package:missingpersonapp/features/chat/screens/chat_list_screen.dart';
+import 'package:missingpersonapp/features/chat/providers/chat_provider.dart';
+import 'package:missingpersonapp/features/chat/screens/chat_list_screen.dart';
 import 'package:missingpersonapp/common/models/missing_person.dart';
 import 'package:missingpersonapp/features/home/data/missing_person_fetch.dart';
 import 'package:missingpersonapp/features/home/provider/allMissingperson.dart';
@@ -60,6 +62,7 @@ void main() async {
       ChangeNotifierProvider(create: (_) => AllMissingPeopleProvider()),
       ChangeNotifierProvider(create: (_) => CaseProvider()),
       ChangeNotifierProvider(create: (_) => MatchedCaseProvider()),
+       ChangeNotifierProvider(create: (_) => ChatProvider()),
       ChangeNotifierProxyProvider<UserProvider, MissingPersonProvider>(
         create: (context) {
           final user = Provider.of<UserProvider>(context, listen: false).user;
@@ -106,25 +109,6 @@ class _MyAppState extends State<MyApp> {
           selectionHandleColor: Colors.grey,
         ),
       ),
-      // home: Consumer<AllMissingPeopleProvider>(
-      //   builder: (ctx, missingPeopleProvider, _) {
-      //     if (missingPeopleProvider.isLoading) {
-      //       return Scaffold(
-      //         body: Center(
-      //           child: CircularProgressIndicator(),
-      //         ),
-      //       );
-      //     } else if (missingPeopleProvider.errorMessage.isNotEmpty) {
-      //       return Scaffold(
-      //         body: Center(
-      //           child: Text('Error: ${missingPeopleProvider.errorMessage}'),
-      //         ),
-      //       );
-      //     } else {
-      //       return HomePage();
-      //     }
-      //   },
-      // ),
       home: Provider.of<UserProvider>(context).user.token.isEmpty
           ? LoginPage()
           : const HomePage(),
@@ -135,6 +119,9 @@ class _MyAppState extends State<MyApp> {
         '/matchedPeople': (context) => const MatchedCases(),
         '/notification': (context) => const NotificationPage(),
         '/missingPersonPosted': (context) => MissingPersonPage(),
+        '/chatList': (context) => ChatListScreen(
+          userId: Provider.of<UserProvider>(context, listen: false).user.id,
+        )
       },
     );
   }

@@ -9,7 +9,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
-
+import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 
 class ChatScreen extends StatefulWidget {
   final String receiverId;
@@ -23,7 +23,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   late Box<Message> _messagesBox;
-  bool _isLoading = true; // Add a loading state variable
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _ChatScreenState extends State<ChatScreen> {
     await _openMessagesBox();
     await _fetchMissingPersons();
     setState(() {
-      _isLoading = false; // Set loading to false after initialization
+      _isLoading = false;
     });
   }
 
@@ -49,74 +49,73 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _sendMessage(String content) async {
-  final userProvider = Provider.of<UserProvider>(context, listen: false);
-  final user = userProvider.user; 
-  final allMissingPeopleProvider = Provider.of<AllMissingPeopleProvider>(context, listen: false);
-  final currentUser = allMissingPeopleProvider.missingPersons.firstWhere((person) => person.user_id == user.id); 
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user; // This is user1
+    final allMissingPeopleProvider = Provider.of<AllMissingPeopleProvider>(context, listen: false);
 
-  final senderId = currentUser.user_id;
-  final receiverId = widget.receiverId;
+    final senderId = user.id; // user1's id
+    final receiverId = widget.receiverId; // user2's id passed from the post
 
-  // Create a message object
-  final message = Message(
-    id: DateTime.now().toString(),
-    senderId: senderId,
-    receiverId: receiverId,
-    content: content,
-    timestamp: DateTime.now(),
-  );
+    // Create a message object
+    final message = Message(
+      id: DateTime.now().toString(),
+      senderId: senderId,
+      receiverId: receiverId,
+      content: content,
+      timestamp: DateTime.now(),
+    );
 
-  // Add message to local storage
-  _messagesBox.add(message);
+    // Add message to local storage
+    _messagesBox.add(message);
 
-  // Send message to backend
+    // Send message to backend
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('authorization');
-  final response = await http.post(
-    Uri.parse('http://192.168.23.31:4000/api/chat'), // Replace with your backend URL
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${token}', // Replace with your authentication token
-    },
-    body: jsonEncode({
+    final response = await http.post(
+      Uri.parse('http://${Constants.postUri}:4000/api/chat'), // Replace with your backend URL
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${token}', // Replace with your authentication token
+      },
+      body: jsonEncode({
+        'receiver': receiverId,
+        'message': content,
+        // Add any other fields you need to send to the backend
+      }),
+    );
+
+    // Check if the message was sent successfully to the backend
+    if (response.statusCode == 201) {
+      // Message sent successfully
+      print('Message sent successfully');
+    } else {
+      // Failed to send message
+      print('Failed to send message');
+      return;
+    }
+
+    // Connect to socket.io server
+    final socket = io.io('ws://${Constants.postUri}:4000');
+
+    // Emit 'sendMessage' event to socket.io server
+    socket.emit('sendMessage', {
+      'sender': senderId,
       'receiver': receiverId,
       'message': content,
-      // Add any other fields you need to send to the backend
-    }),
-  );
+      // Add any other fields you need to send to the socket.io server
+    });
 
-  // Check if the message was sent successfully to the backend
-  if (response.statusCode == 201) {
-    // Message sent successfully
-    print('Message sent successfully');
-  } else {
-    // Failed to send message
-    print('Failed to send message');
-    return;
+    // Close socket connection
+    socket.close();
+
+    // Update UI
+    setState(() {});
   }
-
-  // Connect to socket.io server
-final socket = io.io('ws://192.168.23.31:4000');
-
-  // Emit 'sendMessage' event to socket.io server
-  socket.emit('sendMessage', {
-    'sender': senderId,
-    'receiver': receiverId,
-    'message': content,
-    // Add any other fields you need to send to the socket.io server
-  });
-
-  // Close socket connection
-  socket.close();
-
-  // Update UI
-  setState(() {});
-}
 
   @override
   Widget build(BuildContext context) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.user; 
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user; // This is user1
     final allMissingPeopleProvider = Provider.of<AllMissingPeopleProvider>(context);
 
     if (_isLoading || allMissingPeopleProvider.isLoading) {
@@ -136,8 +135,8 @@ final socket = io.io('ws://192.168.23.31:4000');
         body: Center(child: Text(allMissingPeopleProvider.errorMessage)),
       );
     }
-    final currentUserId = allMissingPeopleProvider.missingPersons.firstWhere((person) => 
-    person.user_id == user.id).user_id;
+
+    final currentUserId = user.id; // user1's id
     final messages = _messagesBox.values.where((msg) =>
       (msg.senderId == currentUserId && msg.receiverId == widget.receiverId) ||
       (msg.senderId == widget.receiverId && msg.receiverId == currentUserId)).toList();
