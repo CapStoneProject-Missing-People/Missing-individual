@@ -47,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(
                 height: 20,
               ),
-              Icon(Icons.lock, size: 100),
+              Icon(Icons.lock, size: 100, color: Colors.blue),
               SizedBox(
                 height: 20,
               ),

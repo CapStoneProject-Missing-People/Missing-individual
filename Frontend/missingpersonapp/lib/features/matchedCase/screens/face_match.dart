@@ -1,11 +1,10 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:missingpersonapp/features/matchedCase/utils/image_display.dart';
 import 'package:provider/provider.dart';
 import 'package:missingpersonapp/features/matchedCase/provider/matched_case_provider.dart';
 
 class MissingPersonImageMatch extends StatelessWidget {
-  const MissingPersonImageMatch({Key? key});
+  const MissingPersonImageMatch({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,76 +23,43 @@ class MissingPersonImageMatch extends StatelessWidget {
           } else {
             return Consumer<MatchedCaseProvider>(
               builder: (context, matchedCaseProvider, child) {
+                for (var i = 0;
+                    i < matchedCaseProvider.matchedCases.length;
+                    i++) {
+                  final person = matchedCaseProvider.matchedCases[i];
+                  print('Matched Case $i: ${person.id}');
+                  print('Status: ${person.status}');
+                  print('Number of Matches: ${person.matches.length}');
+                  print('the person buffer ${person.imageBuffers[0]}');
+                  print("all the missing person data $person");
+                  for (var match in person.matches) {
+                    print('Match Distance: ${match.distance}');
+                    print('Match Similarity: ${match.similarity}');
+                    print("all the match data ${match}");
+                    print('image buffer of match ${match.imageBuffer}');
+                  }
+                }
+
                 return ListView.builder(
                   itemCount: matchedCaseProvider.matchedCases.length,
                   itemBuilder: (context, index) {
-                    final person =
-                        matchedCaseProvider.matchedCases[index];
+                    final person = matchedCaseProvider.matchedCases[index];
                     return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ListTile(
-                          title: Text('Missing Person: ${person.id}'),
-                          subtitle:
-                              Text('Matches: ${person.matches.length}'),
+                        ImageDisplay(
+                          imageBytes: person.imageBuffers[0],
                         ),
-                        if (person.imageBuffers.isNotEmpty)
+                        const SizedBox(height: 8.0),
+                        Text('ID: ${person.id}'),
+                        Text('Status: ${person.status}'),
+                        Text('Number of Matches: ${person.matches.length}'),
+                        for (var match in person.matches)
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SizedBox(height: 10),
-                              Text(
-                                'Missing Person Images',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 5),
-                              SizedBox(
-                                height: 120,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: person.imageBuffers.length,
-                                  itemBuilder: (context, imgIndex) {
-                                    final imageBuffer =
-                                        person.imageBuffers[imgIndex];
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Image.memory(imageBuffer), // Render the image from imageBuffer
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        if (person.matches.isNotEmpty)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 10),
-                              Text(
-                                'Potential Matches',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 5),
-                              SizedBox(
-                                height: 120,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: person.matches.length,
-                                  itemBuilder: (context, matchIndex) {
-                                    final match = person.matches[matchIndex];
-                                    final matchImageBuffer =
-                                        match['imageBuffer'];
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Visibility(
-                                        visible: matchImageBuffer != null,
-                                        child: Image.memory(
-                                            matchImageBuffer ?? Uint8List(0)),
-                                        // Render the image from matchImageBuffer if available
-                                      ),
-                                    );
-                                  },
-                                ),
+                              Text('Match Distance: ${match.distance}'),
+                              Text('Match Similarity: ${match.similarity}'),
+                              ImageDisplay(
+                                imageBytes: match.imageBuffer,
                               ),
                             ],
                           ),

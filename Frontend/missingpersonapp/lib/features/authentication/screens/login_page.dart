@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 30,
               ),
-              Icon(Icons.lock, size: 100),
+              Icon(Icons.lock, size: 100, color: Colors.blue),
               SizedBox(
                 height: 20,
               ),

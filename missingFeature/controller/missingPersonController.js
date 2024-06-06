@@ -131,13 +131,11 @@ export const CreateMissingPerson = async (req, res) => {
 };
 
 export const GetMissingPerson = async (req, res) => {
-  console.log('Getting missing person');
   try {
     const userId = req.user.userId;
     const missingPeople = await MissingPerson.find({ userID: userId });
 
-    const missingPersonIds = missingPeople.map(person => person._id);
-    // console.log(missingPersonIds);
+    const missingPersonIds = missingPeople.map(person => person._id.toString());
 
     const matchesResponse = await axios.post('http://localhost:6000/get-face-matches', {
       personIds: missingPersonIds,
@@ -147,14 +145,23 @@ export const GetMissingPerson = async (req, res) => {
       throw new Error('Failed to get face matches from external API');
     }
 
-    const matchesData = matchesResponse.data;
-    console.log(matchesData.matches)
+    const matchesData = matchesResponse.data.facematch;
     const matchedPeopleResults = missingPeople.map(person => ({
       ...person.toObject(),
-      matches: matchesData.facematch[person._id] || [],
+      imageBuffers: person.imageBuffers.map(buffer => {
+        return Buffer.isBuffer(buffer) ? buffer.toString('base64') : buffer;
+      }),  // Convert buffers to Base64 strings if necessary
+      matches: (matchesData[person._id.toString()] || []).map(match => ({
+        ...match,
+        imageBuffer: match.imageBuffer.map(buffer => {
+          return Buffer.isBuffer(buffer) ? buffer.toString('base64') : buffer;
+        })  // Convert buffers to Base64 strings if necessary
+      }))
     }));
-    res.json(matchedPeopleResults);
+
+    res.status(200).json({ success: true, data: matchedPeopleResults });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error getting missing person:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };

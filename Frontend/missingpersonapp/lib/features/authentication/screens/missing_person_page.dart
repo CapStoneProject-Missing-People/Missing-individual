@@ -41,7 +41,7 @@ class _MissingPersonPageState extends State<MissingPersonPage> {
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.background,
-        title: Text('Missing Persons'),
+        title: Text('My Posts'),
       ),
       body: Consumer<MissingPersonProvider>(
         builder: (context, provider, child) {

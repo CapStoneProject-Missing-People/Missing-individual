@@ -55,7 +55,7 @@ export const RecognizeFace = async (req, res) => {
       user_id: result.person_id || "",
       user_agent: req.headers["User-Agent"],
       method: req.method,
-      ip: req.ip,
+      ip: req.socket.remoteAddress,
       status: 500,
       error: error.message || 'Internal Server Error',
       logLevel: "error"

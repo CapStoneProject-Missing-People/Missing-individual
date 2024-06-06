@@ -56,6 +56,3 @@ class _MatchedCasesState extends State<MatchedCases> {
     );
   }
 }
-
-
-
