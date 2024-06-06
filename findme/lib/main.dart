@@ -1,4 +1,5 @@
-import 'package:findme/features/matchedCase/screens/missing_person_page1.dart';
+import 'package:findme/features/compare/screens/compare.dart';
+import 'package:findme/features/matchedCase/screens/matched-person.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -19,6 +20,6 @@ class MyApp extends StatelessWidget {
                 onBackground: Colors.black,
                 primary: Colors.blue,
                 onPrimary: Colors.white)),
-        home: MissingPersonMatchPage());
+        home: ComparePersonPage());
   }
 }

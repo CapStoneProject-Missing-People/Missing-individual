@@ -86,7 +86,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     if (feedbackText.isEmpty && _rating == 0.0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please provide feedback text or a rating.'),
+          content: Text('Please provide a feedback.'),
           duration: Duration(seconds: 2),
         ),
       );
@@ -101,26 +101,28 @@ class _FeedbackPageState extends State<FeedbackPage> {
     _logger.i('Feedback: ${feedbackData.feedback}');
 
     // Send the feedback data to the backend
-    final url = Uri.parse('http://example.com/api/feedback');
+    final url = Uri.parse('http://192.168.23.31:4000/api/postFeedBack');
+    var token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NWM0ODJkYjhmOWFkY2Y0NzEwNTUxYyIsImlhdCI6MTcxNzQyNTI4OCwiZXhwIjoxNzE3Njg0NDg4fQ.HYUzw1YuS7HuazXkcUadu_4JF3AsrymmVFYUveZReS4";
     final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
+        'authorization': "Bearer $token",
       },
       body: jsonEncode(feedbackData.toJson()),
     );
+    print(response.statusCode);
 
     // Check the response status and show a message to the user
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       // Show a feedback message to the user
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Thank you for your feedback!'),
           duration: Duration(seconds: 2),
         ),
-      );
-
-      // Clear the feedback text field and reset rating
+      ); // Clear the feedback text field and reset rating
       _feedbackController.clear();
       setState(() {
         _rating = 0.0;
@@ -136,10 +138,4 @@ class _FeedbackPageState extends State<FeedbackPage> {
       );
     }
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: FeedbackPage(),
-  ));
 }

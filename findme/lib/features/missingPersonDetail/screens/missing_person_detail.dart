@@ -1,5 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:findme/features/matchedCase/models/missing_person1.dart';
+import 'package:findme/features/matchedCase/models/matched-person-model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -80,17 +80,18 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CarouselSlider.builder(
-                    itemCount: widget.missingPerson.photos.length,
-                    itemBuilder: (context, index, realIndex) {
-                      final urlImage = widget.missingPerson.photos[index];
-                      return buildImage(urlImage, index);
-                    },
-                    options: CarouselOptions(
-                      height: 350,
-                      enableInfiniteScroll: false,
-                      onPageChanged: (index, reason) =>
-                          setState(() => activeIndex = index),
-                    )),
+                  itemCount: widget.missingPerson.photos.length,
+                  itemBuilder: (context, index, realIndex) {
+                    final imageBytes = widget.missingPerson.photos[index];
+                    return buildImage(imageBytes as String, index);
+                  },
+                  options: CarouselOptions(
+                    height: 350,
+                    enableInfiniteScroll: false,
+                    onPageChanged: (index, reason) =>
+                        setState(() => activeIndex = index),
+                  ),
+                ),
                 SizedBox(height: 12),
                 Center(
                   child: widget.missingPerson.photos.length > 1
@@ -98,7 +99,7 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
                       : Container(),
                 ),
                 const SizedBox(height: 20),
-                buildContainer('Name', '${widget.missingPerson.name}',
+                buildContainer('Name', '${widget.missingPerson.firstName}',
                     Icons.person, context),
                 SizedBox(height: 5),
                 buildContainer('Age', '${widget.missingPerson.age}',
@@ -115,9 +116,6 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
                     '${widget.missingPerson.phoneNumber}',
                     Icons.phone,
                     context),
-                SizedBox(height: 5),
-                buildContainer("Description",
-                    '${widget.missingPerson.description}', Icons.book, context),
               ],
             ),
           ),

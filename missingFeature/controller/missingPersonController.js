@@ -1,14 +1,10 @@
 import MissingPerson from "../models/missingPersonSchema.js";
 import axios from "axios";
-import fs from "fs";
-import path, { parse } from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
 import { createFeature } from "./featureController.js";
+import { sendNotificationToAllUsersAndGuests } from "./push-notification.controller.js";
 
 export const CreateMissingPerson = async (req, res) => {
   try {
-    console.log(req.body);
     const { timeSinceDisappearance } = req.params;
     let baseReq;
     if (timeSinceDisappearance > 2) {
@@ -34,7 +30,6 @@ export const CreateMissingPerson = async (req, res) => {
         ...base
       } = req.body;
       baseReq = base;
-      console.log(baseReq);
     }
 
     const parsedData = {};
@@ -83,6 +78,7 @@ export const CreateMissingPerson = async (req, res) => {
       }
     }
     parsedData.clothing = clothing;
+    console.log(req.user.userId);
 
     let userID = req.user.userId;
     let userIDString = userID.toString();
@@ -93,18 +89,13 @@ export const CreateMissingPerson = async (req, res) => {
       return res.status(400).json({message: result});
     }
 
-    console.log(result);
-
     const images = req.files;
     const imageBuffers = images.map((image) => image.buffer);
-    console.log(imageBuffers);
     // Create a new missing person record in the database
     const newMissingPerson = new MissingPerson({
       userID,
       imageBuffers,
     });
-    console.log("newMissId: ", newMissingPerson._id);
-    console.log(imageBuffers);
     const response = await axios.post(
       "http://localhost:6000/add-face-feature",
       {
@@ -122,6 +113,14 @@ export const CreateMissingPerson = async (req, res) => {
     result.mergedFeature.missing_case_id = newMissingPerson._id;
     await result.createdFeature.save();
     await result.mergedFeature.save();
+
+    // Send push notification to all users and guests
+    await sendNotificationToAllUsersAndGuests(
+      "New Missing Person",
+      `A new person named ${parsedData.name.firstName} ${parsedData.name.lastName} has been Added To the missing List.\n Click to see the detail`,
+      result.mergedFeature._id.toString()
+    );
+
     return res
       .status(201)
       .json({ message: "Missing person record created successfully.", createdFeatures: result });
@@ -129,5 +128,34 @@ export const CreateMissingPerson = async (req, res) => {
     // Handle unexpected errors
     console.error('Error occurred:', error);
     return res.status(500).json({ error: error.message });
+  }
+};
+
+export const GetMissingPerson = async (req, res) => {
+  console.log('Getting missing person');
+  try {
+    const userId = req.user.userId;
+    const missingPeople = await MissingPerson.find({ userID: userId });
+
+    const missingPersonIds = missingPeople.map(person => person._id);
+    // console.log(missingPersonIds);
+
+    const matchesResponse = await axios.post('http://localhost:6000/get-face-matches', {
+      personIds: missingPersonIds,
+    });
+
+    if (matchesResponse.status !== 200) {
+      throw new Error('Failed to get face matches from external API');
+    }
+
+    const matchesData = matchesResponse.data;
+    console.log(matchesData.matches)
+    const matchedPeopleResults = missingPeople.map(person => ({
+      ...person.toObject(),
+      matches: matchesData.facematch[person._id] || [],
+    }));
+    res.json(matchedPeopleResults);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

@@ -2,23 +2,18 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
-const MergedFeatures = {
+const MergedFeatures = new Schema({
   user_id: {
-    type: Schema.Types.ObjectId ,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: "User",
   },
-  featureId: {
-    type: Schema.Types.ObjectId,
-    required: false,
-    ref: "Features_GT_2" || "Features_LTE_2"
-  },
   missing_case_id: {
-    type: Schema.Types.ObjectId ,
+    type: Schema.Types.ObjectId,
     required: false,
     ref: "MissingPerson"
   },
-  name: Schema({
+  name: {
     firstName: {
       type: String,
     },
@@ -29,7 +24,7 @@ const MergedFeatures = {
       type: String,
     },
     _id: false,
-  }),
+  },
   gender: {
     type: String,
     enum: ["male", "female"],
@@ -44,7 +39,7 @@ const MergedFeatures = {
     enum: ["fair", "black", "white", "tseyim"],
     required: true,
   },
-  clothing: Schema({
+  clothing: {
     upper: {
       clothType: {
         type: String,
@@ -70,7 +65,7 @@ const MergedFeatures = {
       },
     },
     _id: false,
-  }),
+  },
   body_size: {
     type: String,
     enum: ["thin", "average", "muscular", "overweight", "obese", "fit", "athletic", "curvy", "petite", "fat"],
@@ -80,8 +75,8 @@ const MergedFeatures = {
     type: String,
     required: false,
   },
-  featureType: {
-    type: String
+  timeSinceDisappearance: {
+    type: Number,
   },
   inputHash: {
     type: String,
@@ -94,12 +89,12 @@ const MergedFeatures = {
   },
   medicalInformation: { 
     type: String,
-  required: false
-},
+    required: false
+  },
   circumstanceOfDisappearance: {
     type: String,
     required: false
   }
-};
+}, { timestamps: true });
 
 export default model("MergedFeaturesModel", MergedFeatures)

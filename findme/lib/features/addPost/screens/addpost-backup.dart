@@ -3,6 +3,7 @@ import 'package:findme/features/addPost/models/addpost_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -45,7 +46,6 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
 
   List<File> _images = [];
   bool _showClothDetails = true;
-  bool _showAdditionalDetails = true;
 
   @override
   void initState() {
@@ -57,8 +57,6 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
     setState(() {
       final months = int.tryParse(_lastTimeSeenController.text) ?? 0;
       _showClothDetails = months <= 2 || _lastTimeSeenController.text.isEmpty;
-      _showAdditionalDetails =
-          months > 2 || _lastTimeSeenController.text.isEmpty;
     });
   }
 
@@ -143,37 +141,23 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
       request.fields['firstName'] = missingPerson.firstName;
       request.fields['middleName'] = missingPerson.middleName;
       request.fields['lastName'] = missingPerson.lastName;
+      request.fields['last_place_seen'] = missingPerson.lastSeenLocation;
       request.fields['last_time_seen'] = missingPerson.lastTimeSeen.toString();
       request.fields['gender'] = missingPerson.gender;
       request.fields['age'] = missingPerson.age.toString();
       request.fields['skin_color'] = missingPerson.skinColor;
-
-      if (_showClothDetails) {
-        request.fields['clothingUpperClothType'] = missingPerson.upperClothType;
-        request.fields['clothingUpperClothColor'] =
-            missingPerson.upperClothColor;
-        request.fields['clothingLowerClothType'] = missingPerson.lowerClothType;
-        request.fields['clothingLowerClothColor'] =
-            missingPerson.lowerClothColor;
-      }
-
-      if (_lastTimeSeenController.text.isEmpty ||
-          int.parse(_lastTimeSeenController.text) <= 2) {
-        request.fields['body_size'] = missingPerson.bodySize;
-        request.fields['last_place_seen'] = missingPerson.lastSeenLocation;
-      }
-
-      if (_lastTimeSeenController.text.isEmpty ||
-          int.parse(_lastTimeSeenController.text) > 2) {
-        request.fields['medicalInformation'] = missingPerson.medicalInformation;
-        request.fields['circumstanceOfDisappearance'] =
-            missingPerson.circumstanceOfDisappearance;
-        request.fields['lastSeenAddressDes'] = missingPerson.lastAddressDesc;
-      }
-
+      request.fields['clothingUpperClothType'] = missingPerson.upperClothType;
+      request.fields['clothingUpperClothColor'] = missingPerson.upperClothColor;
+      request.fields['clothingLowerClothType'] = missingPerson.lowerClothType;
+      request.fields['clothingLowerClothColor'] = missingPerson.lowerClothColor;
+      request.fields['body_size'] = missingPerson.bodySize;
       request.fields['eyeDescription'] = missingPerson.eyeDescription;
       request.fields['noseDescription'] = missingPerson.noseDescription;
       request.fields['hairDescription'] = missingPerson.hairDescription;
+      request.fields['medicalInformation'] = missingPerson.medicalInformation;
+      request.fields['circumstanceOfDisappearance'] =
+          missingPerson.circumstanceOfDisappearance;
+      request.fields['lastSeenAddressDes'] = missingPerson.lastAddressDesc;
 
       for (var i = 0; i < _images.length; i++) {
         request.files.add(await http.MultipartFile.fromPath(
@@ -230,13 +214,11 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
               const SizedBox(height: 10),
               _buildTextFormField(_lastNameController, 'Last Name'),
               const SizedBox(height: 10),
+              _buildTextFormField(
+                  _lastPlaceSeenController, 'Last Seen Location'),
+              const SizedBox(height: 10),
               _buildTextFormField(_lastTimeSeenController,
                   'Last Time Seen (in months)', TextInputType.number),
-              const SizedBox(height: 10),
-              if (_showClothDetails) ...[
-                _buildTextFormField(
-                    _lastPlaceSeenController, 'Last Seen Location'),
-              ],
               const SizedBox(height: 10),
               _buildDropdown('Gender:', _selectedGender, ['male', 'female'],
                   (newValue) {
@@ -248,30 +230,28 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
               _buildTextFormField(_ageController, 'Age', TextInputType.number),
               const SizedBox(height: 10),
               _buildDropdown('Skin Color:', _selectedSkinColor,
-                  ['fair', 'dark', 'light', 'brown', 'black'], (newValue) {
+                  ['fair', 'black', 'white', 'tseyim'], (newValue) {
                 setState(() {
                   _selectedSkinColor = newValue!;
                 });
               }),
               const SizedBox(height: 10),
-              if (_showClothDetails) ...[
-                _buildDropdown('Body Size:', _selectedBodySize, [
-                  'thin',
-                  'average',
-                  'muscular',
-                  'overweight',
-                  'obese',
-                  'fit',
-                  'athletic',
-                  'curvy',
-                  'petite',
-                  'fat'
-                ], (newValue) {
-                  setState(() {
-                    _selectedBodySize = newValue!;
-                  });
-                }),
-              ],
+              _buildDropdown('Body Size:', _selectedBodySize, [
+                'thin',
+                'average',
+                'muscular',
+                'overweight',
+                'obese',
+                'fit',
+                'athletic',
+                'curvy',
+                'petite',
+                'fat'
+              ], (newValue) {
+                setState(() {
+                  _selectedBodySize = newValue!;
+                });
+              }),
               const SizedBox(height: 10),
               _buildTextFormField(_eyeDescriptionController, 'Eye Description'),
               const SizedBox(height: 10),
@@ -281,15 +261,12 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
               _buildTextFormField(
                   _hairDescriptionController, 'Hair Description'),
               const SizedBox(height: 10),
-              if (_showAdditionalDetails) ...[
-                _buildTextFormField(_medicalInformation, 'Medical Information'),
-                const SizedBox(height: 10),
-                _buildTextFormField(_circumstanceOfDisappearance,
-                    'Circumstance Of Disappearance'),
-                const SizedBox(height: 10),
-                _buildTextFormField(_lastAddressDescController,
-                    'Last Seen Address Description'),
-              ],
+              _buildTextFormField(_medicalInformation, 'Medical Information'),
+              const SizedBox(height: 10),
+              _buildTextFormField(
+                  _circumstanceOfDisappearance, 'Circumstance Of Disapperance'),
+              _buildTextFormField(
+                  _lastAddressDescController, 'Last Seen Address Description'),
               const SizedBox(height: 10),
               if (_showClothDetails) ...[
                 _buildDropdown('Upper Cloth Type:', _selectedUpperClothType,
@@ -370,12 +347,6 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
         if (value == null || value.isEmpty) {
           return 'Please enter $labelText';
         }
-        if (controller == _lastTimeSeenController) {
-          final numValue = int.tryParse(value);
-          if (numValue == null || numValue < 0) {
-            return 'Please enter a valid number for Last Time Seen';
-          }
-        }
         return null;
       },
     );
@@ -421,10 +392,4 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
       }).toList(),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: MissingPersonAddPage(),
-  ));
 }

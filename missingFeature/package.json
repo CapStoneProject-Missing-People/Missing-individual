@@ -22,12 +22,13 @@
     "firebase-admin": "^12.1.0",
     "jsonfile": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.7.0",
     "mongoose": "^8.3.1",
     "multer": "^1.4.5-lts.1",
     "pg": "^8.11.5",
     "validator": "^13.11.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.3"
   }
 }

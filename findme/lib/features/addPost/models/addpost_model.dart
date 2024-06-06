@@ -2,7 +2,8 @@ class MissingPerson {
   final String firstName;
   final String middleName;
   final String lastName;
-  final String lastPlaceSeen;
+  final String lastSeenLocation;
+  final String lastAddressDesc;
   final int lastTimeSeen;
   final String gender;
   final int age;
@@ -15,13 +16,16 @@ class MissingPerson {
   final String eyeDescription;
   final String noseDescription;
   final String hairDescription;
+  final String medicalInformation;
+  final String circumstanceOfDisappearance;
   final List<String> imagePaths;
 
   MissingPerson({
     required this.firstName,
     required this.middleName,
     required this.lastName,
-    required this.lastPlaceSeen,
+    required this.lastSeenLocation,
+    required this.lastAddressDesc,
     required this.lastTimeSeen,
     required this.gender,
     required this.age,
@@ -34,6 +38,8 @@ class MissingPerson {
     required this.eyeDescription,
     required this.noseDescription,
     required this.hairDescription,
+    required this.medicalInformation,
+    required this.circumstanceOfDisappearance,
     required this.imagePaths,
   });
 
@@ -42,8 +48,9 @@ class MissingPerson {
       'firstName': firstName,
       'middleName': middleName,
       'lastName': lastName,
-      'lastPlaceSeen': lastPlaceSeen,
-      'lastTimeSeen': lastTimeSeen,
+      'lastSeenLocation': lastSeenLocation,
+      'lastSeenAddressDes': lastAddressDesc,
+      'timesincedisapprearance': lastTimeSeen,
       'gender': gender,
       'age': age,
       'skinColor': skinColor,
@@ -55,6 +62,8 @@ class MissingPerson {
       'eyeDescription': eyeDescription,
       'noseDescription': noseDescription,
       'hairDescription': hairDescription,
+      'medicalInformation': medicalInformation,
+      'circumstanceOfDisappearance': circumstanceOfDisappearance,
       'imagePaths': imagePaths,
     };
   }
