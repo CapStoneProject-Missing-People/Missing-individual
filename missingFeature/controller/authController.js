@@ -60,10 +60,12 @@ const createToken = (id) => {
 export const signup_post = async (req, res) => {
   const { name, email, phoneNo, password, role } = req.body;
   try {
+    console.log('top of try')
     let assignedRole = ROLES.User; // Default to "User" role
     if (role && Object.values(ROLES).includes(role)) {
       assignedRole = role;
     }
+    console.log('after role assigning')
     const user = await User.create({
       email,
       name,
@@ -71,15 +73,20 @@ export const signup_post = async (req, res) => {
       password,
       role: assignedRole,
     });
+
+    console.log('after user create')
     const token = createToken(user._id);
     res.cookie("jwt", token, {
       httpOnly: true,
       maxAge: maxAge * 1000,
     });
+    console.log('in singup post')
+    // console.log('header')
+    // console.log(req.headers)
     await AddActionLog({
       action: "Signup",
       user_id: user._id || "",
-      user_agent: req.headers["user-agent"],
+      user_agent: req.headers["user-agent"] || '',
       method: req.method,
       ip: req.socket.remoteAddress,
       status: 200,
@@ -90,7 +97,7 @@ export const signup_post = async (req, res) => {
     AddActionLog({
       action: "Signup",
       user_id: email || "",
-      user_agent: req.headers["User-Agent"],
+      user_agent: req.headers["user-Agent"],
       method: req.method,
       ip: req.ip,
       status: 500,
@@ -116,7 +123,7 @@ export const login_post = async (req, res) => {
     await AddActionLog({
       action: "Login",
       user_id: user._id || "",
-      user_agent: req.headers["user-agent"],
+      user_agent: req.headers["user-agent"] || '',
       method: req.method,
       ip: req.socket.remoteAddress,
       status: 200,

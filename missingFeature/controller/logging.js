@@ -3,6 +3,7 @@ import ActionLog from "../models/logSchema.js";
 // function to Create a new action log
 export const AddActionLog = async (logData) => {
   try {
+    console.log(logData)
     await ActionLog.create(logData);
     console.log("Action logged successfully");
   } catch (error) {
@@ -13,6 +14,8 @@ export const AddActionLog = async (logData) => {
 // api gate way to add action log
 export const AddActionLogGateWay = async (req, res) => {
   try {
+    console.log('user agent')
+    console.log(req.body)
     const logData = req.body; // Expecting log data in the request body
     await AddActionLog(logData);
     console.log("Action logged successfully");

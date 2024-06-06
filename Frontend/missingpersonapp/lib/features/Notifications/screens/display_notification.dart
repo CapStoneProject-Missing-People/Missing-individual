@@ -92,6 +92,7 @@ class NotificationDetailPage extends StatelessWidget {
 
   NotificationDetailPage({required this.notification});
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

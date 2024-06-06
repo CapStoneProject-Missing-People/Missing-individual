@@ -19,7 +19,7 @@ Future<List<MissingPerson>> fetchMissingPeople() async {
         try {
           final Map<String, dynamic> data = item as Map<String, dynamic>;
           print("Current data item: $data");
-
+          
           List<Uint8List> imageBuffers = [];
           if (data['missing_case_id'] != null && data['missing_case_id']['imageBuffers'] != null) {
             imageBuffers = (data['missing_case_id']['imageBuffers'] as List<dynamic>).map((imageUrl) {
@@ -32,12 +32,23 @@ Future<List<MissingPerson>> fetchMissingPeople() async {
             }).toList();
           }
 
+          String userName = '';
+          String email = '';
+          String userId = '';
+
+          if (data['user_id'] is Map<String, dynamic>) {
+            final userMap = data['user_id'] as Map<String, dynamic>;
+            userName = userMap['name'] ?? '';
+            email = userMap['email'] ?? '';
+            userId = userMap['_id'] ?? '';
+          }
+
           return MissingPerson(
             name: data['name']['firstName'] ?? '',
             age: data['age'] ?? 0,
-            userName: data['user_id']['name'] ?? '',
-            email: data['user_id']['email'] ?? '',
-            user_id: data['user_id']['_id'] ?? '',
+            userName: userName,
+            email: email,
+            user_id: userId,
             skin_color: data['skin_color'] ?? '',
             photos: imageBuffers,
             phoneNo: '123-456-7890', // Temporary placeholder

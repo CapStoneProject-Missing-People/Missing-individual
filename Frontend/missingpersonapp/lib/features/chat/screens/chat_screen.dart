@@ -73,7 +73,7 @@ class _ChatScreenState extends State<ChatScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('authorization');
   final response = await http.post(
-    Uri.parse('http://192.168.23.31:4000/api/chat'), // Replace with your backend URL
+    Uri.parse('http://192.168.59.103:4000/api/chat'), // Replace with your backend URL
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ${token}', // Replace with your authentication token
@@ -96,7 +96,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   // Connect to socket.io server
-final socket = io.io('ws://192.168.23.31:4000');
+final socket = io.io('ws://192.168.59.103:4000');
 
   // Emit 'sendMessage' event to socket.io server
   socket.emit('sendMessage', {

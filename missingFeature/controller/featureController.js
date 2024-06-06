@@ -76,17 +76,12 @@ export const getFeatures = async (req, res) => {
       }
     }
     const features = await MergedFeaturesModel.find(filterCriteria)
-
+      .lean()
+      .populate({
+        path: "missing_case_id",
+        select: ["status", "imageBuffers", "dateReported"],
+      });
     console.log("features: ", features);
-    .lean()
-    .populate({
-      path: 'missing_case_id',
-      select: ['status', 'imageBuffers', 'dateReported']
-    })
-    .populate({
-      path: 'user_id',
-      select: ['name', 'email'] // Select fields you want to populate from User model
-    });    console.log(features);
 
     res.status(200).json(features);
   } catch (error) {
@@ -94,7 +89,6 @@ export const getFeatures = async (req, res) => {
     console.log("Error ferching features: ", error);
   }
 };
-
 //@desc Get single Feature
 //@route GET /api/features/getSingle/:id
 //@access public
@@ -226,21 +220,11 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
       return "Duplicate feature already exists in MergedFeatures collection";
     }
 
-    const mergedFeatures = await MergedFeaturesModel.create(featureData);
+    const mergedFeatures = await MergedFeaturesModel.create(newFeatureData);
     console.log("Feature stored successfully in MergedFeatures collection.");
-    console.log("mergedFeatures: ", mergedFeatures);
     const mergedFeatureCaseId = mergedFeatures._id;
     feature.mergedFeatureId = mergedFeatureCaseId;
     feature.save();
-    const existingEmbeddingsCount = await embeddings.countDocuments();
-    if (existingEmbeddingsCount < 1) {
-      const caseId = feature._id;
-      const pipelineModel = await generateEmbeddings();
-      const output = await pipelineModel(data.description, {
-        pooling: "mean",
-        normalize: true,
-      });
-      const embeddingData = output.data;
 
     const pipelineModel = await generateEmbeddings();
     const output = await pipelineModel(newFeatureData.description, { pooling: "mean", normalize: true });
@@ -252,6 +236,7 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
       await embeddings.create({ caseId: feature._id, embedding: embeddingArray, similarity: {} });
       console.log("Initial embedding stored successfully");
     } else {
+      // const existingEmbeddings = await embeddings.find();
       var similarityScores = existingEmbeddings.map(existingEmbedding => {
         const similarity = calculateSimilarity(embeddingData, existingEmbedding.embedding);
         return { existingCaseId: existingEmbedding.caseId, existingEmbeddingId: existingEmbedding._id, similarityScore: similarity * 100 };
