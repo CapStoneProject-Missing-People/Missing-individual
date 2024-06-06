@@ -9,6 +9,7 @@ import MainMissingPeople from './components/page/MissingPeople/MainMissingPeople
 import Profile from './components/page/Profile';
 import MainFeedback from './components/page/Feedback/MainFeedback';
 import MainLogManagement from './components/page/LogManagement/MainLogManagement';
+import MainImageRecognition from './components/page/ImageRecognition/MainImageRecognition';
 import Login from './components/page/Login';
 import PrivateRoute from './components/PrivateRoute';
 
@@ -89,7 +90,18 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/" replace />} /> {/* Redirect to Login page for any other route */}
+        <Route
+          path="/img-recognitions"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainImageRecognition />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        {/* Redirect to Login page for any other route */}
+        <Route path="*" element={<Navigate to="/" replace />} /> 
       </Routes>
     </MenuContextProvider>
   );

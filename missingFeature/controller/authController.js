@@ -35,11 +35,7 @@ const handleErrors = (err) => {
   }
 
   // Cast error for role
-  if (err.errors.role.name === "CastError" /* && err.path === 'role' */) {
-    errors.role = "Invalid role value provided";
-    console.log(err);
-    return errors.role;
-  }
+
 
   // Validate errors
   /* if (err.message.includes("user validation failed")) {
@@ -186,6 +182,7 @@ export const admin_login_post = async (req, res) => {
       httpOnly: true,
       maxAge: maxAge * 1000,
     });
+    console.log("ip: " + req.ip)
     await AddActionLog({
       action: "admin_login",
       user_id: user._id || "",
@@ -208,7 +205,7 @@ export const admin_login_post = async (req, res) => {
       logLevel: "error",
     });
     const errors = handleErrors(err);
-    console.log("the error is:", errors);
+    console.log("the error is:", err);
     res.status(400).json({ errors });
   }
 };

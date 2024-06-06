@@ -1,3 +1,4 @@
+import feedBackModel from '../models/feedBackModel.js';
 import Feedback from '../models/feedBackModel.js'
 //@desc create feedback
 //@route POST /api
@@ -41,3 +42,16 @@ export const getFeedBack = async (req, res) => {
     });
   }
 };
+
+export const deleteFeedback = async (req, res) => {
+  try {
+    const feedback = await feedBackModel.findById(req.params.feedBackId)
+    if (!feedback) {
+      return res.status(404).json({ message: "feedback not found" });
+    }
+    await feedback.deleteOne()
+    res.status(200).json({ message: "feedback removed successfully"})
+  } catch (error) {
+
+  }
+}

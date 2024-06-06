@@ -661,7 +661,7 @@ export const deleteFeature = async (req, res) => {
     console.log(mergedFeature);
     // const feature = await Features.findById(req.params.id);
     if (!mergedFeature) {
-      res.status(404).json({ message: "feature not found" });
+      return res.status(404).json({ message: "feature not found" });
     }
 
     if (mergedFeature.user_id.toString() !== req.user.userId.toString()) {
