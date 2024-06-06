@@ -1,4 +1,3 @@
-
 import express from "express";
 import {
   getAllUsers,
@@ -9,6 +8,8 @@ import {
   updatePermissions,
   updateUserProfile,
   deleteAdmin,
+  getLoggedInUserData,
+  getAllPosts,
 } from "../controller/adminController.js";
 import {
   requireAuth,
@@ -17,7 +18,12 @@ import {
 } from "../middleware/authMiddleware.js";
 
 export const adminRouters = express.Router();
-
+adminRouters.get(
+  "/getLogInData",
+  requireAuth,
+  isAdmin([3244,5150]),
+  getLoggedInUserData
+);
 adminRouters.get(
   "/getAllUsers",
   requireAuth,
@@ -26,10 +32,19 @@ adminRouters.get(
   getAllUsers
 );
 adminRouters.get(
-  "/getAllAdmins",
+  "/getAllPost",
   requireAuth,
-  isAdmin([5150]),
-  getAllAdmins
+  isAdmin([3244, 5150]),
+  requirePermission("read"),
+  getAllPosts
+);
+adminRouters.get("/getAllAdmins", requireAuth, isAdmin([5150]), getAllAdmins);
+
+adminRouters.get(
+  "/getLogInData",
+  requireAuth,
+  isAdmin([3244]),
+  getLoggedInUserData
 );
 
 adminRouters.put(
@@ -39,7 +54,7 @@ adminRouters.put(
   requirePermission("update"),
   updateUserProfile
 );
-
+  
 adminRouters.delete(
   "/deleteUser/:userId",
   requireAuth,
