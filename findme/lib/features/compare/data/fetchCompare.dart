@@ -4,15 +4,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class Constants {
-  static String uri = 'http://192.168.188.100:4000';
-  static String postUri = 'http://192.168.188.100:4000';
-  static String faceApi = 'http://192.168.188.100:6000';
+  static String postUri = 'http://192.168.23.140:4000';
+  static String faceApi = 'http://192.168.23.140:6000';
 }
 
 Future<List<MatchedPersonAddCompare>> fetchMatchedPeople(String userId) async {
   print("Fetching matched people for user ID: $userId...");
 
-  final String url = "${Constants.postUri}/api/features/getAll?userId=$userId";
+  final String url = "${Constants.postUri}/api/features/getSingle/$userId";
   print("Request URL: $url");
 
   try {

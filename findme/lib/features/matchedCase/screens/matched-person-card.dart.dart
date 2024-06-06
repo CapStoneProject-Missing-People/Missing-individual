@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:findme/features/matchedCase/models/matched-person-model.dart';
-import 'package:findme/features/matchedCase/screens/matched_sample.dart';
 import 'package:findme/features/missingPersonDetail/screens/missing_person_detail.dart';
 import 'package:flutter/material.dart';
 
