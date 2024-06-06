@@ -76,8 +76,6 @@ export const getFeatures = async (req, res) => {
       }
     }
     const features = await MergedFeaturesModel.find(filterCriteria)
-
-    console.log("features: ", features);
     .lean()
     .populate({
       path: 'missing_case_id',
