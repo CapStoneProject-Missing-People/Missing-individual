@@ -1,8 +1,12 @@
+// missing_person_details.dart
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:missingpersonapp/common/models/missing_person.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'dart:typed_data';
+import 'package:provider/provider.dart';
+import '../../features/chat/screens/chat_screen.dart';
 
 class MissingPersonDetails extends StatefulWidget {
   final MissingPerson missingPerson;
@@ -18,6 +22,27 @@ class MissingPersonDetails extends StatefulWidget {
 
 class _MissingPersonDetailsState extends State<MissingPersonDetails> {
   int activeIndex = 0;
+  bool isChatVisible = true;
+  ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection == ScrollDirection.forward ||
+          _scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+        setState(() {
+          isChatVisible = true;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   Container buildContainer(
       String text1, String text2, IconData text3, BuildContext context) {
@@ -77,49 +102,86 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
         backgroundColor: Theme.of(context).colorScheme.background,
         title: Text(widget.header),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CarouselSlider.builder(
-                itemCount: widget.missingPerson.photos.length,
-                itemBuilder: (context, index, realIndex) {
-                  final imageBytes = widget.missingPerson.photos[index];
-                  return buildImage(imageBytes, index);
-                },
-                options: CarouselOptions(
-                  height: 350,
-                  enableInfiniteScroll: false,
-                  onPageChanged: (index, reason) =>
-                      setState(() => activeIndex = index),
-                ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CarouselSlider.builder(
+                    itemCount: widget.missingPerson.photos.length,
+                    itemBuilder: (context, index, realIndex) {
+                      final imageBytes = widget.missingPerson.photos[index];
+                      return buildImage(imageBytes, index);
+                    },
+                    options: CarouselOptions(
+                      height: 350,
+                      enableInfiniteScroll: false,
+                      onPageChanged: (index, reason) =>
+                          setState(() => activeIndex = index),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Center(
+                    child: widget.missingPerson.photos.length > 1
+                        ? buildIndicator(activeIndex, widget.missingPerson.photos)
+                        : Container(),
+                  ),
+                  const SizedBox(height: 20),
+                  buildContainer('Name', '${widget.missingPerson.name}',
+                      Icons.person, context),
+                  SizedBox(height: 5),
+                  buildContainer('Age', '${widget.missingPerson.age}',
+                      Icons.calendar_month, context),
+                  SizedBox(height: 5),
+                  buildContainer('Skin Color', '${widget.missingPerson.skin_color}',
+                      Icons.color_lens_outlined, context),
+                  SizedBox(height: 5),
+                  buildContainer('Phone Number', '${widget.missingPerson.phoneNo}',
+                      Icons.phone, context),
+                  SizedBox(height: 5),
+                  buildContainer('Description',
+                      '${widget.missingPerson.description}', Icons.book, context),
+                ],
               ),
-              SizedBox(height: 12),
-              Center(
-                child: widget.missingPerson.photos.length > 1
-                    ? buildIndicator(activeIndex, widget.missingPerson.photos)
-                    : Container(),
-              ),
-              const SizedBox(height: 20),
-              buildContainer('Name', '${widget.missingPerson.name}',
-                  Icons.person, context),
-              SizedBox(height: 5),
-              buildContainer('Age', '${widget.missingPerson.age}',
-                  Icons.calendar_month, context),
-              SizedBox(height: 5),
-              buildContainer('Skin Color', '${widget.missingPerson.skin_color}',
-                  Icons.color_lens_outlined, context),
-              SizedBox(height: 5),
-              buildContainer('Phone Number', '${widget.missingPerson.phoneNo}',
-                  Icons.phone, context),
-              SizedBox(height: 5),
-              buildContainer('Description',
-                  '${widget.missingPerson.description}', Icons.book, context),
-            ],
+            ),
           ),
-        ),
+          Visibility(
+            visible: isChatVisible,
+            child: Positioned(
+              bottom: 20,
+              right: 20,
+              child: Column(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      setState(() {
+                        isChatVisible = false;
+                      });
+                    },
+                  ),
+                  FloatingActionButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(
+                            receiverId: widget.missingPerson.phoneNo,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Icon(Icons.chat),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -80,7 +80,11 @@ export const getFeatures = async (req, res) => {
       .populate({
         path: "missing_case_id",
         select: ["status", "imageBuffers", "dateReported"],
+      }).populate({
+        path: 'user_id',
+        select: ['name', 'phoneNo']
       });
+
     console.log("features: ", features);
 
     res.status(200).json(features);
