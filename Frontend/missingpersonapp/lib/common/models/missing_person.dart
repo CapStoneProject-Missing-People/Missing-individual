@@ -1,7 +1,10 @@
 import 'dart:typed_data';
 
 class MissingPerson {
+  final String user_id;
   final String name;
+  final String userName;
+  final String email;
   final int age;
   final String skin_color;
   final List<Uint8List> photos;
@@ -9,6 +12,9 @@ class MissingPerson {
   final String description;
 
   MissingPerson({
+    required this.user_id,
+    required this.userName,
+    required this.email,
     required this.name,
     required this.age,
     required this.skin_color,
@@ -27,6 +33,9 @@ class MissingPerson {
     return MissingPerson(
       name: data['name'] ?? '',
       age: data['age'] ?? 0,
+      userName: data['userName'] ?? '',
+      email: data['email'] ?? '',
+      user_id: data['user_id'] ?? '',
       skin_color: data['skin_color'] ?? '',
       photos: photos,
       phoneNo: data['phoneNo'] ?? '',

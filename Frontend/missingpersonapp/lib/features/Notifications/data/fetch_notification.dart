@@ -19,6 +19,9 @@ Future<MissingPerson> fetchCaseFromApiByID(String caseID) async {
     return MissingPerson(
       name: jsonData['name']['firstName'],
       age: jsonData['age'],
+      userName: jsonData['user_id']['name'] ?? '',
+      email: jsonData['user_id']['email'] ?? '',
+      user_id: jsonData['user_id'],
       skin_color: jsonData['skin_color'],
       photos: imageBuffers,
       phoneNo: '123-456-7890', // Temporary placeholder

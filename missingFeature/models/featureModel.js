@@ -6,7 +6,7 @@ const baseAttributes = {
   user_id: {
     type: Schema.Types.ObjectId ,
     required: true,
-    ref: "user",
+    ref: "User",
   },
   mergedFeatureId: {
     type: Schema.Types.ObjectId,

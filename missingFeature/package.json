@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "nodemon app.js"
-    },
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -20,11 +20,13 @@
     "express": "^4.19.2",
     "express-async-handler": "^1.2.0",
     "firebase-admin": "^12.1.0",
+    "http": "^0.0.1-security",
     "jsonfile": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.1",
     "multer": "^1.4.5-lts.1",
     "pg": "^8.11.5",
+    "socket.io": "^4.7.5",
     "validator": "^13.11.0"
   },
   "devDependencies": {

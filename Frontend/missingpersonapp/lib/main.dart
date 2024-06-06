@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:missingpersonapp/common/services/fcm-service.dart';
 import 'package:missingpersonapp/features/Notifications/provider/missingcase-provider.dart';
 import 'package:missingpersonapp/features/Notifications/screens/display_notification.dart';
@@ -18,6 +19,11 @@ import 'package:missingpersonapp/features/matchedCase/provider/matched_case_prov
 import 'package:missingpersonapp/features/matchedCase/screens/matched_case.dart';
 import 'package:missingpersonapp/firebase_options.dart';
 import 'package:provider/provider.dart';
+import 'package:missingpersonapp/features/chat/models/message.dart';
+import 'package:missingpersonapp/features/chat/screens/user_list_screen.dart';
+import 'package:missingpersonapp/common/models/missing_person.dart';
+import 'package:missingpersonapp/features/home/data/missing_person_fetch.dart';
+import 'package:missingpersonapp/features/home/provider/allMissingperson.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -30,9 +36,21 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Register Hive adapters
+  Hive.registerAdapter(MessageAdapter());
+  
+  // Open Hive boxes
+  await Hive.openBox<Message>('messages');
+  await Hive.openBox('authBox');
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -81,12 +99,32 @@ class _MyAppState extends State<MyApp> {
       title: 'MissingPerson',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        primarySwatch: Colors.blue,
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: Colors.green,
           selectionColor: Colors.grey,
           selectionHandleColor: Colors.grey,
         ),
       ),
+      // home: Consumer<AllMissingPeopleProvider>(
+      //   builder: (ctx, missingPeopleProvider, _) {
+      //     if (missingPeopleProvider.isLoading) {
+      //       return Scaffold(
+      //         body: Center(
+      //           child: CircularProgressIndicator(),
+      //         ),
+      //       );
+      //     } else if (missingPeopleProvider.errorMessage.isNotEmpty) {
+      //       return Scaffold(
+      //         body: Center(
+      //           child: Text('Error: ${missingPeopleProvider.errorMessage}'),
+      //         ),
+      //       );
+      //     } else {
+      //       return HomePage();
+      //     }
+      //   },
+      // ),
       home: Provider.of<UserProvider>(context).user.token.isEmpty
           ? LoginPage()
           : const HomePage(),
@@ -101,3 +139,4 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+

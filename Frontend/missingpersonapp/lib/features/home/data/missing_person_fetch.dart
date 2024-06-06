@@ -6,63 +6,52 @@ import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 
 Future<List<MissingPerson>> fetchMissingPeople() async {
   try {
-    // Make HTTP GET request to fetch data from the API endpoint
     final response = await http.get(
       Uri.parse("${Constants.postUri}/api/features/getAll"),
     );
 
+    print('Response status: ${response.statusCode}');
     if (response.statusCode == 200) {
-      // Parse the JSON response
       final List<dynamic> jsonData = json.decode(response.body);
-
-      // Debug print the raw JSON data
       print("Raw JSON data: $jsonData");
 
-      // Map the parsed data to instances of MissingPerson class
-      print("before result");
-
-      List<MissingPerson> missingPeople = jsonData.map((data) {
+      List<MissingPerson> missingPeople = jsonData.map((dynamic item) {
         try {
-          // Debug print the current data item
+          final Map<String, dynamic> data = item as Map<String, dynamic>;
           print("Current data item: $data");
 
-          // Check if missing_case_id is not null
-          if (data['missing_case_id'] != null) {
-            // Decode each base64 image string to Uint8List
-            final List<Uint8List> imageBuffers = 
-                (data['missing_case_id']['imageBuffers'] as List<dynamic>)
-                    .map((imageUrl) => base64Decode(imageUrl))
-                    .toList();
-
-            return MissingPerson(
-              name: data['name']['firstName'],
-              age: data['age'],
-              skin_color: data['skin_color'],
-              photos: imageBuffers,
-              phoneNo: '123-456-7890', // Temporary placeholder
-              description: data['description'],
-            );
-          } else {
-            print("missing_case_id is null for ${data['name']['firstName']}");
-            return MissingPerson(
-              name: data['name']['firstName'],
-              age: data['age'],
-              skin_color: data['skin_color'],
-              photos: [],
-              phoneNo: '123-456-7890', // Temporary placeholder
-              description: data['description'],
-            );
+          List<Uint8List> imageBuffers = [];
+          if (data['missing_case_id'] != null && data['missing_case_id']['imageBuffers'] != null) {
+            imageBuffers = (data['missing_case_id']['imageBuffers'] as List<dynamic>).map((imageUrl) {
+              if (imageUrl is String) {
+                return base64Decode(imageUrl);
+              } else {
+                print('Invalid image URL format: $imageUrl');
+                return Uint8List(0); // Return an empty Uint8List in case of error
+              }
+            }).toList();
           }
+
+          return MissingPerson(
+            name: data['name']['firstName'] ?? '',
+            age: data['age'] ?? 0,
+            userName: data['user_id']['name'] ?? '',
+            email: data['user_id']['email'] ?? '',
+            user_id: data['user_id']['_id'] ?? '',
+            skin_color: data['skin_color'] ?? '',
+            photos: imageBuffers,
+            phoneNo: '123-456-7890', // Temporary placeholder
+            description: data['description'] ?? '',
+          );
         } catch (e) {
           print("Error mapping data item: $e");
           throw e;
         }
       }).toList();
 
-      print("after result");
+      print("Parsed missingPeople: $missingPeople");
       return missingPeople;
     } else {
-      // If the request fails, throw an exception or handle the error accordingly
       print('Failed to fetch missing people. Status code: ${response.statusCode}');
       throw Exception('Failed to fetch missing people');
     }
