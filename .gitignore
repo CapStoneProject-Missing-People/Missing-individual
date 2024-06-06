@@ -5,3 +5,4 @@ face-recognition/node_modules/
 .vscode
 missingFeature/.env
 missingFeature/uploads
+/Frontend/missingpersonapp/lib/features/authentication/utils/constants.dart

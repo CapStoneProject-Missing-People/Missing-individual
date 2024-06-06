@@ -35,23 +35,80 @@ const Table = ({ data }) => {
   }, []);
 
   const columns = useMemo(() => {
-    const isSuperAdmin = loggedInUserRole === 'superAdmin';
+    const isSuperAdmin = loggedInUserRole === 5150;
     const cols = [
       {
         Header: "Name",
         accessor: "name",
-        width: "180px",
       },
       {
         Header: "Phone",
         accessor: "phoneNo",
-        width: "180px",
         disableSortBy: true,
       },
       {
         Header: "Email",
         accessor: "email",
-        width: "240px",
+        disableSortBy: true,
+      },
+      {
+        Header: "Admin Privilege",
+        accessor: "adminPrivilege",
+        Cell: ({ row }) => (
+          <button 
+            onClick={() => handleAdminPrivilegeToggle(row.original._id, row.original.role)}
+            className={`px-4 py-2 rounded-full ${
+              row.original.role === 3244 ? "bg-green-600" : "bg-red-600"
+            } text-white`}
+          >
+            {row.original.role === 3244 ? "On" : "Off"}
+          </button>
+        ),
+        disableSortBy: true,
+      },
+      {
+        Header: "Read",
+        accessor: "read",
+        Cell: ({ row }) => (
+          <button 
+            onClick={() => handlePermissionToggle(row.original, 'read')}
+            className={`px-4 py-2 rounded-full ${
+              row.original.permissions.includes('read') ? "bg-blue-600" : "bg-gray-400"
+            } text-white`}
+          >
+            Read
+          </button>
+        ),
+        disableSortBy: true,
+      },
+      {
+        Header: "Update",
+        accessor: "update",
+        Cell: ({ row }) => (
+          <button 
+            onClick={() => handlePermissionToggle(row.original, 'update')}
+            className={`px-4 py-2 rounded-full ${
+              row.original.permissions.includes('update') ? "bg-yellow-600" : "bg-gray-400"
+            } text-white`}
+          >
+            Update
+          </button>
+        ),
+        disableSortBy: true,
+      },
+      {
+        Header: "Remove",
+        accessor: "remove",
+        Cell: ({ row }) => (
+          <button 
+            onClick={() => handlePermissionToggle(row.original, 'delete')}
+            className={`px-4 py-2 rounded-full ${
+              row.original.permissions.includes('delete') ? "bg-red-600" : "bg-gray-400"
+            } text-white`}
+          >
+            Remove
+          </button>
+        ),
         disableSortBy: true,
       },
       {
@@ -66,27 +123,8 @@ const Table = ({ data }) => {
           </button>
         ),
         disableSortBy: true,
-        width: "100px",
       },
     ];
-    if (isSuperAdmin) {
-      cols.splice(3, 0, {
-        Header: "Admin Privilege",
-        accessor: "adminPrivilege",
-        Cell: ({ row }) => (
-          <button 
-            onClick={() => handleAdminPrivilegeToggle(row.original._id, row.original.role)}
-            className={`px-4 py-2 rounded-full ${
-              row.original.role === 'admin' ? "bg-green-600" : "bg-red-600"
-            } text-white`}
-          >
-            {row.original.role === 'admin' ? "On" : "Off"}
-          </button>
-        ),
-        disableSortBy: true,
-        width: "150px",
-      });
-    }
     return cols;
   }, [loggedInUserRole]);
 
@@ -135,8 +173,9 @@ const Table = ({ data }) => {
       const headers = {
         Authorization: `Bearer ${token}`,
       };
-      await axios.delete(`http://localhost:4000/api/admin/deleteUser/${currentId}`, { headers });
+      await axios.delete(`http://localhost:4000/api/admin/deleteAdmin/${currentId}`, { headers });
       setTableData(prevData => prevData.filter(row => row._id !== currentId));
+      console.log("show:",tableData)
     } catch (error) {
       console.error("Error deleting row:", error);
     }
@@ -148,8 +187,8 @@ const Table = ({ data }) => {
       const headers = {
         Authorization: `Bearer ${token}`,
       };
-      const newRole = currentRole === 'admin' ? 'user' : 'admin';
-      const response = await axios.put(`http://localhost:4000/api/admin/updateRole/${_id}`, { role: newRole }, { headers });
+      const newRole = currentRole === 3244 ? 2001 : 3244;
+      const response = await axios.patch(`http://localhost:4000/api/admin/updateRole/${_id}`, { role: newRole }, { headers });
       console.log('updating.');
       if (response.data) {
         // Filter out the row with the specified _id and update the table data
@@ -160,9 +199,38 @@ const Table = ({ data }) => {
     }
   };
 
+  const handlePermissionToggle = async (user, permission) => {
+    try {
+      const token = Cookies.get('jwt');
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      
+      // Find the current user's permissions
+      const currentPermissions = user.permissions;
+  
+      // Toggle the permission
+      const newPermissions = currentPermissions.includes(permission)
+        ? currentPermissions.filter(perm => perm !== permission)
+        : [...currentPermissions, permission];
+        console.log("please: ",newPermissions)
+  
+      // Update the permissions in the backend
+      const response = await axios.patch(`http://localhost:4000/api/admin/updatePermissions/${user._id}`, { permissions: newPermissions }, { headers });
+  
+      if(response.data) {
+        // Update the local state with the new permissions
+        setTableData(prevData => prevData.map(row => row._id === user._id ? { ...row, permissions: newPermissions } : row));
+      }
+    } catch (error) {
+      console.error("Error updating permissions:", error);
+    }
+  };
+
+
   return (
     <div className="w-full flex flex-col items-center gap-4">
-      <div className="w-full max-w-[60rem] flex flex-col sm:flex-row justify-between gap-2">
+      <div className="w-full flex flex-col sm:flex-row justify-between gap-2">
         <GlobalSearchFilter1
           className="sm:w-64"
           globalFilter={globalFilter}

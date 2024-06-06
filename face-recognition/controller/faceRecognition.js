@@ -1,6 +1,8 @@
 import { uploadFaceFeature, checkFaceMatch } from "../face.js";
 import FaceMatchResult from "../schema/faceMatch.js";
-import axios from "axios";
+import { logData } from "../helper/helpers.js";
+import axios from 'axios';
+import FaceModel from "../schema/face-feature.js";
 
 export const RecognizeFace = async (req, res) => {
   const startTime = Date.now(); // Start timer
@@ -15,23 +17,32 @@ export const RecognizeFace = async (req, res) => {
     if (result.error) {
       return res.status(400).json({ error: result.error });
     }
+    console.log("image buffer: " + file1)
     await FaceMatchResult.create({
       person_id: result.person_id,
       distance: result.distance,
       similarity: result.similarity,
+      faceFeautre: result.faceFeautre,
+      imageBuffers: file1
     });
-    await axios.post(
-      "http://localhost:5000/api/add_log_data",
-      {
-        action: "FaceRecognition",
-        user_id: result.person_id || "1234",
-        user_agent: req.headers["user-agent"],
-        method: req.method,
-        ip: req.ip,
-        status: 200,
-        logLevel: "info"
-      }
-    );
+    
+    await logData({
+      action: "FaceRecognition",
+      user_id: result.person_id || "",
+      user_agent: req.headers["user-agent"],
+      method: req.method,
+      ip: req.socket.remoteAddress,
+      status: 200,
+      logLevel: "info"
+    });
+    const notificationData = {
+      title: "Face Recognition Match",
+      body: `A potential match has been found for missing person ID: ${result.person_id}`,
+      caseId: result.person_id
+    }
+
+    await axios.post('http://localhost:4000/api/notificationToSingleUser', notificationData);
+
     res.json({
       person_id: result.person_id,
       distance: result.distance,
@@ -39,19 +50,16 @@ export const RecognizeFace = async (req, res) => {
     });
   } catch (error) {
     console.error("Error checking face:", error);
-    await axios.post(
-      "http://localhost:3000/api/add_log_data",
-      {
-        action: "FaceRecognition",
-        user_id: "1234",
-        user_agent: req.headers["User-Agent"],
-        method: req.method,
-        ip: req.ip,
-        status: 500,
-        error: error.message || 'Internal Server Error',
-        logLevel: "error"
-      }
-    );
+    await logData({
+      action: "FaceRecognition",
+      user_id: result.person_id || "",
+      user_agent: req.headers["User-Agent"],
+      method: req.method,
+      ip: req.ip,
+      status: 500,
+      error: error.message || 'Internal Server Error',
+      logLevel: "error"
+    });
     res.status(500).json({ error: "Internal server error" });
   } finally {
     const endTime = Date.now(); // End timer
@@ -71,13 +79,6 @@ export const addFaceFeature = async (req, res) => {
       return res.status(400).json({ message: "person_id is required." });
     }
 
-    // Convert person_id to ObjectId
-    // try {
-    //   person_id = mongoose.Types.ObjectId();
-    // } catch (error) {
-    //   return res.status(400).json({ message: "Invalid person_id format." });
-    // }
-
     console.log("image")
     // Check if any images are provided
     if (!images || images.length === 0) {
@@ -88,6 +89,10 @@ export const addFaceFeature = async (req, res) => {
     if (images.length === 0) {
       return res.status(400).json({ message: "No images provided." });
     }
+
+    // Delete existing face feature for the person_id
+    await deleteFaceFeature(person_id);
+
     let result = await uploadFaceFeature(images, person_id);
 
     if (result) {
@@ -102,4 +107,14 @@ export const addFaceFeature = async (req, res) => {
     const endTime = Date.now(); // End timer
     console.log("Total processing time:", endTime - startTime, "ms");
   }
+};
+
+export const deleteFaceFeature = async (person_id) => {
+    try {
+        const result = await FaceModel.findOneAndDelete({ person_id });
+        return result;
+    } catch (error) {
+        console.error("Error deleting face feature:", error);
+        throw new Error(error);
+    }
 };

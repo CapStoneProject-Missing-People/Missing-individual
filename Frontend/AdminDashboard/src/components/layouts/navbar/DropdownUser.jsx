@@ -17,7 +17,7 @@ const DropdownUser = ({ user }) => {
     // Redirect to the login page
     navigate('/');
   };
-  
+ 
   // Close on click outside
   useEffect(() => {
     const clickHandler = ({ target }) => {
@@ -51,7 +51,9 @@ const DropdownUser = ({ user }) => {
           <span className="block text-center text-sm text-white dark:text-white">
             {user.name} {user.lastName}
           </span>
-          <span className="block text-xs">{user.role}</span>
+          <span className="block text-xs">
+            {user.role === 5150 ? "Super Admin" : "Admin"}
+          </span>
         </span>
 
         <div className="h-8 w-8 mr-1 rounded-full bg-gray-300 text-gray-700 flex items-center justify-center font-bold">
@@ -62,8 +64,10 @@ const DropdownUser = ({ user }) => {
               alt="User"
             />
           ) : (
+            
             <span className="text-white text-lg">{user.name.charAt(0)}</span>
           )}
+          
         </div>
       </Link>
 
@@ -86,7 +90,7 @@ const DropdownUser = ({ user }) => {
           </li>
           <li>
             <Link
-              to="/settings"
+              to="/dashboard"
               className="flex items-center gap-3.5 mb-1
               text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
               >

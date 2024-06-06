@@ -5,13 +5,18 @@ import bcrypt from "bcrypt";
 
 const { Schema, model } = mongoose;
 
+const ROLES = {
+  User: 2001,
+  Admin: 3244,
+  SuperAdmin: 5150,
+};
+
 const userSchema = new Schema(
   {
     email: {
       type: String,
       required: [true, "Please enter an email"],
       unique: true,
-      lowercase: true,
       validate: [isEmail, "Please enter a valid email"],
     },
     name: {
@@ -30,9 +35,31 @@ const userSchema = new Schema(
       minlength: [6, "Minimum password length is 6 characters"],
     },
     role: {
+      type: Number,
+      required: true,
+      enum: Object.values(ROLES),
+      default: ROLES.User, // Default role is "User"
+    },
+    permissions: {
+      type: [String],
+      enum: ["read", "update", "delete"],
+      default: [],
+    },
+    fcmToken: {
       type: String,
-      enum: ["user", "admin", "superAdmin"],
-      default: "user",
+      default: null,
+    },
+    notificationsEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    fcmToken: {
+      type: String,
+      default: null,
+    },
+    notificationsEnabled: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -64,6 +91,22 @@ userSchema.statics.login = async function (email, password) {
   throw new Error("incorrect email");
 };
 
+userSchema.statics.adminlogin = async function (email, password) {
+  const user = await this.findOne({ email });
+  if (user) {
+    if (user.role !== 3244 && user.role !== 5150) {
+      throw new Error("unauthorized access");
+    }
+    const auth = await bcrypt.compare(password, user.password);
+    if (auth) {
+      return user;
+    }
+    throw new Error("incorrect password");
+  }
+  throw new Error("incorrect email");
+};
 const User = model("User", userSchema);
 
-export default User;
+//export default User;
+
+export { User, ROLES };

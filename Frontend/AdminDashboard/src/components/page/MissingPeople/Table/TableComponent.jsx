@@ -14,7 +14,11 @@ function TableComponent({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const handleRowClick = (row) => {
+  const handleRowClick = (row,e) => {
+    if (e.target.tagName.toLowerCase() === 'button') {
+      // Don't open the edit modal if a button (delete button) was clicked
+      return;
+    }
     setSelectedUser(row.original);
     setIsModalOpen(true);
   };
@@ -73,7 +77,7 @@ function TableComponent({
                 <tr
                   {...row.getRowProps()}
                   className="py-1 border-b last:border-none cursor-pointer"
-                  onClick={() => handleRowClick(row)}
+                  onClick={(e) => handleRowClick(row,e)}
                 >
                   {row.cells.map((cell) => {
                     return (
@@ -109,6 +113,7 @@ function TableComponent({
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           user={selectedUser}
+          style={{ overlay: { zIndex: 9999 } }}
         />
       )}
     </div>

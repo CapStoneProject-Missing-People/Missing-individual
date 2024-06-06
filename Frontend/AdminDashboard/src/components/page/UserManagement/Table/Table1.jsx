@@ -35,7 +35,7 @@ const Table = ({ data }) => {
   }, []);
 
   const columns = useMemo(() => {
-    const isSuperAdmin = loggedInUserRole === 'superAdmin';
+    const isSuperAdmin = loggedInUserRole === 5150;
     const cols = [
       {
         Header: "Name",
@@ -77,10 +77,10 @@ const Table = ({ data }) => {
           <button 
             onClick={() => handleAdminPrivilegeToggle(row.original._id, row.original.role)}
             className={`px-4 py-2 rounded-full ${
-              row.original.role === 'admin' ? "bg-green-600" : "bg-red-600"
+              row.original.role === 3244 ? "bg-green-600" : "bg-red-600"
             } text-white`}
           >
-            {row.original.role === 'admin' ? "On" : "Off"}
+            {row.original.role === 3244 ? "On" : "Off"}
           </button>
         ),
         disableSortBy: true,
@@ -148,8 +148,8 @@ const Table = ({ data }) => {
       const headers = {
         Authorization: `Bearer ${token}`,
       };
-      const newRole = currentRole === 'admin' ? 'user' : 'admin';
-      const response = await axios.put(`http://localhost:4000/api/admin/updateRole/${_id}`, { role: newRole }, { headers });
+      const newRole = currentRole === 3244 ? 2001 : 3244;
+      const response = await axios.patch(`http://localhost:4000/api/admin/updateRole/${_id}`, { role: newRole }, { headers });
       if (response.data) {
         // Filter out the row with the specified _id and update the table data
         setTableData(prevData => prevData.map(row => row._id === _id ? { ...row, role: newRole } : row));
