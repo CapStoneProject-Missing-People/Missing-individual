@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:missingpersonapp/features/Notifications/screens/display_notification.dart';
 import 'package:missingpersonapp/features/PostAdd/screens/addpost.dart';
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
+import 'package:missingpersonapp/features/compare/screens/compare.dart';
 import 'package:missingpersonapp/features/home/screens/bottom_sheet_widget.dart';
 import 'package:missingpersonapp/features/home/services/check_face.dart';
 import 'package:missingpersonapp/common/screens/profile_drawer.dart';
@@ -118,14 +119,16 @@ class _HomePageState extends State<HomePage> {
       drawer: const ProfileDrawer(),
       body: Stack(
         children: [
-          _selectedIndex == 0
-              ? HomePageContent(
-                  searchText: _searchText,
-                  filters: _filters,
-                )
-              : _selectedIndex == 1
-                  ? const MissingPersonAddPage()
-                  : const NotificationPage(),
+        _selectedIndex == 0
+    ? HomePageContent(
+        searchText: _searchText,
+        filters: _filters,
+      )
+    : _selectedIndex == 1
+        ? const MissingPersonAddPage()
+        : _selectedIndex == 2
+            ? const NotificationPage()
+            : const ComparePersonPage(),
           MyDraggableSheet(
             visible: _isFilterVisible,
             onFilterChanged: _onFilterChanged,
@@ -152,6 +155,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications_none_outlined),
             label: 'Notification',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.compare),
+            label: 'Compare Feature',
           ),
         ],
         currentIndex: _selectedIndex,
@@ -226,6 +233,8 @@ class _HomePageState extends State<HomePage> {
         return 'Add Post';
       case 2:
         return 'Notification';
+      case 3:
+        return 'Compare Feature';
       default:
         return 'Missing Person App';
     }
