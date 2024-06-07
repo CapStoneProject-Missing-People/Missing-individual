@@ -219,7 +219,7 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
       return "Duplicate feature already exists in MergedFeatures collection";
     }
 
-    const mergedFeatures = await MergedFeaturesModel.create(featureData);
+    const mergedFeatures = await MergedFeaturesModel.create(newFeatureData);
     console.log("Feature stored successfully in MergedFeatures collection.");
     console.log("mergedFeatures: ", mergedFeatures);
     const mergedFeatureCaseId = mergedFeatures._id;
@@ -237,10 +237,12 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
     const embeddingData = output.data;
     const embeddingArray = [...embeddingData];
 
-    const existingEmbeddings = await embeddings.find();
-      await embeddings.create({ caseId: feature._id, embedding: embeddingArray, similarity: {} });
-      console.log("Initial embedding stored successfully");
+    await embeddings.create({ caseId: feature._id, embedding: embeddingArray, similarity: {} });
+    console.log("Initial embedding stored successfully");
     }else {
+      const existingEmbeddings = await embeddings.find();
+      const embeddingData = output.data;
+      const embeddingArray = [...embeddingData];
       var similarityScores = existingEmbeddings.map(existingEmbedding => {
         const similarity = calculateSimilarity(embeddingData, existingEmbedding.embedding);
         return { existingCaseId: existingEmbedding.caseId, existingEmbeddingId: existingEmbedding._id, similarityScore: similarity * 100 };

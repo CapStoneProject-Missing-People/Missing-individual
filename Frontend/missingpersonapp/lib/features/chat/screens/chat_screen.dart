@@ -72,7 +72,7 @@ class _ChatScreenState extends State<ChatScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('authorization');
     final response = await http.post(
-      Uri.parse('http://${Constants.postUri}:4000/api/chat'), // Replace with your backend URL
+      Uri.parse('${Constants.postUri}/api/chat'), // Replace with your backend URL
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${token}', // Replace with your authentication token
@@ -95,7 +95,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     // Connect to socket.io server
-    final socket = io.io('ws://${Constants.postUri}:4000');
+    final socket = io.io('ws://${Constants.wsUri}');
 
     // Emit 'sendMessage' event to socket.io server
     socket.emit('sendMessage', {
@@ -152,9 +152,38 @@ class _ChatScreenState extends State<ChatScreen> {
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 final message = messages[index];
-                return ListTile(
-                  title: Text(message.content),
-                  subtitle: Text(message.timestamp.toString()),
+                bool isMe = message.senderId == currentUserId;
+                return Row(
+                  mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: isMe ? Colors.blue[100] : Colors.grey[200],
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10),
+                          bottomLeft: isMe ? Radius.circular(10) : Radius.circular(0),
+                          bottomRight: isMe ? Radius.circular(0) : Radius.circular(10),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            message.content,
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            message.timestamp.toString(),
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -163,16 +192,28 @@ class _ChatScreenState extends State<ChatScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
+                IconButton(
+                  icon: Icon(Icons.image, color: Colors.blue, size: 30),
+                  onPressed: () {
+                    // Handle image upload functionality
+                  },
+                ),
                 Expanded(
+                  flex: 2,
                   child: TextField(
                     controller: _messageController,
                     decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       labelText: 'Enter message',
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: Icon(Icons.send, color: Colors.blue, size: 30),
                   onPressed: () {
                     if (_messageController.text.isNotEmpty) {
                       _sendMessage(_messageController.text);
@@ -185,6 +226,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
+      backgroundColor: Colors.grey[100],
     );
   }
 }

@@ -48,4 +48,23 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
+router.get('/getChatSessions/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const userChats = await Message.find({
+      $or: [{ sender: userId }, { receiver: userId }],
+    })
+    
+    console.log(userChats);
+
+    if (userChats.length > 0) {
+      res.status(200).json(userChats);
+    } else {
+      res.status(404).json({ msg: 'Chat sessions not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching chat sessions:', error);
+    res.status(500).json({ msg: 'Internal server error' });
+  }
+});
 export default router;
