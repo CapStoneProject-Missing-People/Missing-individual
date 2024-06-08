@@ -119,7 +119,7 @@ export const matchFeatures = async (newFeatureData, timeSinceDisappearance, simi
       matchingStatus.aggregateSimilarity = parseFloat((aggregateSimilarity / fieldCount).toFixed(2));
 
       // Store matchingStatus in the new collection
-      if(matchingStatus.aggregateSimilar) {
+      if(matchingStatus.aggregateSimilarity > 70.0) {
         await MatchingStatus.create({
           user_id: newFeatureData.user_id,
           newCaseId: newFeatureData._id,
