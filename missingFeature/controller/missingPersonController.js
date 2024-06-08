@@ -91,8 +91,8 @@ export const CreateMissingPerson = async (req, res) => {
 
     // Handling feature creation
     const result = await createFeature(parsedData, timeSinceDisappearance, userID, res);
-    if (typeof(result) === "string") {
-      return res.status(404).json({ message: result });
+    if (typeof(result.message) === "string") {
+      return res.status(400).json({status: result.statusCode, message: result.message});
     }
     console.log('result')
     console.log(result);

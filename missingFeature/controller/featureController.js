@@ -4,9 +4,9 @@ import embeddings from "../models/embeddingsModel.js";
 import { pipeline } from "@xenova/transformers";
 import matchingStatus from "../models/matchingStatus.js"
 import mongoose from "mongoose";
-
+import { matchFeatures } from "../service/matchFeatures.js"
 import MergedFeaturesModel from "../models/mergedFeaturesSchema.js";
-import { features } from "process";
+
 
 export const getOwnFeatures = async (req, res) => {
   try {
@@ -210,7 +210,7 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
 
     const existingFeature = await Features.findOne({ inputHash: newFeatureData.inputHash });
     if (existingFeature) {
-      return { message: 'Duplicate feature already exists' }
+      return { message: 'Duplicate feature already exists', statusCode: 400 }
     }
 
     const feature = await Features.create(newFeatureData);
@@ -233,7 +233,7 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
     if (existingEmbeddingsCount < 1) {
       const caseId = feature._id;
       const pipelineModel = await generateEmbeddings();
-      const output = await pipelineModel(data.description, {
+      const output = await pipelineModel(newFeatureData.description, {
         pooling: "mean",
         normalize: true,
       });
@@ -243,6 +243,11 @@ export const createFeature = async (parsedData, timeSinceDisappearance, userID, 
     await embeddings.create({ caseId: feature._id, embedding: embeddingArray, similarity: {} });
     console.log("Initial embedding stored successfully");
     }else {
+         const pipelineModel = await generateEmbeddings();
+      const output = await pipelineModel(newFeatureData.description, {
+        pooling: "mean",
+        normalize: true,
+      });
       const existingEmbeddings = await embeddings.find();
       const embeddingData = output.data;
       const embeddingArray = [...embeddingData];
@@ -439,9 +444,10 @@ export const compareFeature = async (req, res) => {
           }
         }
 
+
         similarityScores.forEach((score) => {
           if (score.existingCaseId.equals(caseData._id)) {
-            const similarityScore = score.similarityScore * 100;
+            const similarityScore = parseFloat((score.similarityScore * 100).toFixed(2));
             matchingStatus.similarityScore = similarityScore;
             aggregateSimilarity += similarityScore;
             fieldCount++;
@@ -451,7 +457,7 @@ export const compareFeature = async (req, res) => {
           }
         });
 
-        matchingStatus.aggregateSimilarity = aggregateSimilarity / fieldCount;
+        matchingStatus.aggregateSimilarity = parseFloat((aggregateSimilarity / fieldCount).toFixed(2));
         console.log(aggregateSimilarity)
         console.log(fieldCount)
         console.log(highSimilarityFieldCount)

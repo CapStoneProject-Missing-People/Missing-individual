@@ -1,4 +1,5 @@
 import MatchingStatus from '../models/matchingStatus.js'; // Adjust the path as needed
+import initializeFeaturesModel from '../models/featureModel.js';
 
 export const matchFeatures = async (newFeatureData, timeSinceDisappearance, similarityScores) => {
   try {
@@ -20,7 +21,7 @@ export const matchFeatures = async (newFeatureData, timeSinceDisappearance, simi
         medicalInformation: newFeatureData.medicalInformation,
         circumstanceOfDisappearance: newFeatureData.circumstanceOfDisappearance
       };
-    } else if(timeSinceDisappearance <= 2) {
+    } else if (timeSinceDisappearance <= 2) {
       criteria = {
         age: newFeatureData.age,
         "name.firstName": newFeatureData.name.firstName,
@@ -57,11 +58,15 @@ export const matchFeatures = async (newFeatureData, timeSinceDisappearance, simi
       if (feature._id.equals(newFeatureData._id)) {
         continue;
       }
-      
+
       const matchingStatus = { id: feature._id };
+      let aggregateSimilarity = 0;
+      let fieldCount = 0;
+      let highSimilarityFieldCount = 0;
 
       for (const key in criteria) {
         const value = criteria[key];
+        fieldCount++;
 
         if (key === "age") {
           const featureAge = feature.age;
@@ -70,11 +75,10 @@ export const matchFeatures = async (newFeatureData, timeSinceDisappearance, simi
           } else {
             const newReqAgeRange = Object.keys(ageRanges).find(range => ageRanges[range].$gte <= value && ageRanges[range].$lte >= value);
             const featureAgeRange = Object.keys(ageRanges).find(range => ageRanges[range].$gte <= featureAge && ageRanges[range].$lte >= featureAge);
-
             matchingStatus.age = newReqAgeRange === featureAgeRange ? 85 : 0;
           }
         } else if (key.startsWith("name.")) {
-          const namePart = key.split(".")[1];
+          var namePart = key.split(".")[1];
           matchingStatus[namePart] = feature.name[namePart] === value ? 100 : 0;
         } else if (key.startsWith("clothing.")) {
           const [_, clothingType, clothKey] = key.split(".");
@@ -82,35 +86,51 @@ export const matchFeatures = async (newFeatureData, timeSinceDisappearance, simi
 
           if ((featureClothing === "blue" && value === "light blue") || (featureClothing === "light blue" && value === "blue") ||
               (featureClothing === "yellow" && value === "orange") || (featureClothing === "orange" && value === "yellow")) {
-              matchingStatus[`${clothingType}${clothKey.charAt(0).toUpperCase() + clothKey.slice(1)}`] = 85;
+            matchingStatus[`${clothingType}${clothKey.charAt(0).toUpperCase() + clothKey.slice(1)}`] = 85;
           } else {
-            matchingStatus[`${clothingType}${clothKey.charAt(0).toUpperCase() + clothKey.slice(1)}`] = featureClothing === value ? 100 : 0;          }
+            matchingStatus[`${clothingType}${clothKey.charAt(0).toUpperCase() + clothKey.slice(1)}`] = featureClothing === value ? 100 : 0;
+          }
         } else {
           matchingStatus[key] = feature[key] === value ? 100 : 0;
+        }
+
+        if (key.startsWith('name.')) {
+          aggregateSimilarity += matchingStatus[namePart];
+        } else {
+          aggregateSimilarity += matchingStatus[key];
+        }
+        
+        if ((key.startsWith('name.') && matchingStatus[namePart] >= 85) || matchingStatus[key] >= 85) {
+          highSimilarityFieldCount++;
         }
       }
 
       similarityScores.forEach((score) => {
-        if (score.existingCaseId.equals(newFeatureData._id)) {
-          matchingStatus.similarityScore = score.similarityScore;
+        if (score.existingCaseId.equals(feature._id)) {
+          const similarityScore = parseFloat((score.similarityScore).toFixed(2));
+          matchingStatus.similarityScore = similarityScore;
+          aggregateSimilarity += similarityScore;
+          fieldCount++;
+          if (similarityScore >= 85) {
+            highSimilarityFieldCount++;
+          }
         }
       });
+      matchingStatus.aggregateSimilarity = parseFloat((aggregateSimilarity / fieldCount).toFixed(2));
 
       // Store matchingStatus in the new collection
-      await MatchingStatus.create({
-        user_id: newFeatureData.user_id,
-        newCaseId: newFeatureData._id,
-        existingCaseId: feature._id,
-        matchingStatus,
-      });
-
-      console.log('maching status')
-      console.log(matchingStatus)
+      if(matchingStatus.aggregateSimilar) {
+        await MatchingStatus.create({
+          user_id: newFeatureData.user_id,
+          newCaseId: newFeatureData._id,
+          existingCaseId: feature._id,
+          matchingStatus,
+  });
+}
 
       response.push(matchingStatus);
     }
 
-    console.log('response: ', response)
     return response;
   } catch (error) {
     console.error("Error comparing features:", error);

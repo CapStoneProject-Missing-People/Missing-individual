@@ -20,7 +20,8 @@ const matchingStatusSchema = new mongoose.Schema({
     body_size: { type: Number, required: false },
     lastSeenLocation: { type: Number, required: false },
     medicalInformation: { type: Number, required: false },
-    circumstanceOfDisappearance: { type: Number, required: false }
+    circumstanceOfDisappearance: { type: Number, required: false },
+    aggregateSimilarity: { type: Number, required: false}
   },
 });
 
