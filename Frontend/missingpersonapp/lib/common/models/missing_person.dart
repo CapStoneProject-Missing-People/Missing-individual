@@ -76,6 +76,8 @@ class Name {
       lastName: json['lastName'] as String? ?? '',
     );
   }
+
+  toLowerCase() {}
 }
 
 class Clothing {

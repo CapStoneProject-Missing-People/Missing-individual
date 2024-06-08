@@ -159,7 +159,7 @@ Skin Color: ${missingPerson.skinColor}
                         ),
                       ),
                       Text(
-                        missingPerson.phoneNo,
+                        '123-456-7890', // Placeholder phone number
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: Colors.grey.shade800,
