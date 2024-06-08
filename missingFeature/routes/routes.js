@@ -43,3 +43,5 @@ routers.route('/guest-notifications').get(guestNotification)
 // Routes for Image
 routers.route('/get-images-with-names').get(requireAuth, isAdmin([3244, 5150]), fetchAllMissingPeopleWithNames);
 routers.route('/update-image/:missingId').put(upload.any(), requireAuth, isAdmin([3244, 5150]), updateImageBuffers);
+routers.route('/update-image').put(requireAuth, isAdmin([3244, 5150]), updateImageBuffers);
+

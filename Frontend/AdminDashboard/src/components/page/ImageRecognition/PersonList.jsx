@@ -32,7 +32,6 @@ const PersonList = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 

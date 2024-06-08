@@ -205,6 +205,7 @@ function Charts({ data }) {
         </div>
       </div>
     </div>
+  
   );
 }
 

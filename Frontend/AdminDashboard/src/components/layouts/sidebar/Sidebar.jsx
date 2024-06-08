@@ -17,9 +17,8 @@ import Logo from "./newlogo.png"
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const Sidebar = () => {
-  let isTabletMid = useMediaQuery({ query: "(max-width: 768px)" });
-  const { isOpen, toggleMenu } = useContext(MenuContext);
+
+const subsubMenuList = [
   const [open, setOpen] = useState(isTabletMid ? false : true);
   const sidebarRef = useRef();
   const { pathname } = useLocation();

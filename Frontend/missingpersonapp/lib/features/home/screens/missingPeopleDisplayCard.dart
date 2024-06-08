@@ -23,8 +23,11 @@ class MissingPeopleDisplay extends StatelessWidget {
   Future<void> _shareMissingPerson(BuildContext context) async {
     final String shareContent = '''
 Missing Person Details:
-First Name: ${missingPerson.name}
+First Name: ${missingPerson.name.firstName}
+Middle Name: ${missingPerson.name.middleName}
+Last Name: ${missingPerson.name.lastName}
 Age: ${missingPerson.age}
+Skin Color: ${missingPerson.skinColor}
     ''';
 
     List<XFile> files = [];

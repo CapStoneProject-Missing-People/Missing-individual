@@ -14,15 +14,25 @@ class AllMissingPeopleProvider extends ChangeNotifier {
   Future<void> fetchMissingPersons() async {
     _isLoading = true;
     _errorMessage = '';
-    notifyListeners();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
 
     try {
-      _missingPersons = await fetchMissingPeople();
+      print('before fetch');
+      final List<MissingPerson> fetchedData = await fetchMissingPeople();
+      print('Fetched data: $fetchedData');
+      _missingPersons = fetchedData;
     } catch (e) {
+      print('Error mapping data item: $e');
       _errorMessage = 'Failed to fetch missing persons';
     } finally {
       _isLoading = false;
-      notifyListeners();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
     }
   }
 }
