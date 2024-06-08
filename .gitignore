@@ -1,12 +1,1 @@
-missingFeature/node_modules/
-authentiation/node_modules/
-face-recognition/node_modules/
-.env
-.vscode
-missingFeature/.env
-missingFeature/uploads
-/Frontend/missingpersonapp/lib/features/authentication/utils/constants.dart
-
-
-
-
+build/ 
