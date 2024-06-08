@@ -41,7 +41,7 @@ const baseAttributes = {
   },
   skin_color: {
     type: String,
-    enum: ["fair", "black", "white", "tseyim"],
+    enum: ["fair", "black", "white", "tseyim", "light"],
     required: true,
   },
   clothing: Schema({
@@ -73,7 +73,7 @@ const baseAttributes = {
   }),
   body_size: {
     type: String,
-    enum: ["thin", "average", "muscular", "overweight", "obese", "fit", "athletic", "curvy", "petite", "fat"],
+    enum: ["thin", "average", "muscular", "overweight", "obese", "fit", "athletic", "curvy", "petite", "fat", "medium"],
   },
   description: {
     type: String,
