@@ -14,11 +14,17 @@ const PersonList = () => {
         const headers = {
           Authorization: `Bearer ${token}`,
         };
-        const response = await axios.get("http://localhost:4000/api/features/getAll", { headers });
-        const persons = response.data.map(person => ({
-          _id: person._id,
-          firstName: person.name.firstName,
+        const response = await axios.get("http://localhost:4000/api/get-images-with-names", { headers });
+
+        const persons = response.data.map(item => ({
+          _id: item.id,
+          firstName: item.name,
+          images: item.imageBuffers.map(buffer => ({
+            id: item.id,
+            url: URL.createObjectURL(new Blob([new Uint8Array(buffer.data)], { type: 'image/jpg' })),
+          })),
         }));
+
         setData(persons);
         setLoading(false);
       } catch (error) {
@@ -26,6 +32,7 @@ const PersonList = () => {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 

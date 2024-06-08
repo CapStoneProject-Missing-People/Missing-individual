@@ -1,0 +1,21 @@
+.scrollbar {
+    scrollbar-width: 8px;
+    /* scrollbar-color: #cbd5e0 #f7fafc; */
+  }
+  
+  .scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: #b9b8b8;
+    border-radius: 4px;
+  }
+  
+  .scrollbar::-webkit-scrollbar-track {
+    background: #f7fafc;
+  }
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  

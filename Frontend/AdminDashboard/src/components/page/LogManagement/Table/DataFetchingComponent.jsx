@@ -5,7 +5,8 @@ import Table1 from './Table1'; // Make sure the path is correct
 const DataFetchingComponent = () => {
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
-  
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -13,15 +14,20 @@ const DataFetchingComponent = () => {
         const headers = {
           Authorization: `Bearer ${token}`,
         };
-        const response = await axios.get("http://localhost:4000/api/admin/getAllUsers", { headers });
+        const response = await axios.get("http://localhost:4000/api/get-action-logs", { headers });
         setData(response.data);
+        setLoading(false);
       } catch (error) {
-        setError('You Do not have permission!');
+        setError('You do not have permission!');
+        setLoading(false);
       }
     };
     fetchData();
   }, []);
- if (error) return <div className='font-bold p-4'>{error}</div>;
+
+  if (loading) return <div className="font-bold p-4">Loading...</div>;
+  if (error) return <div className="font-bold p-4">{error}</div>;
+
   return (
     <div>
       <Table1 data={data} />

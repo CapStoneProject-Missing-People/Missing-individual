@@ -11,28 +11,11 @@ import { MenuContext } from "../../../context/MenuContext";
 import { MdOutlineFeedback, MdDashboard, MdOutlineManageAccounts } from "react-icons/md";
 import { FaArrowsDownToPeople } from "react-icons/fa6";
 import { SiMicrosoftonenote } from "react-icons/si";
-import { TbTextRecognition } from "react-icons/tb";
+import { TbTextRecognition, TbReportAnalytics } from "react-icons/tb";
 import { FaUser } from "react-icons/fa";
 import Logo from "./newlogo.png"
 import axios from 'axios';
 import Cookies from 'js-cookie';
-
-const subsubMenuList = [
-  {
-    name: "Storage",
-    icon: RiBuilding3Line,
-    menus: ["storage1", "storage2", "storage3", "storage4"],
-  },
-];
-
-const subMenusList = [
-  {
-    name: "Features",
-    icon: TbTextRecognition,
-    menus: ["Facial recognition", "Description match"],
-  },
- 
-];
 
 const Sidebar = () => {
   let isTabletMid = useMediaQuery({ query: "(max-width: 768px)" });
@@ -102,10 +85,6 @@ const Sidebar = () => {
         },
       };
       const [subMenuOpen, setSubMenuOpen] = useState(false);
-
-      const toggleSubMenu = () => {
-        setSubMenuOpen(!subMenuOpen);
-      };
     
   return (
     <div>
@@ -134,11 +113,13 @@ const Sidebar = () => {
           />
           </NavLink>
           
-          <NavLink to={"/dashboard"}>
-            <span className="text-xl text-gray-200 whitespace-pre">
+          {isOpen === true && (
+        <NavLink to="/dashboard">
+          <span className="text-xl text-gray-200 whitespace-pre">
             FindMe
           </span>
-          </NavLink>
+        </NavLink>
+      )}
           
         </div>
 
@@ -217,49 +198,21 @@ const Sidebar = () => {
                 Image Recognition
               </NavLink>
             </li>
-            
-
-            {/* {(isOpen || isTabletMid) && (
-              <div className="border-y py-5 border-slate-300 ">
-                
-                {subMenusList?.map((menu) => (
-                  <div
-                    key={menu.name}
-                    className="flex flex-col gap-1 text-gray-400 "
-                  >
-                    <Submenu data={menu} isOpen={subMenuOpen} toggleSubMenu={toggleSubMenu}/>
-                    
-                  </div>
-                ))}
-              </div>
-            )} */}
+            <li>
+              <NavLink to={"/reports"} className={({ isActive }) =>
+                  `link text-gray-200 hover:bg-sky-700 ${isActive ? "bg-sky-600" : ""}`
+                }>
+                <TbReportAnalytics
+                  size={23}
+                  className="min-w-max text-gray-200"
+                />
+                Reports
+              </NavLink>
+            </li>
             
           </ul>
           
         </div>
-        <motion.div
-          onClick={() => {
-            // setOpen(!open);
-            toggleMenu(!isOpen);
-          }}
-          animate={
-            open
-              ? {
-                  x: 0,
-                  y: 0,
-                  rotate: 0,
-                }
-              : {
-                  x: -10,
-                  y: -200,
-                  rotate: 180,
-                }
-          }
-          transition={{ duration: 0 }}
-          className="absolute text-gray-300 w-fit h-fit md:block z-50 hidden right-2 bottom-3 cursor-pointer"
-        >
-          <IoIosArrowBack size={25} />
-        </motion.div>
       </motion.div>
     
     </div>

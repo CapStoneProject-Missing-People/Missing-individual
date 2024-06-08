@@ -50,7 +50,7 @@ const Navbar = () => {
         >
           <MdMenu />
         </div>
-        <div className="hidden sm:block pl-2">
+        {/* <div className="hidden sm:block pl-2">
           <form action="https://formbold.com/s/unique_form_id" method="POST">
             <div className="relative">
               <button className="absolute left-0 top-1/2 -translate-y-1/2">
@@ -69,13 +69,13 @@ const Navbar = () => {
               />
             </div>
           </form>
-        </div>
+        </div> */}
       </div>
 
       {/* Right Side */}
       <div className="flex items-center gap-3 2xsm:gap-7">
         <ul className="flex items-center gap-3 2xsm:gap-4 mr-2">
-          <DropdownNotification />
+          {/* <DropdownNotification /> */}
           <DropdownFeedback />
         </ul>
         {loading ? (

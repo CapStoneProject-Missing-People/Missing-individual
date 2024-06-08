@@ -3,24 +3,27 @@ import CardDataStats from './CardDataStats';
 import Charts from './Charts';
 import Statistics from './Statistics';
 import axios from 'axios';
+import { SiMicrosoftonenote } from "react-icons/si";
+import { MdOutlineFeedback } from "react-icons/md";
+import { GrUserAdmin } from 'react-icons/gr';
+import { FaArrowsDownToPeople } from "react-icons/fa6";
 
 function MainDashboard() {
   const [stats, setStats] = useState({
     logManagement: 0,
     feedbackCollection: 0,
-    reportingTools: 0,
-    alerts: 0,
+    userManagement: 0,
+    missingPeople: 0,
   });
 
   const [chartData, setChartData] = useState({
-    loggedInUser: [],
-    registeredUsers: [],
-    userPosts: [],
+    loggedInUser: {},
+    registeredUsers: {},
+    userPosts: {},
   });
   const [logs, setLogs] = useState([]);
 
   useEffect(() => {
-    // Fetch logs data
     const fetchLogs = async () => {
       try {
         const response = await axios.get('http://localhost:4000/api/get-action-logs');
@@ -34,16 +37,15 @@ function MainDashboard() {
   }, []);
 
   useEffect(() => {
-    // Calculate the number of logs dynamically
     setStats((prevStats) => ({
       ...prevStats,
       logManagement: logs.length,
     }));
   }, [logs]);
+
   const [feedbackData, setFeedbackData] = useState([]);
 
   useEffect(() => {
-    // Fetch feedback data
     const fetchFeedback = async () => {
       try {
         const response = await axios.get('http://localhost:4000/api/getFeedBacks');
@@ -57,7 +59,6 @@ function MainDashboard() {
   }, []);
 
   useEffect(() => {
-    // Calculate the number of feedbacks dynamically
     setStats((prevStats) => ({
       ...prevStats,
       feedbackCollection: feedbackData.length,
@@ -65,7 +66,6 @@ function MainDashboard() {
   }, [feedbackData]);
 
   useEffect(() => {
-    // Fetch data for each category and calculate the number of rows
     const fetchData = async () => {
       try {
         const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
@@ -75,58 +75,36 @@ function MainDashboard() {
 
         const [userManagementResponse, featuresResponse, logInDataResponse] = await Promise.all([
           axios.get("http://localhost:4000/api/admin/getAllUsers", { headers }),
-          axios.get("http://localhost:4000/api/features/getAll", { headers }),
+          axios.get("http://localhost:4000/api/admin/getAllPost", { headers }),
           axios.get("http://localhost:4000/api/admin/getLogInData", { headers }),
         ]);
 
-        setStats({
+        setStats((prevStats) => ({
+          ...prevStats,
           userManagement: userManagementResponse.data.length,
-          alerts: 10, // Example static data, replace with real response if needed
-        });
-
-        const registeredUsersData = userManagementResponse.data.map(user => ({
-          createdAt: user.createdAt,
-          registeredDate: new Date(user.createdAt).toLocaleDateString(), // Extract registration date
-          registeredTime: new Date(user.createdAt).toLocaleTimeString(), // Extract registration time
+          missingPeople: featuresResponse.data.length,
         }));
 
-        // Aggregate the number of users per month based on the registration date
-        const monthlyRegisteredUsers = Array(12).fill(0); // Initialize an array with 12 zeros for each month
-        registeredUsersData.forEach(user => {
-          const registeredMonth = new Date(user.createdAt).getMonth(); // Extract month (0 = January, 11 = December)
-          monthlyRegisteredUsers[registeredMonth] += 1;
-        });
+        const aggregateData = (data, dateKey) => {
+          return data.reduce((acc, item) => {
+            const date = new Date(item[dateKey]);
+            const yearMonth = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            if (!acc[yearMonth]) {
+              acc[yearMonth] = 0;
+            }
+            acc[yearMonth] += 1;
+            return acc;
+          }, {});
+        };
 
-        const userPostsData = featuresResponse.data.map(post => ({
-          createdAt: post.createdAt,
-          postDate: new Date(post.createdAt).toLocaleDateString(), // Extract post date
-          postTime: new Date(post.createdAt).toLocaleTimeString(), // Extract post time
-        }));
-
-        // Aggregate the number of posts per month based on the post date
-        const monthlyUserPosts = Array(12).fill(0); // Initialize an array with 12 zeros for each month
-        userPostsData.forEach(post => {
-          const postMonth = new Date(post.createdAt).getMonth(); // Extract month (0 = January, 11 = December)
-          monthlyUserPosts[postMonth] += 1;
-        });
-
-        const loggedInUserData = logInDataResponse.data.map(log => ({
-          timestamp: log.timestamp,
-          logInDate: new Date(log.timestamp).toLocaleDateString(), // Extract login date
-          logInTime: new Date(log.timestamp).toLocaleTimeString(), // Extract login time
-        }));
-
-        // Aggregate the number of logins per month based on the login date
-        const monthlyLoggedInUsers = Array(12).fill(0); // Initialize an array with 12 zeros for each month
-        loggedInUserData.forEach(log => {
-          const logMonth = new Date(log.timestamp).getMonth(); // Extract month (0 = January, 11 = December)
-          monthlyLoggedInUsers[logMonth] += 1;
-        });
+        const registeredUsersData = aggregateData(userManagementResponse.data, 'createdAt');
+        const userPostsData = aggregateData(featuresResponse.data, 'createdAt');
+        const loggedInUserData = aggregateData(logInDataResponse.data, 'timestamp');
 
         setChartData({
-          registeredUsers: monthlyRegisteredUsers,
-          userPosts: monthlyUserPosts,
-          loggedInUser: monthlyLoggedInUsers,
+          registeredUsers: registeredUsersData,
+          userPosts: userPostsData,
+          loggedInUser: loggedInUserData,
         });
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -137,7 +115,7 @@ function MainDashboard() {
   }, []);
 
   return (
-<main className="h-96">
+    <main className="h-96">
       <div className="font-semibold mb-4">
         <h3>DASHBOARD</h3>
       </div>
@@ -146,41 +124,54 @@ function MainDashboard() {
           title="Log management"
           count={stats.logManagement}
           address="/log-management"
+          icon={SiMicrosoftonenote}
+          color="bg-indigo-400"
         />
         <CardDataStats
           title="Feedback Collection"
           count={stats.feedbackCollection}
           address="/feedbacks"
+          icon={MdOutlineFeedback}
+          color="bg-red-600"
         />
         <CardDataStats
           title="User Management"
           count={stats.userManagement}
           address="/user-management"
+          icon={GrUserAdmin}
+          color="bg-emerald-600"
         />
-        <CardDataStats title="Alerts" count={stats.alerts} address="/alerts" />
+        <CardDataStats 
+          title="Missing People" 
+          count={stats.missingPeople} 
+          address="/missing-people"
+          icon={FaArrowsDownToPeople} 
+          color="bg-orange-600"
+        />
       </div>
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:gap-7.5">
+      <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:gap-7.5">
         <div className="col-span-1">
-          <Charts data={chartData} className="col-span-1" />
+          <Charts data={chartData} className="chart-container col-span-1" />
         </div>
         <div className="col-span-1">
-          <div className="max-w-full mx-auto px-5 pt-7.5 pb-5 mt-3 mb-4 h-max ">
-            <Statistics chartType="gender" />
-          </div>
-        </div>
-        <div className="col-span-1">
-          <div className="max-w-full mx-auto pt-7.5 pb-5 mt-3 mb-5 h-max ">
-            <Statistics chartType="status" />
-          </div>
-        </div>
-        <div className="col-span-1">
-          <div className="max-w-full mx-auto px-5 pt-7.5 pb-5 mt-3 mb-5 h-max ">
+          <div className="chart-container col-span-1 rounded-2xl shadow-md border border-stroke bg-white px-5 py-5 pt-7.5 pb-4.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-1 mt-3">
             <Statistics chartType="age" />
           </div>
         </div>
+        <div className="col-span-1 ">
+          <div className="chart-container col-span-1 rounded-2xl shadow-md border border-stroke bg-white px-5 py-5 pt-7.5 pb-4.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-1 mt-3">
+            <Statistics chartType="gender" />
+          </div>
+        </div>
+        <div className="col-span-1 mb-12">
+          <div className="chart-container col-span-1 rounded-2xl shadow-md border border-stroke bg-white px-5 py-5 pt-7.5 pb-4.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-1 mt-3">
+            <Statistics chartType="status" />
+          </div>
+        </div>
       </div>
+      
     </main>
   );
-};
+}
 
 export default MainDashboard;

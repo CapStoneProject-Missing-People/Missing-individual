@@ -11,6 +11,7 @@ import MainFeedback from './components/page/Feedback/MainFeedback';
 import MainLogManagement from './components/page/LogManagement/MainLogManagement';
 import MainImageRecognition from './components/page/ImageRecognition/MainImageRecognition';
 import Login from './components/page/Login';
+import MainReportPage from './components/page/ReportPage/MainReportPage';
 import PrivateRoute from './components/PrivateRoute';
 
 const App = () => {
@@ -96,6 +97,16 @@ const App = () => {
             <PrivateRoute>
               <MainLayout>
                 <MainImageRecognition />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainReportPage />
               </MainLayout>
             </PrivateRoute>
           }

@@ -1,11 +1,14 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IoEyeOutline, IoEyeOffOutline } from 'react-icons/io5';
 
 const Login = ({ setUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false); // State for password visibility
   const [errors, setErrors] = useState({ email: '', password: '' });
+  const [loginError, setLoginError] = useState(''); // State for generic login error
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -13,6 +16,7 @@ const Login = ({ setUser }) => {
 
     // Reset errors
     setErrors({ email: '', password: '' });
+    setLoginError(''); // Reset generic login error
 
     try {
       const res = await axios.post('http://localhost:4000/api/users/adminLogin', {
@@ -25,7 +29,6 @@ const Login = ({ setUser }) => {
       });
 
       const data = res.data;
-      console.log('Response data:', data);
 
       if (data.errors) {
         setErrors(data.errors);
@@ -38,6 +41,7 @@ const Login = ({ setUser }) => {
       }
     } catch (err) {
       console.error('Error during login:', err);
+      setLoginError('wrong email or password. Please try again.'); // Set generic login error
     }
   };
 
@@ -48,6 +52,9 @@ const Login = ({ setUser }) => {
         onSubmit={handleSubmit}
       >
         <h2 className="text-2xl font-bold mb-6">Log in</h2>
+        {loginError && (
+          <div className="text-red-500 text-sm mb-4">{loginError}</div>
+        )}
         <div className="mb-4">
           <label htmlFor="email" className="block text-gray-700 mb-2">
             Email
@@ -65,12 +72,12 @@ const Login = ({ setUser }) => {
             <div className="text-red-500 text-sm">{errors.email}</div>
           )}
         </div>
-        <div className="mb-6">
+        <div className="mb-6 relative">
           <label htmlFor="password" className="block text-gray-700 mb-2">
             Password
           </label>
           <input
-            type="password"
+            type={passwordVisible ? 'text' : 'password'} // Toggle input type
             name="password"
             id="password"
             value={password}
@@ -78,6 +85,12 @@ const Login = ({ setUser }) => {
             required
             className="w-full px-3 py-2 border border-gray-300 rounded"
           />
+          <div
+            className="absolute inset-y-0 right-0 pr-3 mt-8 flex items-center text-gray-500 cursor-pointer"
+            onClick={() => setPasswordVisible(!passwordVisible)} // Toggle visibility
+          >
+            {passwordVisible ? < IoEyeOutline size={24} /> : < IoEyeOffOutline size={24} />}
+          </div>
           {errors.password && (
             <div className="text-red-500 text-sm">{errors.password}</div>
           )}
