@@ -12,9 +12,7 @@ class ProfileDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Placeholder for the logged-in user's first name
     final user = Provider.of<UserProvider>(context).user;
-
     String loggedInUserName = user.name;
 
     return Drawer(
@@ -52,9 +50,12 @@ class ProfileDrawer extends StatelessWidget {
                   const SizedBox(
                       width:
                           16), // Add some spacing between the avatar and the name
-                  Text(
-                    loggedInUserName, // Display the logged-in user's name
-                    style: const TextStyle(fontSize: 20, color: Colors.black),
+                  Expanded(
+                    child: Text(
+                      loggedInUserName, // Display the logged-in user's name
+                      style: const TextStyle(fontSize: 20, color: Colors.black),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
@@ -69,15 +70,6 @@ class ProfileDrawer extends StatelessWidget {
                   '/manageProfile'); // Navigate to the manage profile page
             },
           ),
-          // CustomListTile(
-          //   icon: Icons.article_outlined,
-          //   title: 'My Posts',
-          //   onTap: () {
-          //     Navigator.pop(context); // Close the drawer
-          //     Navigator.pushNamed(context,
-          //         '/missingPost'); // Navigate to the manage profile page
-          //   },
-          // ),
           CustomListTile(
             icon: Icons.group,
             title: 'Matched People',
@@ -96,7 +88,6 @@ class ProfileDrawer extends StatelessWidget {
                   '/missingPersonPosted'); // Navigate to the manage profile page
             },
           ),
-          
           CustomListTile(
             icon: Icons.feedback_outlined,
             title: 'FeedBack',
@@ -104,6 +95,15 @@ class ProfileDrawer extends StatelessWidget {
               Navigator.pop(context); // Close the drawer
               Navigator.pushNamed(
                   context, '/feedBack'); // Navigate to the manage profile page
+            },
+          ),
+          CustomListTile(
+            icon: Icons.message,
+            title: 'Messages',
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.pushNamed(context,
+                  '/chatList'); // Navigate to the chat list screen
             },
           ),
           const Spacer(), // Push the sign-out tile to the bottom
@@ -148,11 +148,10 @@ class CustomListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16), // Add padding to the ListTile
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       leading: Icon(icon, size: 24, color: Colors.blue),
       title: Text(title,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
       onTap: onTap,
     );
   }

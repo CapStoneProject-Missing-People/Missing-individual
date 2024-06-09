@@ -15,18 +15,18 @@ const DataFetchingComponent = () => {
         const headers = {
           Authorization: `Bearer ${token}`,
         };
-        const response = await axios.get("http://localhost:4000/api/admin/getAllPost", { headers });
+        const response = await axios.get("http://localhost:4000/api/features/getAll", { headers });
         setData(response.data);
         setLoading(false);
       } catch (error) {
-        setError('You Do not have permission!');
+        setError('Error fetching data');
         setLoading(false);
       }
     };
     fetchData();
   }, []);
   if (loading) return <div>Loading...</div>;
- if (error) return <div className='font-bold p-4'>{error}</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div>

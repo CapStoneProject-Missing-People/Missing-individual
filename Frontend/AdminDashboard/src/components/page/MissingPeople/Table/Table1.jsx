@@ -4,6 +4,7 @@ import {
   useSortBy,
   useGlobalFilter,
   usePagination,
+  useAsyncDebounce,
 } from 'react-table';
 import GlobalSearchFilter1 from './GlobalSearchFilter1';
 import SelectMenu1 from './SelectMenu1';
@@ -12,6 +13,23 @@ import TableComponent from './TableComponent';
 import Modals from './Modal';
 import axios from 'axios';
 
+const globalFilterFunction = (rows, columns, filterValue) => {
+  if (!filterValue) return rows;
+
+  const lowercasedFilter = filterValue.toLowerCase();
+
+  return rows.filter(row => {
+    return columns.some(column => {
+      const value = row.values[column.accessor];
+      if (typeof value === 'object' && value !== null) {
+        return Object.values(value).some(nestedValue =>
+          String(nestedValue).toLowerCase().includes(lowercasedFilter)
+        );
+      }
+      return String(value).toLowerCase().includes(lowercasedFilter);
+    });
+  });
+};
 const Table = ({ data }) => {
   const [tableData, setTableData] = useState(data);
   const [showModal, setShowModal] = useState(false);
@@ -26,9 +44,12 @@ const Table = ({ data }) => {
       },
       {
         Header: 'Name',
-        accessor: row => `${row.name.firstName} ${row.name.middleName} ${row.name.lastName}`,
-        id: 'name', // Provide a unique ID for the accessor
+        accessor: 'name',
         width: '320px',
+        Cell: ({ row }) => {
+          const { firstName, middleName, lastName } = row.original.name;
+          return `${firstName} ${middleName} ${lastName}`;
+        },
       },
       {
         Header: 'Gender',
@@ -47,7 +68,12 @@ const Table = ({ data }) => {
         width: '300px',
         disableSortBy: true,
       },
-      
+      {
+        Header: 'Body Size',
+        accessor: 'body_size',
+        width: '200px',
+        disableSortBy: true,
+      },
       {
         Header: 'Status',
         accessor: 'missing_case_id.status',
@@ -83,11 +109,10 @@ const Table = ({ data }) => {
     []
   );
 
-  useEffect(() => {
+  useEffect(()=> {
     // Update the table data whenever the `data` prop changes
     setTableData(data);
-  }, [data]);
-
+  },[data]);
   const {
     getTableProps,
     getTableBodyProps,
@@ -108,6 +133,7 @@ const Table = ({ data }) => {
       columns,
       data: tableData,
       initialState: { pageSize: 5 },
+     
     },
     useGlobalFilter,
     useSortBy,
@@ -122,6 +148,7 @@ const Table = ({ data }) => {
   };
 
   const confirmDelete = async () => {
+    console.log("hiiiiii")
     setShowModal(false);
     try {
       const token = document.cookie.split('; ').find(row => row.startsWith('jwt=')).split('=')[1];
@@ -132,7 +159,7 @@ const Table = ({ data }) => {
       // Send a DELETE request to the backend endpoint
       await axios.delete(`http://localhost:4000/api/admin/deletePost/${currentId}`, { headers });
       // If the request is successful, update the state to remove the deleted row
-      setTableData((prevData) => prevData.filter((row) => row._id !== currentId));
+      setTableData(prevData => prevData.filter(row => row._id !== currentId));
     } catch (error) {
       console.error("Error deleting row:", error);
     }
@@ -140,10 +167,10 @@ const Table = ({ data }) => {
 
   return (
     <div className="w-full flex flex-col items-center gap-4">
-      <div className="w-full flex flex-col sm:flex-row justify-between gap-2">
+      <div className="w-full  flex flex-col sm:flex-row justify-between gap-2">
         <GlobalSearchFilter1
           className="sm:w-64"
-          globalFilter={globalFilter}
+          globalFilter={state.globalFilter}
           setGlobalFilter={setGlobalFilter}
         />
         <SelectMenu1
@@ -173,11 +200,11 @@ const Table = ({ data }) => {
           pageIndex={pageIndex}
         />
       </div>
-      <Modals
+       <Modals 
         show={showModal}
         onClose={() => setShowModal(false)}
         onConfirm={confirmDelete}
-      />
+      /> 
     </div>
   );
 };

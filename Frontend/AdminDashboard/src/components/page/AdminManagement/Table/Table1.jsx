@@ -81,21 +81,21 @@ const Table = ({ data }) => {
         ),
         disableSortBy: true,
       },
-      // {
-      //   Header: "Update",
-      //   accessor: "update",
-      //   Cell: ({ row }) => (
-      //     <button 
-      //       onClick={() => handlePermissionToggle(row.original, 'update')}
-      //       className={`px-4 py-2 rounded-full ${
-      //         row.original.permissions.includes('update') ? "bg-yellow-600" : "bg-gray-400"
-      //       } text-white`}
-      //     >
-      //       Update
-      //     </button>
-      //   ),
-      //   disableSortBy: true,
-      // },
+      {
+        Header: "Update",
+        accessor: "update",
+        Cell: ({ row }) => (
+          <button 
+            onClick={() => handlePermissionToggle(row.original, 'update')}
+            className={`px-4 py-2 rounded-full ${
+              row.original.permissions.includes('update') ? "bg-yellow-600" : "bg-gray-400"
+            } text-white`}
+          >
+            Update
+          </button>
+        ),
+        disableSortBy: true,
+      },
       {
         Header: "Remove",
         accessor: "remove",

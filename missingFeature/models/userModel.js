@@ -105,7 +105,7 @@ userSchema.statics.adminlogin = async function (email, password) {
   }
   throw new Error("incorrect email");
 };
-const User = model("user", userSchema);
+const User = model("User", userSchema);
 
 //export default User;
 

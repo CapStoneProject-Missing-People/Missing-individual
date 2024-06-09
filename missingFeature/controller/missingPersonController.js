@@ -29,7 +29,14 @@ export const CreateMissingPerson = async (req, res) => {
         body_size,
         ...base
       } = req.body;
-      baseReq = base;
+      baseReq = {
+        ...base,
+        clothingUpperClothType,
+        clothingUpperClothColor,
+        clothingLowerClothType,
+        clothingLowerClothColor,
+        body_size,
+      };
     }
 
     const parsedData = {};
@@ -78,15 +85,17 @@ export const CreateMissingPerson = async (req, res) => {
       }
     }
     parsedData.clothing = clothing;
+    console.log('Parsed Data: ', parsedData); // Debugging line
 
     let userID = req.user.userId;
-    let userIDString = userID.toString();
 
     // Handling feature creation
     const result = await createFeature(parsedData, timeSinceDisappearance, userID, res);
-    if (typeof(result) === "string") {
-      return res.status(400).json({message: result});
+    if (typeof(result.message) === "string") {
+      return res.status(400).json({status: result.statusCode, message: result.message});
     }
+    console.log('result')
+    console.log(result);
 
     const images = req.files;
     const imageBuffers = images.map((image) => image.buffer);
@@ -107,12 +116,14 @@ export const CreateMissingPerson = async (req, res) => {
       // change the faceFeatureCreated to true
       newMissingPerson.faceFeatureCreated = true;
     }
+  
     await newMissingPerson.save();
+    console.log(newMissingPerson._id);
     result.createdFeature.missing_case_id = newMissingPerson._id;
     result.mergedFeature.missing_case_id = newMissingPerson._id;
+
     await result.createdFeature.save();
     await result.mergedFeature.save();
-
     // Send push notification to all users and guests
     await sendNotificationToAllUsersAndGuests(
       "New Missing Person",
@@ -126,7 +137,7 @@ export const CreateMissingPerson = async (req, res) => {
   } catch (error) {
     // Handle unexpected errors
     console.error('Error occurred:', error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ message: 'Feature cannot be created, Please try again!' });
   }
 };
 
