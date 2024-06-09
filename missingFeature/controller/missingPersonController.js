@@ -2,6 +2,7 @@ import MissingPerson from "../models/missingPersonSchema.js";
 import axios from "axios";
 import { createFeature } from "./featureController.js";
 import { sendNotificationToAllUsersAndGuests } from "./push-notification.controller.js";
+import MergedFeaturesModel from "../models/mergedFeaturesSchema.js";
 
 export const CreateMissingPerson = async (req, res) => {
   try {
@@ -80,6 +81,7 @@ export const CreateMissingPerson = async (req, res) => {
     parsedData.clothing = clothing;
 
     let userID = req.user.userId;
+
     let userIDString = userID.toString();
 
     // Handling feature creation
@@ -135,10 +137,10 @@ export const GetMissingPerson = async (req, res) => {
     const userId = req.user.userId;
     const missingPeople = await MissingPerson.find({ userID: userId });
 
-    const missingPersonIds = missingPeople.map(person => person._id.toString());
+    const caseIds = missingPeople.map(person => person._id.toString());
 
     const matchesResponse = await axios.post('http://localhost:6000/get-face-matches', {
-      personIds: missingPersonIds,
+      personIds: caseIds,
     });
 
     if (matchesResponse.status !== 200) {
@@ -163,5 +165,103 @@ export const GetMissingPerson = async (req, res) => {
   } catch (error) {
     console.error('Error getting missing person:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+export const GetMergedId = async (req, res) => {
+  console.log('inside')
+  try {
+    const { caseId } = req.params;
+    console.log(caseId);
+    
+    // Search for the MergedFeature using the caseId
+    const mergedFeature = await MergedFeaturesModel.findOne({ missing_case_id: caseId });
+    
+    if (!mergedFeature) {
+      return res.status(404).json({ message: "MergedFeature not found" });
+    }
+    
+    // Get the id of the mergedFeature
+    const mergedFeatureId = mergedFeature._id;
+    
+    // get missing person
+    const response =  await MergedFeaturesModel.findById(mergedFeatureId).lean().populate({
+      path: 'missing_case_id',
+      select: ['status', 'imageBuffers', 'dateReported']
+    });
+    console.log(response)
+    // Use the response in the API response
+    return res.status(200).json({ response });
+  } catch (error) {
+    console.error('Error getting merged feature:', error.message);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const UpdateMissingStatusToFound = async (req, res) => {
+  try {
+    const { caseId } = req.params;
+
+    // Find the missing person record by caseId
+    const missingPerson = await MissingPerson.findById(caseId);
+
+    if (!missingPerson) {
+      return res.status(404).json({ message: "Missing person not found" });
+    }
+
+    // Update the missing status to "found"
+    missingPerson.status = "found";
+    await missingPerson.save();
+
+    return res.status(200).json({ message: "Missing status updated to found" });
+  } catch (error) {
+    console.error('Error updating missing status:', error.message);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const UpdateMissingStatusToMissing = async (req, res) => {
+  try {
+    const { caseId } = req.params;
+
+    // Find the missing person record by caseId
+    const missingPerson = await MissingPerson.findById(caseId);
+
+    if (!missingPerson) {
+      return res.status(404).json({ message: "Missing person not found" });
+    }
+
+    // Update the missing status to "missing"
+    missingPerson.status = "missing";
+    await missingPerson.save();
+
+    return res.status(200).json({ message: "Missing status updated to missing" });
+  } catch (error) {
+    console.error('Error updating missing status to missing:', error.message);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const UpdateMissingStatusToPending = async (req, res) => {
+  try {
+    const { caseId } = req.params;
+    console.log(caseId)
+
+    // Find the missing person record by caseId
+    const missingPerson = await MissingPerson.findById(caseId);
+
+    if (!missingPerson) {
+      return res.status(404).json({ message: "Missing person not found" });
+    }
+
+    // Update the missing status to "pending"
+    missingPerson.status = "pending";
+    await missingPerson.save();
+
+    return res.status(200).json({ message: "Missing status updated to pending" });
+  } catch (error) {
+    console.error('Error updating missing status to pending:', error.message);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 };

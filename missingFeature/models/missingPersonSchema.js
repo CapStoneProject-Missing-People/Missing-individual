@@ -5,11 +5,11 @@ const { Schema, model, models } = mongoose;
 const missingPerson = new Schema({
   userID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
+    ref: "User",
   },
   dateReported: { type: Date, default: Date.now },
   status: { type: String, enum: ["missing", "pending", "found"], default: "missing" },
-  imageBuffers: [{ type: Buffer }], 
+  imageBuffers: [{ type: Buffer }],
   faceFeatureCreated: { type: Boolean, default: false },
 });
 
