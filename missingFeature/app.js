@@ -9,6 +9,7 @@ import { routers } from "./routes/routes.js";
 import { feedBackRouter } from "./routes/feedBackRouter.js";
 import { adminRouters } from "./routes/adminRouter.js";
 import cors from "cors";
+import Notification from "./models/NotificationModel.js";
 // import cookieParser from "cookie-parser"
 // import { requireAuth, checkUser } from "./middleware/authMiddleware"
 
@@ -18,7 +19,17 @@ dotenv.config();
 const port = process.env.PORT || 4000;
 const app = express();
 
-connectionDb();
+connectionDb().then(() => {
+  console.log("Data base connection established");
+
+  // periodically delete old notifications
+  setInterval(async () => {
+    console.log("checking for old notifications to delete");
+    await Notification.deleteOldNotifications();
+}, 86400);
+}).catch((err) => {
+  console.log("Error connecting to database", err);
+});
 
 app.use(express.json());
 
