@@ -3,9 +3,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:missingpersonapp/common/services/fcm-service.dart';
 import 'package:missingpersonapp/features/Notifications/provider/missingcase-provider.dart';
+import 'package:missingpersonapp/features/Notifications/provider/notification_provider.dart';
 import 'package:missingpersonapp/features/Notifications/screens/display_notification.dart';
 import 'package:missingpersonapp/features/PostAdd/screens/addpost.dart';
 import 'package:missingpersonapp/features/Profile/screens/profile_page.dart';
+import 'package:missingpersonapp/features/Settings/settings.dart';
 import 'package:missingpersonapp/features/authentication/provider/missing_person_provider.dart';
 import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';
 import 'package:missingpersonapp/features/authentication/screens/login_page.dart';
@@ -13,9 +15,11 @@ import 'package:missingpersonapp/features/authentication/screens/missing_person_
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/feedback/screens/feedback.dart';
 import 'package:missingpersonapp/features/home/provider/allMissingperson.dart';
+import 'package:missingpersonapp/features/home/provider/matchcase.dart';
 import 'package:missingpersonapp/features/home/screens/home_page.dart';
+import 'package:missingpersonapp/features/matchedCase/provider/desc_match_provider.dart';
 import 'package:missingpersonapp/features/matchedCase/provider/matched_case_provider.dart';
-import 'package:missingpersonapp/features/matchedCase/screens/matched_case.dart';
+import 'package:missingpersonapp/features/matchedCase/screens/imageMatch/matched_case.dart';
 import 'package:missingpersonapp/firebase_options.dart';
 import 'package:provider/provider.dart';
 
@@ -42,6 +46,9 @@ void main() async {
       ChangeNotifierProvider(create: (_) => AllMissingPeopleProvider()),
       ChangeNotifierProvider(create: (_) => CaseProvider()),
       ChangeNotifierProvider(create: (_) => MatchedCaseProvider()),
+      ChangeNotifierProvider(create: (_) => CaseMatchedProvider()),
+      ChangeNotifierProvider(create: (_) => DescriptionMatchProvider()),
+      ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ChangeNotifierProxyProvider<UserProvider, MissingPersonProvider>(
         create: (context) {
           final user = Provider.of<UserProvider>(context, listen: false).user;
@@ -72,6 +79,9 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     authService.getUserData(context);
     fcmService.initialize(context);
+
+    // Load user preferences
+    Provider.of<UserProvider>(context, listen: false).loadUserPreferences();
   }
 
   @override
@@ -97,6 +107,7 @@ class _MyAppState extends State<MyApp> {
         '/matchedPeople': (context) => const MatchedCases(),
         '/notification': (context) => const NotificationPage(),
         '/missingPersonPosted': (context) => MissingPersonPage(),
+        '/settings': (context) => const SettingsPage(), // Add route for settings
       },
     );
   }

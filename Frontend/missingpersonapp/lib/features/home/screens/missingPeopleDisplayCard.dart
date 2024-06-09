@@ -5,6 +5,7 @@ import 'package:missingpersonapp/common/models/missing_person.dart';
 import 'package:missingpersonapp/common/screens/missing_person_detail1.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MissingPeopleDisplay extends StatelessWidget {
   final MissingPerson missingPerson;
@@ -52,8 +53,9 @@ Age: ${missingPerson.age}
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  MissingPersonDetails(missingPerson: missingPerson, header: "Missing Person Details"),
+              builder: (context) => MissingPersonDetails(
+                  missingPerson: missingPerson,
+                  header: "Missing Person Details"),
             ),
           );
         },
@@ -84,19 +86,13 @@ Age: ${missingPerson.age}
                 children: [
                   Row(
                     children: [
-                      const Text(
-                        'Name:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.grey,
-                        ),
-                      ),
                       RichText(
                         text: TextSpan(
                           children: highlightedName,
                           style: const TextStyle(
                             color: Colors.black,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -148,18 +144,31 @@ Age: ${missingPerson.age}
                   const SizedBox(height: 5),
                   Row(
                     children: [
-                      const Text(
-                        'Phone:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      Text(
-                        missingPerson.phoneNo,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.grey.shade800,
+                      GestureDetector(
+                        onTap: () async {
+                          final url = 'tel:${missingPerson.phoneNo}';
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.phone,
+                              color: Colors.green, // Change color as desired
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              missingPerson.phoneNo,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.grey.shade800,
+                                decorationThickness: 3,
+                              ),
+                            ), 
+                          ],
                         ),
                       ),
                     ],

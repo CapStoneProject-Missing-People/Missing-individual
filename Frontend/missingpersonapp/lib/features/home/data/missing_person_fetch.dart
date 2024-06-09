@@ -29,28 +29,37 @@ Future<List<MissingPerson>> fetchMissingPeople() async {
           // Check if missing_case_id is not null
           if (data['missing_case_id'] != null) {
             // Decode each base64 image string to Uint8List
-            final List<Uint8List> imageBuffers = 
+            final List<Uint8List> imageBuffers =
                 (data['missing_case_id']['imageBuffers'] as List<dynamic>)
                     .map((imageUrl) => base64Decode(imageUrl))
                     .toList();
-
             return MissingPerson(
+              missing_id: data['missing_case_id']['_id'],
               name: data['name']['firstName'],
+              body_size: data['body_size'],
               age: data['age'],
+              gender: data['gender'],
               skin_color: data['skin_color'],
               photos: imageBuffers,
-              phoneNo: '123-456-7890', // Temporary placeholder
+              phoneNo: data['phone_no'], // Temporary placeholder
               description: data['description'],
+              status: data['missing_case_id']['status'],
+              date_reported: data['missing_case_id']['dateReported'],
             );
           } else {
             print("missing_case_id is null for ${data['name']['firstName']}");
             return MissingPerson(
+              missing_id: data['missing_case_id']['_id'],
               name: data['name']['firstName'],
               age: data['age'],
+              gender: data['gender'],
               skin_color: data['skin_color'],
               photos: [],
-              phoneNo: '123-456-7890', // Temporary placeholder
+              body_size: data['body_size'],
+              phoneNo: data['phone_no'], // Temporary placeholder
               description: data['description'],
+              status: data['missing_case_id']['status'],
+              date_reported: data['missing_case_id']['dateReported'],
             );
           }
         } catch (e) {
@@ -63,7 +72,8 @@ Future<List<MissingPerson>> fetchMissingPeople() async {
       return missingPeople;
     } else {
       // If the request fails, throw an exception or handle the error accordingly
-      print('Failed to fetch missing people. Status code: ${response.statusCode}');
+      print(
+          'Failed to fetch missing people. Status code: ${response.statusCode}');
       throw Exception('Failed to fetch missing people');
     }
   } catch (e) {

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -37,6 +38,7 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
 
   List<File> _images = [];
   bool _showClothDetails = true;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -68,6 +70,10 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
 
   Future<void> _validateAndSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isSubmitting = true;
+      });
+
       final missingPerson = MissingPersonAddingModel(
         firstName: _firstNameController.text,
         middleName: _middleNameController.text,
@@ -89,35 +95,16 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
       );
 
       final success = await postData(missingPerson);
-      if (success) {
-        Fluttertoast.showToast(
-          msg: "Data submitted successfully",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      } else {
-        Fluttertoast.showToast(
-          msg: "Failed to submit data",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0,
-        );
-      }
+      setState(() {
+        _isSubmitting = false;
+      });
     }
   }
 
   Future<bool> postData(MissingPersonAddingModel missingPerson) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('authorization');
-    final url = Uri.parse(
-        '${Constants.postUri}/api/createMissingPerson/${missingPerson.lastTimeSeen}');
+    final url = Uri.parse('${Constants.postUri}/api/createMissingPerson/${missingPerson.lastTimeSeen}');
 
     try {
       var request = http.MultipartRequest('POST', url);
@@ -146,15 +133,45 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
         ));
       }
 
-      print("PRINT THE REQUEST : ${request.files}");
       var response = await request.send();
-      if (response.statusCode == 200) {
+      final decodedResponse = await response.stream.bytesToString();
+      final parsedResponse = jsonDecode(decodedResponse);
+
+      if (response.statusCode == 201) {
+        final message = parsedResponse['message'];
+        Fluttertoast.showToast(
+          msg: message,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         return true;
       } else {
+        final message = parsedResponse['message'];
+        Fluttertoast.showToast(
+          msg: message,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
         return false;
       }
     } catch (e) {
-      print('Network error: $e');
+      Fluttertoast.showToast(
+        msg: 'Network error: $e',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
       return false;
     }
   }
@@ -164,7 +181,21 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
     final List<XFile>? pickedFiles = await picker.pickMultiImage();
     if (pickedFiles != null) {
       setState(() {
-        _images.addAll(pickedFiles.map((file) => File(file.path)).toList());
+        for (var file in pickedFiles) {
+          if (_images.any((existingFile) => existingFile.path == file.path)) {
+            Fluttertoast.showToast(
+              msg: 'Duplicate image: ${file.name}',
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.orange,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+          } else {
+            _images.add(File(file.path));
+          }
+        }
       });
     }
   }
@@ -178,165 +209,252 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Report Missing Person'),
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildTextFormField(_firstNameController, 'First Name'),
-              const SizedBox(height: 10),
-              _buildTextFormField(_middleNameController, 'Middle Name'),
-              const SizedBox(height: 10),
-              _buildTextFormField(_lastNameController, 'Last Name'),
-              const SizedBox(height: 10),
-              _buildTextFormField(_lastPlaceSeenController, 'Last Place Seen'),
-              const SizedBox(height: 10),
-              _buildTextFormField(_lastTimeSeenController,
-                  'Last Time Seen (in months)', TextInputType.number),
-              const SizedBox(height: 10),
-              _buildDropdown(
-                  'Gender:', _selectedGender, ['male', 'female'],
-                  (newValue) {
-                setState(() {
-                  _selectedGender = newValue!;
-                });
-              }),
-              const SizedBox(height: 10),
-              _buildTextFormField(_ageController, 'Age', TextInputType.number),
-              const SizedBox(height: 10),
-              _buildDropdown(
-                  'Skin Color:', _selectedSkinColor, ['fair', 'light', 'dark'],
-                  (newValue) {
-                setState(() {
-                  _selectedSkinColor = newValue!;
-                });
-              }),
-              const SizedBox(height: 10),
-              _buildDropdown(
-                  'Body Size:', _selectedBodySize, ['thin', 'medium', 'fat'],
-                  (newValue) {
-                setState(() {
-                  _selectedBodySize = newValue!;
-                });
-              }),
-              const SizedBox(height: 10),
-              _buildTextFormField(_eyeDescriptionController, 'Eye Description'),
-              const SizedBox(height: 10),
-              _buildTextFormField(
-                  _noseDescriptionController, 'Nose Description'),
-              const SizedBox(height: 10),
-              _buildTextFormField(
-                  _hairDescriptionController, 'Hair Description'),
-              const SizedBox(height: 10),
-              if (_showClothDetails) ...[
-                _buildDropdown('Upper Cloth Type:', _selectedUpperClothType,
-                    ['tshirt', 'shirt', 'jacket'], (newValue) {
-                  setState(() {
-                    _selectedUpperClothType = newValue!;
-                  });
-                }),
-                const SizedBox(height: 10),
-                _buildDropdown('Upper Cloth Color:', _selectedUpperClothColor,
-                    ['red', 'blue', 'green'], (newValue) {
-                  setState(() {
-                    _selectedUpperClothColor = newValue!;
-                  });
-                }),
-                const SizedBox(height: 10),
-                _buildDropdown('Lower Cloth Type:', _selectedLowerClothType,
-                    ['trouser', 'jeans', 'shorts'], (newValue) {
-                  setState(() {
-                    _selectedLowerClothType = newValue!;
-                  });
-                }),
-                const SizedBox(height: 10),
-                _buildDropdown('Lower Cloth Color:', _selectedLowerClothColor,
-                    ['blue', 'black', 'grey'], (newValue) {
-                  setState(() {
-                    _selectedLowerClothColor = newValue!;
-                  });
-                }),
-              ],
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: pickImages,
-                child: const Text('Pick Images'),
+          child: Card(
+            color: Colors.white,
+            shadowColor: Colors.grey[200],
+            elevation: 8.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildTextField(_firstNameController, 'First Name'),
+                  const SizedBox(height: 10),
+                  _buildTextField(_middleNameController, 'Middle Name'),
+                  const SizedBox(height: 10),
+                  _buildTextField(_lastNameController, 'Last Name'),
+                  const SizedBox(height: 10),
+                  _buildTextField(_lastPlaceSeenController, 'Last Place Seen'),
+                  const SizedBox(height: 10),
+                  _buildTextField(_lastTimeSeenController,
+                      'Last Time Seen (in months)', TextInputType.number),
+                  const SizedBox(height: 10),
+                  _buildDropdown('Gender:', _selectedGender, ['male', 'female'],
+                      (newValue) {
+                    setState(() {
+                      _selectedGender = newValue!;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                  _buildTextField(_ageController, 'Age', TextInputType.number),
+                  const SizedBox(height: 10),
+                  _buildDropdown('Skin Color:', _selectedSkinColor,
+                      ['fair', 'black', 'white', 'tseyim'], (newValue) {
+                    setState(() {
+                      _selectedSkinColor = newValue!;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                  _buildDropdown('Body Size:', _selectedBodySize,
+                      ['thin', 'average','muscular','overweight', 'obese','fit','athletic','curvy','petite','fat'], (newValue) {
+                    setState(() {
+                      _selectedBodySize = newValue!;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                  _buildTextField(_eyeDescriptionController, 'Eye Description'),
+                  const SizedBox(height: 10),
+                  _buildTextField(_noseDescriptionController, 'Nose Description'),
+                  const SizedBox(height: 10),
+                  _buildTextField(_hairDescriptionController, 'Hair Description'),
+                  if (_showClothDetails) ...[
+                    const SizedBox(height: 10),
+                    _buildDropdown('Upper Cloth Type:', _selectedUpperClothType,
+                        ['tshirt','hoodie','sweater','sweetshirt'], (newValue) {
+                      setState(() {
+                        _selectedUpperClothType = newValue!;
+                      });
+                    }),
+                    const SizedBox(height: 10),
+                    _buildDropdown('Upper Cloth Color:', _selectedUpperClothColor,
+                        ['red', 'blue', 'white', 'black','orange','light blue','brown','blue black','yellow'], (newValue) {
+                      setState(() {
+                        _selectedUpperClothColor = newValue!;
+                      });
+                    }),
+                    const SizedBox(height: 10),
+                    _buildDropdown('Lower Cloth Type:', _selectedLowerClothType,
+                        ['trouser', 'shorts', 'nothing', 'boxer'], (newValue) {
+                      setState(() {
+                        _selectedLowerClothType = newValue!;
+                      });
+                    }),
+                    const SizedBox(height: 10),
+                    _buildDropdown('Lower Cloth Color:', _selectedLowerClothColor,
+                        ['blue','black','white','red','orange', 'light blue','brown','blue black','yellow'], (newValue) {
+                      setState(() {
+                        _selectedLowerClothColor = newValue!;
+                      });
+                    }),
+                  ],
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: pickImages,
+                    icon: const Icon(Icons.add_a_photo),
+                    label: const Text('Add Images'),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildImageGrid(),
+                  const SizedBox(height: 10),
+                  if (_isSubmitting)
+                    const Center(child: CircularProgressIndicator())
+                  else
+                    ElevatedButton(
+                      onPressed: _validateAndSubmit,
+                      child: const Text('Submit'),
+                    ),
+                ],
               ),
-              const SizedBox(height: 10),
-              _buildImagePreview(),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _validateAndSubmit,
-                child: const Text('Submit'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTextFormField(TextEditingController controller, String labelText,
-      [TextInputType keyboardType = TextInputType.text]) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: labelText,
-        border: const OutlineInputBorder(),
+Widget _buildTextField(
+    TextEditingController controller,
+    String label, [
+    TextInputType keyboardType = TextInputType.text,
+  ]) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.blue,
+          ),
+          hintText: 'Enter the $label',
+          hintStyle: TextStyle(color: Colors.blue[200]),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(4),
+            borderSide: const BorderSide(
+              color: Colors.blue,
+              width: 2,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Colors.blueAccent,
+              width: 2,
+            ),
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          filled: true,
+          fillColor: Colors.grey[200],
+        ),
+        keyboardType: keyboardType,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter $label';
+          }
+          return null;
+        },
       ),
-      keyboardType: keyboardType,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please enter $labelText';
-        }
-        return null;
-      },
     );
   }
 
-  Widget _buildDropdown(String label, String value, List<String> items,
-      ValueChanged<String?> onChanged) {
+  Widget _buildDropdown(
+    String label,
+    String value,
+    List<String> items,
+    ValueChanged<String?> onChanged,
+  ) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label),
-        const SizedBox(width: 20),
-        DropdownButton<String>(
-          value: value,
-          onChanged: onChanged,
-          items: items.map((String item) {
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(item),
-            );
-          }).toList(),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.blue, width: 2),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: DropdownButton<String>(
+            value: value,
+            icon: const Icon(Icons.arrow_downward, color: Colors.blue),
+            iconSize: 24,
+            elevation: 16,
+            underline: Container(
+              height: 2,
+              color: Colors.transparent,
+            ),
+            onChanged: onChanged,
+            items: items.map<DropdownMenuItem<String>>((String item) {
+              return DropdownMenuItem<String>(
+                value: item,
+                child: Container(
+                  width: 90,
+                  child: Text(
+                    item,
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildImagePreview() {
-    return Column(
-      children: _images.asMap().entries.map((entry) {
-        int index = entry.key;
-        File file = entry.value;
-        return Stack(
-          children: [
-            Image.file(file, height: 100, width: 100),
-            Positioned(
-              right: 0,
-              child: GestureDetector(
-                onTap: () => _removeImage(index),
-                child: const Icon(Icons.close, color: Colors.red),
+  Widget _buildImageGrid() {
+    return _images.isEmpty
+        ? const Text('No images selected.')
+        : SizedBox(
+            height: 80, // Adjust the height as needed
+            child: GridView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _images.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                crossAxisSpacing: 4.0,
+                mainAxisSpacing: 4.0,
               ),
+              itemBuilder: (BuildContext context, int index) {
+                return Stack(
+                  children: [
+                    Container(
+                      height: 80,
+                      width: 80, // Adjust the width as needed
+                      child: Image.file(
+                        _images[index],
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: () => _removeImage(index),
+                        child: const CircleAvatar(
+                          radius: 12,
+                          backgroundColor: Colors.red,
+                          child: Icon(Icons.close, size: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
-          ],
-        );
-      }).toList(),
-    );
+          );
   }
 }

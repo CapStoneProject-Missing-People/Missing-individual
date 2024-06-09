@@ -69,10 +69,13 @@ class _HomePageContentState extends State<HomePageContent> {
           final name = person.name;
           final skinColor = person.skin_color;
           final age = person.age.toString();
+          final weight = person.body_size.toString();
+          final gender = person.gender.toString();
 
           final lowerCaseName = name.toLowerCase();
           final lowerCaseSkinColor = skinColor.toLowerCase();
           final lowerCaseAge = age.toLowerCase();
+
 
           // Check search text
           final searchTextMatch = searchText.isEmpty ||
@@ -86,10 +89,11 @@ class _HomePageContentState extends State<HomePageContent> {
           final ageMatch = (minAge == null || person.age >= minAge) &&
               (maxAge == null || person.age <= maxAge);
 
-          final skinColorMatch =
-              filters['skinColor'] == null || filters['skinColor'] == skinColor;
+          final skinColorMatch = filters['skinColor'] == null || filters['skinColor'] == skinColor;
+          final weightMatch = filters['weight'] == null || filters['weight'] == weight;
+          final genderMatch = filters['gender'] == null || filters['gender'] == gender;
 
-          if (searchTextMatch && ageMatch && skinColorMatch) {
+          if (searchTextMatch && ageMatch && skinColorMatch && weightMatch && genderMatch) {
             final textSpansName = _highlightOccurrences(name, searchText);
             final textSpansSkinColor =
                 _highlightOccurrences(skinColor, searchText);

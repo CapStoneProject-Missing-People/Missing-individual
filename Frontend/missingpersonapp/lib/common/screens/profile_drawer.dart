@@ -106,6 +106,15 @@ class ProfileDrawer extends StatelessWidget {
                   context, '/feedBack'); // Navigate to the manage profile page
             },
           ),
+          CustomListTile(
+            icon: Icons.settings_outlined,
+            title: 'Settings',
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.pushNamed(
+                  context, '/settings'); // Navigate to the manage profile page
+            },
+          ),
           const Spacer(), // Push the sign-out tile to the bottom
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -152,7 +161,7 @@ class CustomListTile extends StatelessWidget {
           horizontal: 16), // Add padding to the ListTile
       leading: Icon(icon, size: 24, color: Colors.blue),
       title: Text(title,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
       onTap: onTap,
     );
   }

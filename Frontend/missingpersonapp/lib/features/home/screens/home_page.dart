@@ -1,12 +1,15 @@
+// home_page.dart
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:missingpersonapp/features/Notifications/screens/display_notification.dart';
 import 'package:missingpersonapp/features/PostAdd/screens/addpost.dart';
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/home/screens/bottom_sheet_widget.dart';
-import 'package:missingpersonapp/features/home/services/check_face.dart';
+import 'package:missingpersonapp/features/home/screens/check_face.dart';
 import 'package:missingpersonapp/common/screens/profile_drawer.dart';
 import 'package:missingpersonapp/features/home/screens/missingPersonDisplayContent.dart';
+import 'package:provider/provider.dart';
+import 'package:missingpersonapp/features/Notifications/provider/notification_provider.dart'; // Add this line
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -139,25 +142,61 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_box_outlined),
-            label: 'Add Post',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_none_outlined),
-            label: 'Notification',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.black,
-        onTap: _onItemTapped,
+      bottomNavigationBar: Consumer<NotificationProvider>(
+        builder: (context, notificationProvider, child) {
+          return BottomNavigationBar(
+            items: <BottomNavigationBarItem>[
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                label: 'Home',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.add_box_outlined),
+                label: 'Add Post',
+              ),
+              BottomNavigationBarItem(
+                icon: Stack(
+                  children: [
+                    const Icon(Icons.notifications_none_outlined),
+                    if (notificationProvider.unreadCount > 0)
+                      Positioned(
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(1),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 12,
+                            minHeight: 12,
+                          ),
+                          child: Text(
+                            '${notificationProvider.unreadCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                label: 'Notification',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.blue,
+            unselectedItemColor: Colors.black,
+            onTap: (index) {
+              _onItemTapped(index);
+              if (index == 2) {
+                notificationProvider.markAllAsRead();
+              }
+            },
+          );
+        },
       ),
     );
   }

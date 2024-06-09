@@ -263,7 +263,7 @@ Status: ${missingPerson.missingCase.status}
                         height: 200,
                         width: double.infinity,
                         color: Colors.grey,
-                        child: Icon(
+                        child: const Icon(
                           Icons.image,
                           color: Colors.white,
                           size: 50,
@@ -332,8 +332,8 @@ Status: ${missingPerson.missingCase.status}
                               context: context,
                               builder: (BuildContext context) {
                                 return AlertDialog(
-                                  title: Text('Confirm Delete'),
-                                  content: Text(
+                                  title: const Text('Confirm Delete'),
+                                  content: const Text(
                                     'Are you sure you want to delete this post?',
                                     style: TextStyle(fontSize: 18),
                                   ),
@@ -342,7 +342,7 @@ Status: ${missingPerson.missingCase.status}
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
-                                      child: Text('Cancel'),
+                                      child: const Text('Cancel'),
                                     ),
                                     TextButton(
                                       onPressed: () async {
@@ -360,7 +360,7 @@ Status: ${missingPerson.missingCase.status}
                                           showToast(context, error.toString());
                                         }
                                       },
-                                      child: Text(
+                                      child: const Text(
                                         'Delete',
                                         style: TextStyle(color: Colors.red),
                                       ),
@@ -370,13 +370,13 @@ Status: ${missingPerson.missingCase.status}
                               },
                             );
                           },
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.delete,
                           ),
                         ),
                         IconButton(
                           onPressed: () => _shareMissingPerson(context),
-                          icon: Icon(Icons.share),
+                          icon: const Icon(Icons.share),
                         ),
                       ],
                     ),

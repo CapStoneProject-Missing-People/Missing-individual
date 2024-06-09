@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:missingpersonapp/features/Profile/services/profile_manage.dart';
 import 'package:missingpersonapp/features/authentication/models/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider extends ChangeNotifier {
   User _user =
       User(id: '', name: '', email: '', token: '', password: '', phoneNo: '');
+  bool _notificationsEnabled = true; // Default value
 
   User get user => _user;
+  bool get notificationsEnabled => _notificationsEnabled;
 
   void setUser(String userJson) {
     _user = User.fromJson(userJson);
@@ -15,6 +18,19 @@ class UserProvider extends ChangeNotifier {
 
   void setUserFromModel(User user) {
     _user = user;
+    notifyListeners();
+  }
+
+  Future<void> loadUserPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _notificationsEnabled = prefs.getBool('notificationsEnabled') ?? true;
+    notifyListeners();
+  }
+
+  void toggleNotifications(bool isEnabled) async {
+    _notificationsEnabled = isEnabled;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('notificationsEnabled', _notificationsEnabled);
     notifyListeners();
   }
 

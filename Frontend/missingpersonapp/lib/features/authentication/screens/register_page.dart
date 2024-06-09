@@ -1,9 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:missingpersonapp/features/authentication/components/my_button.dart';
 import 'package:missingpersonapp/features/authentication/components/my_textfield.dart';
 import 'package:missingpersonapp/features/authentication/screens/login_page.dart';
