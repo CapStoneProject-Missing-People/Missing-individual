@@ -17,8 +17,7 @@ export const RecognizeFace = async (req, res) => {
     if (result.error) {
       return res.status(400).json({ error: result.error });
     }
-    console.log("image buffer: " + file1)
-    await FaceMatchResult.create({
+    const faceMatchResult = await FaceMatchResult.create({
       person_id: result.person_id,
       distance: result.distance,
       similarity: result.similarity,
@@ -35,15 +34,17 @@ export const RecognizeFace = async (req, res) => {
       status: 200,
       logLevel: "info"
     });
-    const notificationData = {
-      title: "Face Recognition Match",
-      body: `A potential match has been found for missing person ID: ${result.person_id}`,
-      caseId: result.person_id
+    if (result.person_id != 'unknown'){
+      const notificationData = {
+        title: "Face Recognition Match",
+        body: `A potential match has been found for a missing person you added. Please click the notification or check the missing person's profile for more details.`,
+        caseId: result.person_id
+      }
+    await axios.post('http://localhost:4000/api/notificationToSingleUser', notificationData);
     }
 
-    await axios.post('http://localhost:4000/api/notificationToSingleUser', notificationData);
-
     res.json({
+      matchId: faceMatchResult._id,
       person_id: result.person_id,
       distance: result.distance,
       confidence: result.similarity,
@@ -52,7 +53,7 @@ export const RecognizeFace = async (req, res) => {
     console.error("Error checking face:", error);
     await logData({
       action: "FaceRecognition",
-      user_id: result.person_id || "",
+      user_id: "",
       user_agent: req.headers["User-Agent"],
       method: req.method,
       ip: req.socket.remoteAddress,
@@ -71,7 +72,6 @@ export const addFaceFeature = async (req, res) => {
   const startTime = Date.now(); // Start timer
 
   try {
-    console.log(req.body)
     const {images, person_id} = req.body;
     // Check if person_id is provided
     
@@ -79,12 +79,10 @@ export const addFaceFeature = async (req, res) => {
       return res.status(400).json({ message: "person_id is required." });
     }
 
-    console.log("image")
     // Check if any images are provided
     if (!images || images.length === 0) {
       return res.status(400).json({ message: "No images provided." });
     }
-    console.log("after image")
     // Process each uploaded image for face recognition
     if (images.length === 0) {
       return res.status(400).json({ message: "No images provided." });
