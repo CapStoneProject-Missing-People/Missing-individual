@@ -9,6 +9,7 @@ import {
   update,
   searchFeature,
   getOwnFeatures,
+  getPotentialMatchs
 } from "../controller/featureController.js";
 
 export const featureRouter = express.Router();
@@ -21,3 +22,4 @@ featureRouter.route("/compare/:timeSinceDisappearance").post(compareFeature);
 featureRouter.route("/updateFeature/:caseId").put(requireAuth, update)
 featureRouter.route("/delete/:caseId").delete(requireAuth, deleteFeature);
 featureRouter.route("/search/:timeSinceDisappearance").post(searchFeature)
+featureRouter.route("/getPotentialMatch").get(requireAuth, getPotentialMatchs)

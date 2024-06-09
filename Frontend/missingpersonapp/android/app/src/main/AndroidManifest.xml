@@ -4,7 +4,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="missingpersonapp"
-        android:name="${applicationName}"
+        android:name="androidx.multidex.MultiDexApplication"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

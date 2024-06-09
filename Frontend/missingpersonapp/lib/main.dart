@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:missingpersonapp/common/services/fcm-service.dart';
 import 'package:missingpersonapp/features/Notifications/provider/missingcase-provider.dart';
 import 'package:missingpersonapp/features/Notifications/provider/notification_provider.dart';
@@ -22,6 +23,13 @@ import 'package:missingpersonapp/features/matchedCase/provider/matched_case_prov
 import 'package:missingpersonapp/features/matchedCase/screens/imageMatch/matched_case.dart';
 import 'package:missingpersonapp/firebase_options.dart';
 import 'package:provider/provider.dart';
+import 'package:missingpersonapp/features/chat/models/message.dart';
+import 'package:missingpersonapp/features/chat/screens/chat_list_screen.dart';
+import 'package:missingpersonapp/features/chat/providers/chat_provider.dart';
+import 'package:missingpersonapp/features/chat/screens/chat_list_screen.dart';
+import 'package:missingpersonapp/common/models/missing_person.dart';
+import 'package:missingpersonapp/features/home/data/missing_person_fetch.dart';
+import 'package:missingpersonapp/features/home/provider/allMissingperson.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -34,9 +42,21 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Register Hive adapters
+  Hive.registerAdapter(MessageAdapter());
+  
+  // Open Hive boxes
+  await Hive.openBox<Message>('messages');
+  await Hive.openBox('authBox');
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
@@ -91,6 +111,7 @@ class _MyAppState extends State<MyApp> {
       title: 'MissingPerson',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        primarySwatch: Colors.blue,
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: Colors.green,
           selectionColor: Colors.grey,
@@ -108,6 +129,9 @@ class _MyAppState extends State<MyApp> {
         '/notification': (context) => const NotificationPage(),
         '/missingPersonPosted': (context) => MissingPersonPage(),
         '/settings': (context) => const SettingsPage(), // Add route for settings
+        '/chatList': (context) => ChatListScreen(
+          userId: Provider.of<UserProvider>(context, listen: false).user.id,
+        )
       },
     );
   }

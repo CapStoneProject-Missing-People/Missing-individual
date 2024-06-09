@@ -1,7 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:missingpersonapp/features/authentication/models/missing_person_model.dart';
+import 'package:missingpersonapp/features/authentication/models/user.dart';
 import 'package:missingpersonapp/features/authentication/provider/missing_person_provider.dart';
+import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';
 import 'package:missingpersonapp/features/authentication/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -130,6 +132,7 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
   @override
   Widget build(BuildContext context) {
     final missingPerson = widget.missingPerson;
+    final user = Provider.of<UserProvider>(context).user;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -172,26 +175,41 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
               buildContainer('Age', missingPerson.age.toString(),
                   Icons.calendar_month, context),
               const SizedBox(height: 5),
-              buildContainer('Gender', missingPerson.gender,
-                  Icons.location_city, context),
+              buildContainer(
+                  'Gender', missingPerson.gender, Icons.location_city, context),
+              SizedBox(height: 5),
+              buildContainer(
+                  'Phone Number', user.phoneNo, Icons.location_city, context),
               const SizedBox(height: 5),
               buildContainer('Skin Color', missingPerson.skin_color,
                   Icons.location_city, context),
               const SizedBox(height: 5),
-               buildContainer(
+              buildContainer(
                   'Body Size', missingPerson.body_size, Icons.phone, context),
               const SizedBox(height: 5),
-              buildContainer('Upper Cloth Type', missingPerson.clothing.upper.clothType,
-                  Icons.location_city, context),
+              buildContainer(
+                  'Upper Cloth Type',
+                  missingPerson.clothing.upper.clothType,
+                  Icons.location_city,
+                  context),
               const SizedBox(height: 5),
-              buildContainer('Upper Cloth Color', missingPerson.clothing.upper.clothColor,
-                  Icons.location_city, context),
+              buildContainer(
+                  'Upper Cloth Color',
+                  missingPerson.clothing.upper.clothColor,
+                  Icons.location_city,
+                  context),
               const SizedBox(height: 5),
-              buildContainer('Lower Cloth Type', missingPerson.clothing.lower.clothType,
-                  Icons.location_city, context),
+              buildContainer(
+                  'Lower Cloth Type',
+                  missingPerson.clothing.lower.clothType,
+                  Icons.location_city,
+                  context),
               const SizedBox(height: 5),
-              buildContainer('Lower Cloth Color', missingPerson.clothing.lower.clothColor,
-                  Icons.location_city, context),
+              buildContainer(
+                  'Lower Cloth Color',
+                  missingPerson.clothing.lower.clothColor,
+                  Icons.location_city,
+                  context),
               const SizedBox(height: 5),
               buildContainer('Description', missingPerson.description,
                   Icons.book, context),

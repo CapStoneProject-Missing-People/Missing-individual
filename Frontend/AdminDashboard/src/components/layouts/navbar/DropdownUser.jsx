@@ -74,7 +74,7 @@ const DropdownUser = ({ user }) => {
       {/* <!-- Dropdown Start --> */}
       <div
         ref={dropdown}
-        className={`absolute right-0 mt-4 flex w-48 flex-col rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark ${
+        className={`absolute right-0 mt-4 flex w-48 flex-col rounded-lg border border-stroke bg-white shadow-md dark:border-strokedark dark:bg-boxdark ${
           dropdownOpen ? 'block' : 'hidden'
         }`}
       >
@@ -82,13 +82,13 @@ const DropdownUser = ({ user }) => {
           <li>
             <Link
               to="/profiles"
-              className="flex items-center gap-3.5 mt-3 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+              className="flex items-center gap-3.5 mb-5 mt-3 text-sm font-medium duration-300 ease-in-out hover:text-gray-300 lg:text-base"
             >
               <IoMdPerson className="fill-current text-black" size={22} />
               <span className="text-black text-base">My Profile</span>
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to="/dashboard"
               className="flex items-center gap-3.5 mb-1
@@ -97,7 +97,7 @@ const DropdownUser = ({ user }) => {
                 <IoSettingsOutline className="fill-current text-black" size={22} />
                 <span className="text-black text-base">Settings</span>
               </Link>
-            </li>
+            </li> */}
           </ul>
           <button
             className="flex items-center text-black gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"

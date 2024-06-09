@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&family=Play:wght@700&display=swap");
+@import "./css/scrollbar.css";
 
 @tailwind base;
 @tailwind components;
@@ -26,7 +27,7 @@
   @apply  text-gray-100;
 }
 @layer components {
-  .edit-modal {
+   .edit-modal {
     ::-webkit-scrollbar {
       width: 8px;
     }
@@ -44,7 +45,12 @@
       background: #555;
     }
   }
-}
+} 
 .new-color{
   background-color: #333131;
+}
+.chart-container {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
 }

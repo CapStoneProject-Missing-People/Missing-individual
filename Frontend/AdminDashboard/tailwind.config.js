@@ -8,8 +8,15 @@ export default {
         kaushan: "Kaushan Script",
         Montserrat: ['Inter', 'system-ui', 'Avenir', 'Helvetica', 'Arial', 'sans-serif'],
       },
+      scrollbar:{
+        DEFAULT:{
+          thumb: '#cbd5e0', // Customize thumb color
+          track: '#f7fafc', // Customize track color
+          width: '8px',
+        }
+      }
     },
   },
-  plugins: [require("tailwind-scrollbar")],
+  plugins: [require("@tailwindcss/typography")],
 }
 
