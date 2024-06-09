@@ -1,12 +1,17 @@
+// fcm-service.dart
 import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:missingpersonapp/features/Notifications/provider/notification_provider.dart';
 import 'package:missingpersonapp/features/Notifications/screens/show_push_notification_click.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
+import 'package:missingpersonapp/features/home/screens/match_detail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:missingpersonapp/main.dart'; // Import the main.dart to access the navigatorKey
+import 'package:provider/provider.dart';
+import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';
 
 class FcmService {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
@@ -33,36 +38,71 @@ class FcmService {
       print('User declined or has not accepted permission');
     }
 
+    _configureFirebaseListeners(context);
+  }
+
+  void _configureFirebaseListeners(BuildContext context) {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Received a message while in the foreground!');
-      print('Message data: ${message.data}');
-      if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
-      }
+      _handleMessage(context, message);
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Message clicked!');
-      _handleMessageClick(message);
+      _handleMessageClick(context, message);
     });
 
-    // Check if the app was opened from a terminated state via a notification
-    RemoteMessage? initialMessage = await _messaging.getInitialMessage();
-    if (initialMessage != null) {
-      _handleMessageClick(initialMessage);
+    _messaging.getInitialMessage().then((RemoteMessage? message) {
+      if (message != null) {
+        _handleMessageClick(context, message);
+      }
+    });
+  }
+
+  void _handleMessage(BuildContext context, RemoteMessage message) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final notificationProvider = Provider.of<NotificationProvider>(context, listen: false); // Add this line
+
+    if (userProvider.notificationsEnabled) {
+      print('Received a message while in the foreground!');
+      print('Message data: ${message.data}');
+      final String jsondata = json.encode(message);
+      print('message header: $jsondata');
+      print('message header: ${message.notification?.title}');
+      if (message.notification != null) {
+        print('Message also contained a notification: ${message.notification}');
+      }
+
+      // Fetch notifications to update the count
+      await notificationProvider.fetchNotifications(); // Add this line
     }
   }
 
-  void _handleMessageClick(RemoteMessage message) {
-    final data = message.data;
-    print("clicked notification data ${data['caseID']}");
-    navigatorKey.currentState?.push(
-      MaterialPageRoute(
-        builder: (context) => ShowPushNotificationTap(
-          theCase: data['caseID'],
-        ),
-      ),
-    );
+  void _handleMessageClick(BuildContext context, RemoteMessage message) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    if (userProvider.notificationsEnabled) {
+      final data = message.data;
+      final notification = message.notification;
+      print("notification ${notification?.title}");
+      print("clicked notification data ${data['caseID']}");
+      if (notification?.title == 'Face Recognition Match'){
+          navigatorKey.currentState?.push(
+            MaterialPageRoute(
+              builder: (context) => PersonDetailsScreen(
+                personId: data['caseID'],
+              ),
+            ),
+          );
+      }
+      else {
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(
+            builder: (context) => ShowPushNotificationTap(
+              theCase: data['caseID'],
+            ),
+          ),
+        );
+      }
+      
+    }
   }
 
   Future<String?> getToken() async {
