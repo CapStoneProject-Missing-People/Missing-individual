@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:missingpersonapp/features/matchedCase/models/missing_person1.dart';
-import 'package:missingpersonapp/features/matchedCase/screens/missing_person_detail1.dart';
+import 'package:missingpersonapp/features/matchedCase/models/description_match_model.dart';
+import 'package:missingpersonapp/features/matchedCase/screens/DescriptionMatch/missing_person_detail1.dart';
 
 class MatchedSamplePage extends StatelessWidget {
-  final MissingPersonAdd missingPerson;
+  final MissingPersonDescMatch missingPerson;
 
   const MatchedSamplePage({super.key, required this.missingPerson});
 

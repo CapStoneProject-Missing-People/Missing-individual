@@ -1,14 +1,13 @@
-import 'package:missingpersonapp/features/matchedCase/models/missing_person1.dart'
-    as mp;
+import 'package:missingpersonapp/features/matchedCase/models/description_match_model.dart';
 import 'package:flutter/material.dart';
-import 'package:missingpersonapp/features/matchedCase/screens/matched_sample.dart';
+import 'package:missingpersonapp/features/matchedCase/screens/DescriptionMatch/matched_sample.dart';
 
 class MissingPersonCard extends StatelessWidget {
-  final mp.MissingPersonAdd missingPerson;
+  final MissingPersonDescMatch missingPerson;
 
   const MissingPersonCard({super.key, required this.missingPerson});
 
-  double calculateMatchPercentage(mp.MissingPersonAdd person) {
+  double calculateMatchPercentage(MissingPersonDescMatch person) {
     double totalMatch = person.ageMatch +
         person.skinColorMatch +
         person.clothColorMatch +
@@ -99,7 +98,7 @@ class MissingPersonCard extends StatelessWidget {
                   ),
                   Text(
                     'Match Percentage: ${matchPercentage.toStringAsFixed(2)}%',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       color: Colors.green,
                     ),

@@ -20,6 +20,7 @@ class MatchedCaseProvider with ChangeNotifier {
         'Authorization': 'Bearer $token',
       },
     );
+
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body)['data'];
       _matchedCases = data.map<MatchedCase>((item) {
@@ -29,6 +30,34 @@ class MatchedCaseProvider with ChangeNotifier {
       notifyListeners();
     } else {
       throw Exception('Failed to load matched cases');
+    }
+  }
+
+  Future<void> updateStatusToFound(String id) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('authorization');
+
+    final response = await http.put(
+      Uri.parse('${Constants.postUri}/api//change-staus-found/$id/status'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({'status': 'found'}),
+    );
+
+    if (response.statusCode == 200) {
+      // Update the local list of matched cases
+      _matchedCases = _matchedCases.map((caseItem) {
+        if (caseItem.id == id) {
+          caseItem.status = 'found';
+        }
+        return caseItem;
+      }).toList();
+
+      notifyListeners();
+    } else {
+      throw Exception('Failed to update status');
     }
   }
 }
