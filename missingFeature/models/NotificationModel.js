@@ -34,10 +34,10 @@ const notificationSchema = new Schema(
 );
 
 notificationSchema.statics.deleteOldNotifications = async function () {
-  const oneDayAgo = new Date();
-  oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+  const fifteenSecondsAgo = new Date();
+  fifteenSecondsAgo.setSeconds(fifteenSecondsAgo.getSeconds() - 86400);
 
-  await this.deleteMany({ createdAt: { $lt: oneDayAgo } });
+  await this.deleteMany({ createdAt: { $lt: fifteenSecondsAgo } });
 };
 
 const Notification = model("notification", notificationSchema);

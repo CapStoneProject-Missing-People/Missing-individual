@@ -84,7 +84,7 @@ export const sendPushNotificationFunc = async ({
       },
       token: fcmToken,
     };
-
+console.log(message);
     const response = await admin.messaging().send(message);
     console.log("Successfully sent FCM message:", response);
     return { success: true, response };
@@ -277,6 +277,7 @@ const DelelteUserFCM = async (fcmToken) => {
 export const FetchNotifications = async (req, res) => {
   try {
     const userId = req.user.userId;
+    console.log("the user: " + req.user.phone_number);
     const notifications = await Notification.find({ user: userId }).sort({
       createdAt: -1,
     });
