@@ -46,11 +46,21 @@ class AuthService {
           showToast(
             context,
             'Account created! Login with the same credentials!',
+            Colors.green
           );
         },
       );
+      print(res.statusCode);
+      if (res.statusCode == 201) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => LoginPage(),
+        ),
+        (route) => false,
+      );
+    }
     } catch (e) {
-      showToast(context, e.toString());
+      showToast(context, 'An network error occurred', Colors.red);
       print(e.toString());
     }
   }
@@ -98,22 +108,66 @@ class AuthService {
         },
       );
     } catch (e) {
-      showToast(context, e.toString());
+      //showToast(context, 'A network error occurred', Colors.red);
       print(e.toString());
     }
   }
 
   Future<void> getUserData(BuildContext context) async {
+  try {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('authorization');
+
+    if (token == null || token.isEmpty) {
+      prefs.setString('authorization', '');
+      return;
+    }
+
+
+    var tokenRes = await http.post(
+      Uri.parse('${Constants.postUri}/api/users/tokenIsValid'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'authorization': "Bearer $token",
+      },
+    );
+
+    var response = jsonDecode(tokenRes.body);
+
+    if (response == true) {
+      http.Response userRes = await http.get(
+        Uri.parse('${Constants.postUri}/api/users/getUser'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'authorization': "Bearer $token",
+        },
+      );
+
+      // Handle HTTP response errors
+      httpErrorHandle(
+        response: userRes,
+        context: context,
+        onSuccess: () async {
+          userProvider.setUser(userRes.body);
+          print("The response from auth service is: " + userRes.body);
+
+          String? fcmToken = await _fcmService.getToken();
+          if (fcmToken != null) {
+            await _fcmService.sendTokenToBackend(fcmToken);
+          }
+        },
+      );
+    }
+  } catch (err) {
+    // Catch any unexpected errors
+    //showToast(context, 'An network error occurred', Colors.red);
+    print(err.toString());
+  }
+}
+
+  Future<bool> isTokenValid(String token) async {
     try {
-      var userProvider = Provider.of<UserProvider>(context, listen: false);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('authorization');
-
-      if (token == null || token.isEmpty) {
-        prefs.setString('authorization', '');
-        return;
-      }
-
       var tokenRes = await http.post(
         Uri.parse('${Constants.postUri}/api/users/tokenIsValid'),
         headers: <String, String>{
@@ -121,58 +175,48 @@ class AuthService {
           'authorization': "Bearer $token",
         },
       );
-
       var response = jsonDecode(tokenRes.body);
-
-      if (response == true) {
-        http.Response userRes = await http.get(
-          Uri.parse('${Constants.postUri}/api/users/getUser'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'authorization': "Bearer $token"
-          },
-        );
-
-        userProvider.setUser(userRes.body);
-
-        String? fcmToken = await _fcmService.getToken();
-        if (fcmToken != null) {
-          await _fcmService.sendTokenToBackend(fcmToken);
-        }
-      }
-    } catch (err) {
-      showToast(context, err.toString());
-      print(err.toString());
+      return response == true;
+    } catch (e) {
+      print(e.toString());
+      return false;
     }
   }
 
+  
   Future<void> signOut(BuildContext context) async {
     print('logging out first');
 
     final navigator = Navigator.of(context);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('authorization');
-     await http.get(
-        Uri.parse('${Constants.postUri}/api/users/tokenIsValid'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'authorization': "Bearer $token",
-        },
-      );
+
+    // Notify the server about the logout if necessary
+    await http.get(
+      Uri.parse('${Constants.postUri}/api/users/tokenIsValid'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'authorization': "Bearer $token",
+      },
+    );
+
+    // Clear the token and user data from SharedPreferences and UserProvider
+    //await prefs.remove('authorization');
     prefs.setString('authorization', '');
-    print('signing out: ${prefs.getString('authorization')}');
+    Provider.of<UserProvider>(context, listen: false).clearUser();
 
     String? fcmToken = await _fcmService.getToken();
     print('token at logout $fcmToken');
     print('logging out');
     if (fcmToken != null) {
       await _fcmService.sendTokenToBackend(
-          fcmToken); // Store the token as a guest token on logout
+        fcmToken,
+      ); // Store the token as a guest token on logout
     }
 
     navigator.pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (context) => LoginPage(),
+        builder: (context) => HomePage(),
       ),
       (route) => false,
     );

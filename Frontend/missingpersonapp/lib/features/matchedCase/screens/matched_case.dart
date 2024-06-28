@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:missingpersonapp/features/matchedCase/screens/DescriptionMatch/existing_case_screen.dart';
 import 'package:missingpersonapp/features/matchedCase/screens/imageMatch/face_match.dart';
-import 'package:missingpersonapp/features/matchedCase/screens/DescriptionMatch/missing_person_page1.dart';
 import 'package:missingpersonapp/features/matchedCase/screens/over_all_match.dart';
 
 class MatchedCases extends StatefulWidget {
@@ -16,7 +16,7 @@ class _MatchedCasesState extends State<MatchedCases> {
 
   // List of pages to switch between
   final List<Widget> _pages = [
-    MissingPersonMatchPage(),
+    ExistingCasesScreen(),
     const MissingPersonImageMatch(),
     const OverAllMatch(),
   ];

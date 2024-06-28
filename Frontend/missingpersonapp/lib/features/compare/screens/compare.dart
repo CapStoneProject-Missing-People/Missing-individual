@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:missingpersonapp/features/compare/data/fetchCompare.dart';
+import 'package:missingpersonapp/features/authentication/utils/constants.dart';
+import 'package:missingpersonapp/features/authentication/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -35,17 +37,65 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
   final TextEditingController _hairDescriptionController =
       TextEditingController();
 
-  String? _selectedGender;
-  String? _selectedSkinColor;
-  String? _selectedBodySize;
-  String? _selectedUpperClothType;
-  String? _selectedUpperClothColor;
-  String? _selectedLowerClothType;
-  String? _selectedLowerClothColor;
+  String? _selectedGender = 'Select Gender';
+  String? _selectedSkinColor = 'Select Skin Color';
+  String? _selectedBodySize = 'Select Body Size';
+  String? _selectedUpperClothType = 'Select Upper Cloth Type';
+  String? _selectedUpperClothColor = 'Select Upper Cloth Color';
+  String? _selectedLowerClothType = 'Select Lower Cloth Type';
+  String? _selectedLowerClothColor = 'Select Lower Cloth Color';
 
   bool _showClothDetails = true;
   bool _showAdditionalDetails = true;
   bool _isLoading = false;
+
+  final List<String> genderItems = ['Select Gender', 'male', 'female'];
+  final List<String> skinColorItems = [
+    'Select Skin Color',
+    'fair',
+    'dark',
+    'light',
+    'brown',
+    'black'
+  ];
+  final List<String> upperClothTypeItems = [
+    'Select Upper Cloth Type',
+    'tshirt',
+    'hoodie',
+    'sweater',
+    'sweetshirt'
+  ];
+  final List<String> upperClothColorItems = [
+    'Select Upper Cloth Color',
+    'red',
+    'blue',
+    'white',
+    'black',
+    'orange',
+    'light blue',
+    'brown',
+    'blue black',
+    'yellow'
+  ];
+  final List<String> lowerClothTypeItems = [
+    'Select Lower Cloth Type',
+    'trouser',
+    'shorts',
+    'nothing',
+    'boxer'
+  ];
+  final List<String> lowerClothColorItems = [
+    'Select Lower Cloth Color',
+    'blue',
+    'black',
+    'white',
+    'red',
+    'orange',
+    'light blue',
+    'brown',
+    'blue black',
+    'yellow'
+  ];
 
   @override
   void initState() {
@@ -80,31 +130,6 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
     super.dispose();
   }
 
-  Future<Map<String, dynamic>?> postData(
-      Map<String, dynamic> personToCompare) async {
-    final url = Uri.parse(
-        '${Constants.postUri}/api/features/compare/${personToCompare['lastTimeSeen']}');
-
-    try {
-      var response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(personToCompare),
-      );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body) as Map<String, dynamic>;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print('Network error: $e');
-      return null;
-    }
-  }
-
   Future<void> _validateAndCompare() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
@@ -131,7 +156,7 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
         'age': _ageController.text.isNotEmpty
             ? int.parse(_ageController.text)
             : null,
-        'skinColor': _selectedSkinColor != null &&
+        'skin_color': _selectedSkinColor != null &&
                 _selectedSkinColor != 'Select Skin Color'
             ? _selectedSkinColor
             : null,
@@ -176,24 +201,68 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
                 : null,
       };
 
-      final response = await postData(personToCompare);
-      setState(() {
-        _isLoading = false;
-      });
+      print("Person to compare: $personToCompare");
 
-      if (response != null) {
-        final matchedPerson = FeatureCompare.fromJson(response);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CompareMatchedPersonCard(
-                featureCompare:
-                    matchedPerson), // Navigate to card-compare.dart with matchedPerson
-          ),
+      // Save lastTimeSeen to the state variable
+      var _lastTimeSeen = personToCompare['lastTimeSeen'] as int?;
+
+      final url = Uri.parse(
+          '${Constants.postUri}/api/features/compare/${_lastTimeSeen}');
+
+      print("URL: $url");
+
+      try {
+        var response = await http.post(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(personToCompare),
         );
-      } else {
+
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+
+        setState(() {
+          _isLoading = false;
+        });
+
+        if (response.statusCode == 200) {
+          final responseBody =
+              jsonDecode(response.body) as Map<String, dynamic>;
+          if (responseBody['matchingStatus'] != null) {
+            final List<dynamic> matchingStatus = responseBody['matchingStatus'];
+            final List<FeatureCompare> featureCompareList =
+                FeatureCompare.fromJsonList(matchingStatus);
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CompareMatchedPersonCard(
+                  featureCompareList: featureCompareList,
+                  lastTimeSeen: _lastTimeSeen, // Pass lastTimeSeen here
+                ),
+              ),
+            );
+          } else {
+            Fluttertoast.showToast(
+              msg: "No Match Found",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 5,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0,
+            );
+          }
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        print('Network error: $e');
         Fluttertoast.showToast(
-          msg: "nothing in the database",
+          msg: "Network error: $e",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 5,
@@ -208,9 +277,6 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Compare Person'),
-      ),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -219,263 +285,178 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
               key: _formKey,
               child: Column(
                 children: [
-                  TextFormField(
-                    controller: _firstNameController,
-                    decoration: const InputDecoration(labelText: 'First Name'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the first name';
-                      }
-                      return null;
-                    },
+                  Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          _buildTextFormField(
+                              _firstNameController, 'First Name'),
+                          _buildTextFormField(
+                              _middleNameController, 'Middle Name'),
+                          _buildTextFormField(_lastNameController, 'Last Name'),
+                          _buildTextFormField(_ageController, 'Age',
+                              isNumeric: true),
+                          _buildDropdownButtonFormField(
+                              'Gender', genderItems, _selectedGender, (value) {
+                            setState(() {
+                              _selectedGender = value;
+                            });
+                          }),
+                          _buildDropdownButtonFormField(
+                              'Skin Color', skinColorItems, _selectedSkinColor,
+                              (value) {
+                            setState(() {
+                              _selectedSkinColor = value;
+                            });
+                          }),
+                          _buildTextFormField(
+                              _lastPlaceSeenController, 'Last Place Seen'),
+                          _buildTextFormField(_lastTimeSeenController,
+                              'Last Time Seen (Months)',
+                              isNumeric: true),
+                          if (_showClothDetails) ...[
+                            _buildDropdownButtonFormField(
+                                'Upper Cloth Type',
+                                upperClothTypeItems,
+                                _selectedUpperClothType, (value) {
+                              setState(() {
+                                _selectedUpperClothType = value;
+                              });
+                            }),
+                            _buildDropdownButtonFormField(
+                                'Upper Cloth Color',
+                                upperClothColorItems,
+                                _selectedUpperClothColor, (value) {
+                              setState(() {
+                                _selectedUpperClothColor = value;
+                              });
+                            }),
+                            _buildDropdownButtonFormField(
+                                'Lower Cloth Type',
+                                lowerClothTypeItems,
+                                _selectedLowerClothType, (value) {
+                              setState(() {
+                                _selectedLowerClothType = value;
+                              });
+                            }),
+                            _buildDropdownButtonFormField(
+                                'Lower Cloth Color',
+                                lowerClothColorItems,
+                                _selectedLowerClothColor, (value) {
+                              setState(() {
+                                _selectedLowerClothColor = value;
+                              });
+                            }),
+                          ],
+                          //if (_showAdditionalDetails) ...[
+                          _buildTextFormField(
+                              _eyeDescriptionController, 'Eye Description'),
+                          _buildTextFormField(
+                              _noseDescriptionController, 'Nose Description'),
+                          _buildTextFormField(
+                              _hairDescriptionController, 'Hair Description'),
+                          _buildTextFormField(_lastAddressDescController,
+                              'Last Address Description'),
+                          _buildTextFormField(
+                              _medicalInformation, 'Medical Information'),
+                          _buildTextFormField(_circumstanceOfDisappearance,
+                              'Circumstance Of Disappearance'),
+                          // ],
+                        ],
+                      ),
+                    ),
                   ),
-                  TextFormField(
-                    controller: _middleNameController,
-                    decoration: const InputDecoration(labelText: 'Middle Name'),
-                  ),
-                  TextFormField(
-                    controller: _lastNameController,
-                    decoration: const InputDecoration(labelText: 'Last Name'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the last name';
-                      }
-                      return null;
-                    },
-                  ),
-                  DropdownButtonFormField<String>(
-                    value: _selectedGender,
-                    decoration: const InputDecoration(labelText: 'Gender'),
-                    items: <String>['Select Gender', 'Male', 'Female']
-                        .map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedGender = newValue;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value == 'Select Gender') {
-                        return 'Please select a gender';
-                      }
-                      return null;
-                    },
-                  ),
-                  DropdownButtonFormField<String>(
-                    value: _selectedSkinColor,
-                    decoration: const InputDecoration(labelText: 'Skin Color'),
-                    items: <String>[
-                      'Select Skin Color',
-                      'fair',
-                      'dark',
-                      'light',
-                      'brown',
-                      'black'
-                    ].map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedSkinColor = newValue;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value == 'Select Skin Color') {
-                        return 'Please select a skin color';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _ageController,
-                    decoration: const InputDecoration(labelText: 'Age'),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the age';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _lastPlaceSeenController,
-                    decoration:
-                        const InputDecoration(labelText: 'Last Place Seen'),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the last place seen';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _lastTimeSeenController,
-                    decoration: const InputDecoration(
-                        labelText: 'Last Time Seen (in months)'),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the last time seen';
-                      }
-                      return null;
-                    },
-                  ),
-                  if (_showClothDetails) ...[
-                    DropdownButtonFormField<String>(
-                      value: _selectedUpperClothType,
-                      decoration:
-                          const InputDecoration(labelText: 'Upper Cloth Type'),
-                      items: <String>[
-                        'Select Upper Cloth Type',
-                        'tshirt',
-                        'hoodie',
-                        'sweater',
-                        'sweetshirt'
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _selectedUpperClothType = newValue;
-                        });
-                      },
-                    ),
-                    DropdownButtonFormField<String>(
-                      value: _selectedUpperClothColor,
-                      decoration:
-                          const InputDecoration(labelText: 'Upper Cloth Color'),
-                      items: <String>[
-                        'Select Upper Cloth Color',
-                        'red',
-                        'blue',
-                        'white',
-                        'black',
-                        'orange',
-                        'light blue',
-                        'brown',
-                        'blue black',
-                        'yellow'
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _selectedUpperClothColor = newValue;
-                        });
-                      },
-                    ),
-                    DropdownButtonFormField<String>(
-                      value: _selectedLowerClothType,
-                      decoration:
-                          const InputDecoration(labelText: 'Lower Cloth Type'),
-                      items: <String>[
-                        'Select Lower Cloth Type',
-                        'trouser',
-                        'shorts',
-                        'nothing',
-                        'boxer'
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _selectedLowerClothType = newValue;
-                        });
-                      },
-                    ),
-                    DropdownButtonFormField<String>(
-                      value: _selectedLowerClothColor,
-                      decoration:
-                          const InputDecoration(labelText: 'Lower Cloth Color'),
-                      items: <String>[
-                        'Select Lower Cloth Color',
-                        'blue',
-                        'black',
-                        'white',
-                        'red',
-                        'orange',
-                        'light blue',
-                        'brown',
-                        'blue black',
-                        'yellow'
-                      ].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _selectedLowerClothColor = newValue;
-                        });
-                      },
-                    ),
-                  ],
-                  if (_showAdditionalDetails) ...[
-                    TextFormField(
-                      controller: _eyeDescriptionController,
-                      decoration:
-                          const InputDecoration(labelText: 'Eye Description'),
-                    ),
-                    TextFormField(
-                      controller: _noseDescriptionController,
-                      decoration:
-                          const InputDecoration(labelText: 'Nose Description'),
-                    ),
-                    TextFormField(
-                      controller: _hairDescriptionController,
-                      decoration:
-                          const InputDecoration(labelText: 'Hair Description'),
-                    ),
-                    TextFormField(
-                      controller: _lastAddressDescController,
-                      decoration: const InputDecoration(
-                          labelText: 'Last Address Description'),
-                    ),
-                    TextFormField(
-                      controller: _medicalInformation,
-                      decoration: const InputDecoration(
-                          labelText: 'Medical Information'),
-                    ),
-                    TextFormField(
-                      controller: _circumstanceOfDisappearance,
-                      decoration: const InputDecoration(
-                          labelText: 'Circumstance of Disappearance'),
-                    ),
-                  ],
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: _validateAndCompare,
-                    child: const Text('compare'),
+                    onPressed: _isLoading ? null : _validateAndCompare,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // background (button) color
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 60.0, vertical: 15.0), // Button size
+                      textStyle:
+                          TextStyle(fontSize: 18), // foreground (text) color
+                    ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator()
+                        : const Text('Compare'),
                   ),
                 ],
               ),
             ),
           ),
-          if (_isLoading)
-            Container(
-              color: Colors.black54,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTextFormField(
+    TextEditingController controller,
+    String labelText, {
+    bool isNumeric = false,
+  }) {
+    return Padding(
+  padding: const EdgeInsets.symmetric(vertical: 10),
+  child: TextFormField(
+    controller: controller,
+    keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+    decoration: InputDecoration(
+      labelText: labelText,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(
+          color: Colors.blue, // Outline color when text field is active
+        ),
+      ),
+    ),
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return '$labelText cannot be empty';
+      }
+      return null;
+    },
+  ),
+);
+  }
+
+  Widget _buildDropdownButtonFormField(
+    String labelText,
+    List<String> items,
+    String? selectedItem,
+    void Function(String?) onChanged,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          labelText: labelText,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        value: selectedItem,
+        onChanged: onChanged,
+        items: items.map((item) {
+          return DropdownMenuItem<String>(
+            value: item,
+            child: Text(item),
+          );
+        }).toList(),
+        validator: (value) {
+          if (value == null || value == 'Select $labelText') {
+            return 'Please select a $labelText';
+          }
+          return null;
+        },
       ),
     );
   }

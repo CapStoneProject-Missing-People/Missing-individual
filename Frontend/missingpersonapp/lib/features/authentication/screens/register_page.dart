@@ -94,19 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 height: 10,
               ),
 
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Forgot Password?",
-                      style:
-                          TextStyle(color: Colors.blue.shade600, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
+              
               SizedBox(
                 height: 15,
               ),

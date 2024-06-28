@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:missingpersonapp/features/authentication/models/missing_person_model.dart';
 import 'package:missingpersonapp/features/authentication/models/user.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
+import 'package:missingpersonapp/features/authentication/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mime/mime.dart';
 
 class MissingPersonProvider extends ChangeNotifier {
   List<MissingPersonSpecific> _missingPersons = [];
@@ -15,7 +19,7 @@ class MissingPersonProvider extends ChangeNotifier {
 
   List<MissingPersonSpecific> get missingPersons => _missingPersons;
 
-  Future<void> fetchMissingPersons() async {
+  Future<void> fetchMissingPersons(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('authorization');
     final http.Response response = await http.get(
@@ -26,39 +30,27 @@ class MissingPersonProvider extends ChangeNotifier {
       },
     );
 
-    if (response.statusCode == 200) {
-      print(response.body.runtimeType);
-      final List<dynamic> data = jsonDecode(response.body);
-      print(data);
-
-      if (data.isNotEmpty) {
-        _missingPersons = data.map((item) {
-          return MissingPersonSpecific.fromJson(item);
-        }).toList();
-      } else {
-        _missingPersons = [];
-      }
-      notifyListeners();
-    } else {
-      throw Exception('Failed to load missing persons');
-    }
+    httpErrorHandle(
+      response: response,
+      context: context,
+      onSuccess: () {
+        final List<dynamic> data = jsonDecode(response.body);
+        if (data.isNotEmpty) {
+          _missingPersons = data.map((item) {
+            return MissingPersonSpecific.fromJson(item);
+          }).toList();
+        } else {
+          _missingPersons = [];
+        }
+        notifyListeners();
+      },
+    );
   }
 
-  /* void removeMissingPerson(MissingPerson person) {
-    _missingPersons.remove(person);
-    notifyListeners();
-  } */
-  Future<void> removeMissingPerson(MissingPersonSpecific missingPerson) async {
-    int timeSinceDisappearance;
-    if (missingPerson.featureType == 'feature_gt_2') {
-      timeSinceDisappearance = 4; // Example value greater than 2
-    } else {
-      timeSinceDisappearance =
-          2; // Default value if featureType is not 'feature_gt_2'
-    }
-
+  Future<void> removeMissingPerson(
+      MissingPersonSpecific missingPerson, BuildContext context) async {
     final url = Uri.parse(
-        '${Constants.postUri}/api/features/delete/${missingPerson.id}?timeSinceDisappearance=${timeSinceDisappearance}');
+        '${Constants.postUri}/api/features/delete/${missingPerson.id}?timeSinceDisappearance=${missingPerson.timeSinceDisappearance}');
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('authorization');
@@ -70,24 +62,23 @@ class MissingPersonProvider extends ChangeNotifier {
           'Authorization': 'Bearer $token'
         },
       );
-      print(response.statusCode);
 
-      if (response.statusCode == 200) {
-        // Successfully deleted from the server
-        _missingPersons.remove(missingPerson);
-        notifyListeners();
-      } else {
-        // Handle server errors
-        throw Exception('Failed to delete the missing person');
-      }
+      httpErrorHandle(
+        response: response,
+        context: context,
+        onSuccess: () {
+          _missingPersons.remove(missingPerson);
+          notifyListeners();
+        },
+      );
     } catch (error) {
-      // Handle network errors or other issues
-      throw Exception('Failed to delete the missing person: $error');
+      showToast(
+          context, 'Failed to delete the missing person: $error', Colors.red);
     }
   }
 
-  Future<void> updateMissingPersonField(
-      MissingPersonSpecific missingPerson, String field, String newValue) async {
+  Future<void> updateMissingPersonField(MissingPersonSpecific missingPerson,
+      String field, String newValue, BuildContext context) async {
     switch (field) {
       case 'First Name':
         missingPerson.name.firstName = newValue;
@@ -132,16 +123,16 @@ class MissingPersonProvider extends ChangeNotifier {
         return;
     }
 
-    // Determine the timeSinceDisappearance
-    int timeSinceDisappearance;
-    if (missingPerson.featureType == 'feature_gt_2') {
-      timeSinceDisappearance = 4; // Example value greater than 2
-    } else {
-      timeSinceDisappearance =
-          2; // Default value if featureType is not 'feature_gt_2'
-    }
-
     String toCamelCase(String str) {
+      if (str == 'First Name') {
+        return 'name.firstName';
+      } else if (str == 'Last Name') {
+        return 'name.lastName';
+      } else if (str == 'middle name') {
+        return 'name.middlename';
+      }
+
+
       List<String> parts = str.split(' ');
       if (parts.length >= 2) {
         String camelCaseStr = parts[0].toLowerCase();
@@ -151,25 +142,18 @@ class MissingPersonProvider extends ChangeNotifier {
         }
         return camelCaseStr;
       }
-      str = str.toLowerCase();
-      return str; // Return the original string if it has fewer than two parts
+      return str
+          .toLowerCase(); // Return the original string in lowercase if it has fewer than two parts
     }
 
-    // Prepare the data to send to the update API
     final updatedTerm = newValue;
     final updatedBy = toCamelCase(field);
     final updateData = {'updateBy': updatedBy, 'updateTerm': updatedTerm};
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('authorization');
-    print(user.id);
-    print(token);
-    print(missingPerson.featureId);
-    print(updatedBy);
-    print(updatedTerm);
 
-    // API call to update the missing person field
     final url = Uri.parse(
-        '${Constants.postUri}/api/features/updateFeature/${missingPerson.id}?timeSinceDisappearance=${timeSinceDisappearance}');
+        '${Constants.postUri}/api/features/updateFeature/${missingPerson.id}?timeSinceDisappearance=${missingPerson.timeSinceDisappearance}');
 
     final response = await http.put(
       url,
@@ -180,15 +164,48 @@ class MissingPersonProvider extends ChangeNotifier {
       body: json.encode(updateData),
     );
 
-    print(response.statusCode);
+    httpErrorHandle(
+      response: response,
+      context: context,
+      onSuccess: () {
+        notifyListeners();
+      },
+    );
+  }
 
-    if (response.statusCode == 200) {
-      // Update was successful, notify listeners
-      print("updated succesfully");
-      notifyListeners();
-    } else {
-      // Handle error response
-      throw Exception('Failed to update missing person');
+  Future<void> updateMissingPersonPhotos(MissingPersonSpecific missingPerson,
+      List<Uint8List> photos, BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('authorization');
+
+    final url = Uri.parse('${Constants.postUri}/api/update-image');
+
+    final request = http.MultipartRequest('PUT', url)
+      ..headers['Authorization'] = 'Bearer $token'
+      ..fields['missingId'] = missingPerson.missingCase.id;
+
+    for (int i = 0; i < photos.length; i++) {
+      final photo = photos[i];
+      final mimeType = lookupMimeType('', headerBytes: photo);
+      final mediaType = MediaType.parse(mimeType ?? 'application/octet-stream');
+      request.files.add(http.MultipartFile.fromBytes(
+        'images',
+        photo,
+        filename: 'image$i.${mediaType.subtype}',
+        contentType: mediaType,
+      ));
     }
+
+    final response = await request.send();
+    final responseBody = await http.Response.fromStream(response);
+
+    httpErrorHandle(
+      response: responseBody,
+      context: context,
+      onSuccess: () {
+        missingPerson.photos = photos;
+        notifyListeners();
+      },
+    );
   }
 }

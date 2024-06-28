@@ -6,7 +6,7 @@ const baseAttributes = {
   user_id: {
     type: Schema.Types.ObjectId ,
     required: true,
-    ref: "user",
+    ref: "User",
   },
   mergedFeatureId: {
     type: Schema.Types.ObjectId,
@@ -48,6 +48,7 @@ const baseAttributes = {
   age: {
     type: Number,
     required: true,
+    max: 120, // Set maximum age constraint here
   },
   skin_color: {
     type: String,
@@ -70,7 +71,7 @@ const baseAttributes = {
     lower: {
       clothType: {
         type: String,
-        enum: ["trouser", "short", "nothing", "boxer"],
+        enum: ["trouser", "shorts", "nothing", "boxer"],
         required: true,
       },
       clothColor: {

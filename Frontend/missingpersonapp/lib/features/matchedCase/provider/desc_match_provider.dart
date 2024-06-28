@@ -3,24 +3,30 @@ import 'package:missingpersonapp/features/matchedCase/models/description_match_m
 import 'package:missingpersonapp/features/matchedCase/service/missing_person_match_service.dart';
 
 class DescriptionMatchProvider with ChangeNotifier {
-  final MissingPersonService _service = MissingPersonService();
-  List<MissingPersonDescMatch> _missingPersons = [];
+  final DescriptionMatchService apiService;
+  List<PotentialMatch> _matches = [];
   bool _isLoading = false;
+  bool get hasError => false;
 
-  List<MissingPersonDescMatch> get missingPersons => _missingPersons;
+  DescriptionMatchProvider({required this.apiService});
+
+  List<PotentialMatch> get matches => _matches;
   bool get isLoading => _isLoading;
+  
 
-  Future<void> fetchMissingPersons() async {
+  Future<void> fetchMatches() async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      _missingPersons = await _service.fetchMissingPersons() as List<MissingPersonDescMatch>;
+      _matches = await apiService.getPotentialMatches();
+      print('Matches in fetchMatches: $_matches');
     } catch (e) {
-      // Handle error
+      print('Error fetching matches: $e'); // Add error logging
+      // Handle errors
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 }

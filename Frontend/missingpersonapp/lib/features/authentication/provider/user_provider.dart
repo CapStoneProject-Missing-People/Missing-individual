@@ -55,4 +55,16 @@ class UserProvider extends ChangeNotifier {
     }
     return success;
   }
+
+  void clearUser() {
+    _user = User(
+      id: '',
+      name: '',
+      email: '',
+      phoneNo: '',
+      token: '',
+      password: '',
+    );
+    notifyListeners();
+  }
 }

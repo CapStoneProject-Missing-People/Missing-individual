@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 
 Future<MissingPerson> fetchmatchCase(String caseID) async {
+  print('the id: ' + caseID);
   final response = await http.get(
     Uri.parse("${Constants.postUri}/api/get-match/$caseID",),
   );
@@ -15,19 +16,33 @@ Future<MissingPerson> fetchmatchCase(String caseID) async {
         (jsonData['missing_case_id']['imageBuffers'] as List<dynamic>)
             .map((imageUrl) => base64Decode(imageUrl))
             .toList();
+          print('the data is: ' + jsonData.toString());
     return MissingPerson(
-      missing_id: jsonData['missing_case_id']['_id'],
-      name: jsonData['name']['firstName'],
-      body_size: jsonData['body_size'],
-      age: jsonData['age'],
-      gender: jsonData['gender'],
-      skin_color: jsonData['skin_color'],
-      photos: imageBuffers,
-      phoneNo: '123-456-7890', // Temporary placeholder
-      description: jsonData['description'],
-      status: jsonData['missing_case_id']['status'],
-      date_reported: jsonData['missing_case_id']['dateReported'],
-    );
+            name: jsonData['name']['firstName'] ?? '',
+            middleName: jsonData['name']['middleName'] ?? '',
+            lastName: jsonData['name']['lastName'] ?? '',
+            gender: jsonData['gender'] ?? '',
+            age: jsonData['age'] ?? 0,
+            posterName: jsonData['user_id']['name'] ?? '',
+            posterEmail: jsonData['user_id']['email'] ?? '',
+            posterPhone: jsonData['user_id']['phoneNo'] ?? '',
+            poster_id: jsonData['user_id']['_id'] ?? '',
+            id: jsonData['_id'] ?? '',
+            skin_color: jsonData['skin_color'] ?? '',
+            lastSeenLocation: jsonData['lastSeenLocation'] ?? '',
+            upperClothColor: jsonData['upperClothColor'] ?? '',
+            upperClothType: jsonData['upperClothType'] ?? '',
+            lowerClothColor: jsonData['lowerClothColor'] ?? '',
+            lowerClothType: jsonData['lowerClothType'] ?? '',
+            status: jsonData['missing_case_id']['status'] ?? '',
+            dateReported: jsonData['missing_case_id']['dateReported'] ?? '',
+            photos: imageBuffers,
+            description: jsonData['description'] ?? '',
+            medicalInformation: jsonData['medicalInformation'] ?? '',
+            timeSinceDisappearance: jsonData['timeSinceDisappearance'] ?? 0,
+            circumstanceOfDisappearance: jsonData['circumstanceOfDisappearance'] ?? '',
+            bodySize: jsonData['bodySize'] ?? '',
+          );
   } else {
     throw Exception('Failed to fetch the case');
   }

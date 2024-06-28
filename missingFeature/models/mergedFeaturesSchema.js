@@ -55,7 +55,7 @@ const MergedFeatures = new Schema({
     lower: {
       clothType: {
         type: String,
-        enum: ["trouser", "short", "nothing", "boxer"],
+        enum: ["trouser", "shorts", "nothing", "boxer"],
         required: false,
       },
       clothColor: {

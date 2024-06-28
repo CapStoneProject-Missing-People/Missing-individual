@@ -24,11 +24,8 @@ class MissingPeopleDisplay extends StatelessWidget {
   Future<void> _shareMissingPerson(BuildContext context) async {
     final String shareContent = '''
 Missing Person Details:
-First Name: ${missingPerson.name.firstName}
-Middle Name: ${missingPerson.name.middleName}
-Last Name: ${missingPerson.name.lastName}
+First Name: ${missingPerson.name}
 Age: ${missingPerson.age}
-Skin Color: ${missingPerson.skinColor}
     ''';
 
     List<XFile> files = [];
@@ -99,6 +96,15 @@ Skin Color: ${missingPerson.skinColor}
                           ),
                         ),
                       ),
+                      SizedBox(width: 6),
+                      Text(missingPerson.middleName,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      
                     ],
                   ),
                   const SizedBox(height: 5),
@@ -149,7 +155,7 @@ Skin Color: ${missingPerson.skinColor}
                     children: [
                       GestureDetector(
                         onTap: () async {
-                          final url = 'tel:${missingPerson.phoneNo}';
+                          final url = 'tel:${missingPerson.posterPhone}';
                           if (await canLaunch(url)) {
                             await launch(url);
                           } else {
@@ -164,7 +170,7 @@ Skin Color: ${missingPerson.skinColor}
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              missingPerson.phoneNo,
+                              missingPerson.posterPhone,
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 color: Colors.grey.shade800,

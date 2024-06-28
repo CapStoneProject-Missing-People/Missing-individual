@@ -143,6 +143,7 @@ export const sendNotificationToAllUsersAndGuests = async (
         fcmToken: guest,
       });
     }
+    console.log("Notification sent to all users and guests");
   } catch (error) {
     console.error(
       "Error sending notifications to all users and guests:",

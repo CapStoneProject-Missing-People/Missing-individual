@@ -87,6 +87,7 @@ class _DetailMatchPageState extends State<DetailMatchPage> {
                 child: Image.memory(widget.match.imageBuffer, height: 200),
               ),
             ),
+            Text("id : ${widget.match.id}"),
             const SizedBox(height: 20),
             if (widget.match.location.isNotEmpty)
               if (widget.match.location.isNotEmpty)
@@ -101,7 +102,7 @@ class _DetailMatchPageState extends State<DetailMatchPage> {
 
                   height: 60,
                   color: Colors.grey[200],
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.location_on, color: Colors.blue, size: 32,),
@@ -157,7 +158,7 @@ class _DetailMatchPageState extends State<DetailMatchPage> {
   void acceptMatch() async {
     try {
       await Provider.of<MatchedCaseProvider>(context, listen: false)
-          .updateStatusToFound(widget.id);
+          .updateStatusToFound(widget.id, widget.match.id);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Match accepted!')),
       );
@@ -168,7 +169,18 @@ class _DetailMatchPageState extends State<DetailMatchPage> {
     }
   }
 
-  void declineMatch() {
-    // decline match
-  }
+  
+    void declineMatch() async {
+      try {
+        await Provider.of<MatchedCaseProvider>(context, listen: false)
+            .deleteMatchedCase(widget.id);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Match declined!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to decline match: $e')),
+        );
+      }
+    }
 }

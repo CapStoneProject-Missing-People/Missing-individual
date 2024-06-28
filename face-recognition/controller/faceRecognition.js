@@ -28,7 +28,7 @@ export const RecognizeFace = async (req, res) => {
     await logData({
       action: "FaceRecognition",
       user_id: result.person_id || "",
-      user_agent: req.headers["user-agent"],
+      user_agent: req.headers["user-agent"] || "",
       method: req.method,
       ip: req.socket.remoteAddress,
       status: 200,
@@ -54,7 +54,7 @@ export const RecognizeFace = async (req, res) => {
     await logData({
       action: "FaceRecognition",
       user_id: "",
-      user_agent: req.headers["User-Agent"],
+      user_agent: req.headers["user-Agent"] || "",
       method: req.method,
       ip: req.socket.remoteAddress,
       status: 500,
@@ -74,7 +74,7 @@ export const addFaceFeature = async (req, res) => {
   try {
     const {images, person_id} = req.body;
     // Check if person_id is provided
-    
+    console.log('inside add feature')
     if (!person_id) {
       return res.status(400).json({ message: "person_id is required." });
     }
@@ -82,17 +82,19 @@ export const addFaceFeature = async (req, res) => {
     // Check if any images are provided
     if (!images || images.length === 0) {
       return res.status(400).json({ message: "No images provided." });
+    console.log("No images provided.")
     }
     // Process each uploaded image for face recognition
     if (images.length === 0) {
       return res.status(400).json({ message: "No images provided." });
+      console.log("No images provided. inside .length === 0")
     }
 
     // Delete existing face feature for the person_id
     await deleteFaceFeature(person_id);
 
     let result = await uploadFaceFeature(images, person_id);
-
+    console.log('result', result)
     if (result) {
       return res.status(200).json({ message: "Face stored" });
     } else {

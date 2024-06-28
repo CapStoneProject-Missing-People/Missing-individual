@@ -1,9 +1,12 @@
 // home_page.dart
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:missingpersonapp/common/utils/add_guard.dart';
 import 'package:missingpersonapp/features/Notifications/screens/display_notification.dart';
 import 'package:missingpersonapp/features/PostAdd/screens/addpost.dart';
+import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
+import 'package:missingpersonapp/features/chat/screens/chat_list_screen.dart';
 import 'package:missingpersonapp/features/compare/screens/compare.dart';
 import 'package:missingpersonapp/features/home/screens/bottom_sheet_widget.dart';
 import 'package:missingpersonapp/features/home/screens/check_face.dart';
@@ -122,16 +125,24 @@ class _HomePageState extends State<HomePage> {
       drawer: const ProfileDrawer(),
       body: Stack(
         children: [
-        _selectedIndex == 0
-    ? HomePageContent(
-        searchText: _searchText,
-        filters: _filters,
-      )
-    : _selectedIndex == 1
-        ? const MissingPersonAddPage()
-        : _selectedIndex == 2
-            ? const NotificationPage()
-            : const ComparePersonPage(),
+          _selectedIndex == 0
+              ? HomePageContent(
+                  searchText: _searchText,
+                  filters: _filters,
+                )
+              : _selectedIndex == 1
+                  ? AuthGuard(child: MissingPersonAddPage())
+                  : _selectedIndex == 2
+                      ? const ComparePersonPage()
+                      : _selectedIndex == 3
+                          ? AuthGuard(
+                              child: ChatListScreen(
+                              userId: Provider.of<UserProvider>(context,
+                                      listen: false)
+                                  .user
+                                  .id,
+                            ))
+                          : const NotificationPage(),
           MyDraggableSheet(
             visible: _isFilterVisible,
             onFilterChanged: _onFilterChanged,
@@ -156,6 +167,14 @@ class _HomePageState extends State<HomePage> {
               const BottomNavigationBarItem(
                 icon: Icon(Icons.add_box_outlined),
                 label: 'Add Post',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.compare_arrows_outlined),
+                label: 'Compare',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.message_outlined),
+                label: 'Messages',
               ),
               BottomNavigationBarItem(
                 icon: Stack(
@@ -267,11 +286,13 @@ class _HomePageState extends State<HomePage> {
       case 1:
         return 'Add Post';
       case 2:
-        return 'Notification';
+        return 'Compare';
       case 3:
-        return 'Compare Feature';
+        return 'Messages';
+      case 4:
+        return 'Notification';
       default:
-        return 'Missing Person App';
+        return 'Notification';
     }
   }
 }

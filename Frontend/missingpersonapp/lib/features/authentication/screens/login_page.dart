@@ -71,20 +71,6 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 10,
               ),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Forgot Password?",
-                      style:
-                          TextStyle(color: Colors.blue.shade600, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
               SizedBox(
                 height: 25,
               ),

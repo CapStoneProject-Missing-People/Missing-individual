@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:typed_data';
@@ -162,12 +163,12 @@ Status: ${missingPerson.missingCase.status}
                                                   context,
                                                   listen: false)
                                               .removeMissingPerson(
-                                                  missingPerson);
+                                                  missingPerson, context);
                                           Navigator.of(context).pop();
                                         } catch (error) {
                                           print(
                                               'Failed to delete the missing person: $error');
-                                          showToast(context, error.toString());
+                                          showToast(context, error.toString(), Colors.red);
                                         }
                                       },
                                       child: const Text(

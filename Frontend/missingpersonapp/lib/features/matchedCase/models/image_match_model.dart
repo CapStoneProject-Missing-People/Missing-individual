@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'dart:convert';
 
 class ImageMatch {
+  final id;
   final double distance;
   final double similarity;
   final DateTime createdAt;
@@ -10,6 +11,7 @@ class ImageMatch {
   final List<dynamic> location;
 
   ImageMatch({
+    required this.id,
     required this.distance,
     required this.similarity,
     required this.createdAt,
@@ -21,6 +23,7 @@ class ImageMatch {
   factory ImageMatch.fromJson(Map<String, dynamic> json) {
     print('match location ${json['location']}');
     return ImageMatch(
+      id: json['id'],
       distance: double.parse(json['distance'].toString()),
       similarity: double.parse(json['similarity'].toString()),
       createdAt: DateTime.parse(json['createdAt']),

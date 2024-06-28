@@ -22,7 +22,7 @@ class _MissingPersonPageState extends State<MissingPersonPage> {
   Future<void> fetchMissingPersons() async {
     try {
       await Provider.of<MissingPersonProvider>(context, listen: false)
-          .fetchMissingPersons();
+          .fetchMissingPersons(context);
     } catch (e) {
       // Handle the exception, e.g., display an error message
       print('Error fetching missing persons: $e');
@@ -31,7 +31,7 @@ class _MissingPersonPageState extends State<MissingPersonPage> {
           content: Text('Error fetching missing persons: $e'),
         ),
       ); */
-      showToast(context, e.toString());
+      showToast(context, e.toString(), Colors.red);
     }
   }
 

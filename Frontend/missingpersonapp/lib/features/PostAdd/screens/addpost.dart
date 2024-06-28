@@ -24,6 +24,8 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   final TextEditingController _lastPlaceSeenController = TextEditingController();
   final TextEditingController _lastTimeSeenController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _medicalInformation = TextEditingController();
+  final TextEditingController _circumstanceOfDisappearance = TextEditingController();
   final TextEditingController _eyeDescriptionController = TextEditingController();
   final TextEditingController _noseDescriptionController = TextEditingController();
   final TextEditingController _hairDescriptionController = TextEditingController();
@@ -65,6 +67,8 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
     _eyeDescriptionController.dispose();
     _noseDescriptionController.dispose();
     _hairDescriptionController.dispose();
+    _medicalInformation.dispose();
+    _circumstanceOfDisappearance.dispose();
     super.dispose();
   }
 
@@ -125,6 +129,8 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
       request.fields['eyeDescription'] = missingPerson.eyeDescription;
       request.fields['noseDescription'] = missingPerson.noseDescription;
       request.fields['hairDescription'] = missingPerson.hairDescription;
+      request.fields['medicalInformation'] = _medicalInformation.text;
+      request.fields['circumstanceOfDisappearance'] = _circumstanceOfDisappearance.text;
 
       for (var i = 0; i < _images.length; i++) {
         request.files.add(await http.MultipartFile.fromPath(
@@ -230,8 +236,7 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
                   _buildTextField(_middleNameController, 'Middle Name'),
                   const SizedBox(height: 10),
                   _buildTextField(_lastNameController, 'Last Name'),
-                  const SizedBox(height: 10),
-                  _buildTextField(_lastPlaceSeenController, 'Last Place Seen'),
+                  
                   const SizedBox(height: 10),
                   _buildTextField(_lastTimeSeenController,
                       'Last Time Seen (in months)', TextInputType.number),
@@ -293,12 +298,16 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
                         _selectedLowerClothColor = newValue!;
                       });
                     }),
+                    const SizedBox(height: 10),
+                  _buildTextField(_lastPlaceSeenController, 'Last Place Seen'),
                   ],
+                    _buildTextField(_medicalInformation, "Medical Information"),
+                    _buildTextField(_circumstanceOfDisappearance, "Circumstance of Disappearance"),
                   const SizedBox(height: 10),
                   ElevatedButton.icon(
                     onPressed: pickImages,
-                    icon: const Icon(Icons.add_a_photo),
-                    label: const Text('Add Images'),
+                    icon: const Icon(Icons.add_a_photo, color: Color.fromARGB(255, 98, 146, 228)),
+                    label: const Text('Add Images', style: TextStyle(color: Color.fromARGB(255, 98, 146, 228)),),
                   ),
                   const SizedBox(height: 10),
                   _buildImageGrid(),
@@ -308,7 +317,8 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
                   else
                     ElevatedButton(
                       onPressed: _validateAndSubmit,
-                      child: const Text('Submit'),
+                      child: const Text('Submit', style: TextStyle(color: Color.fromARGB(255, 71, 162, 236)),
+                    ),
                     ),
                 ],
               ),

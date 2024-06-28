@@ -5,6 +5,7 @@ class ChatItem extends StatelessWidget {
   final String messagePreview;
   final String time;
   final bool isRead;
+  final bool isChatWithSelf;
   final VoidCallback onTap;
 
   const ChatItem({
@@ -13,13 +14,14 @@ class ChatItem extends StatelessWidget {
     required this.messagePreview,
     required this.time,
     required this.isRead,
+    required this.isChatWithSelf,
     required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: isChatWithSelf ? null : onTap,
       child: Container(
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
@@ -65,24 +67,25 @@ class ChatItem extends StatelessWidget {
               ),
             ),
             SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  time,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 12,
+            if (!isChatWithSelf)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    time,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-                SizedBox(height: 4),
-                Icon(
-                  isRead ? Icons.check_circle : Icons.check_circle_outline,
-                  color: isRead ? Colors.blue : Colors.grey,
-                  size: 16,
-                ),
-              ],
-            ),
+                  SizedBox(height: 4),
+                  Icon(
+                    isRead ? Icons.check_circle : Icons.check_circle_outline,
+                    color: isRead ? Colors.blue : Colors.grey,
+                    size: 16,
+                  ),
+                ],
+              ),
           ],
         ),
       ),

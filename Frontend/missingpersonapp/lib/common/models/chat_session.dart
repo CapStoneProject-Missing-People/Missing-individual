@@ -5,6 +5,7 @@ class ChatSession {
   final String message;
   final DateTime time;
   final bool read;
+  final String imageUrl;
 
   ChatSession({
     required this.id,
@@ -13,6 +14,7 @@ class ChatSession {
     required this.message,
     required this.time,
     required this.read,
+    this.imageUrl = '', // Default value for imageUrl
   });
 
   factory ChatSession.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class ChatSession {
       message: json['message'] ?? '',
       time: json['time'] != null ? DateTime.parse(json['time']) : DateTime.now(),
       read: json['read'] ?? false,
+      imageUrl: json['imageUrl'] ?? '', // Handle imageUrl
     );
   }
 }

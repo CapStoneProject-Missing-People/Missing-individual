@@ -27,18 +27,21 @@ class FeatureCompare {
 
   factory FeatureCompare.fromJson(Map<String, dynamic> json) {
     return FeatureCompare(
-      id: json['id'],
-      firstNameMatch: json['firstNameMatch'].toDouble(),
-      middleNameMatch: json['middleNameMatch'].toDouble(),
-      lastNameMatch: json['lastNameMatch'].toDouble(),
-      genderMatch: json['genderMatch'].toDouble(),
-      skinColorMatch: json['skinColorMatch'].toDouble(),
-      lastSeenLocationMatch: json['lastSeenLocationMatch'].toDouble(),
-      medicalInformationMatch: json['medicalInformationMatch'].toDouble(),
-      circumstanceOfDisappearanceMatch:
-          json['circumstanceOfDisappearanceMatch'].toDouble(),
-      similarityScore: json['similarityScore'].toDouble(),
-      aggregateSimilarity: json['aggregateSimilarity'].toDouble(),
+      id: json['id'] ?? '',
+      firstNameMatch: (json['name.firstName'] ?? 0).toDouble(),
+      middleNameMatch: (json['name.middleName'] ?? 0).toDouble(),
+      lastNameMatch: (json['name.lastName'] ?? 0).toDouble(),
+      genderMatch: (json['gender'] ?? 0).toDouble(),
+      skinColorMatch: (json['skin_color'] ?? 0).toDouble(),
+      lastSeenLocationMatch: (json['lastSeenLocation'] ?? 0).toDouble(),
+      medicalInformationMatch: (json['medicalInformation'] ?? 0).toDouble(),
+      circumstanceOfDisappearanceMatch: (json['circumstanceOfDisappearance'] ?? 0).toDouble(),
+      similarityScore: (json['similarityScore'] ?? 0).toDouble(),
+      aggregateSimilarity: (json['aggregateSimilarity'] ?? 0).toDouble(),
     );
+  }
+
+  static List<FeatureCompare> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => FeatureCompare.fromJson(json)).toList();
   }
 }

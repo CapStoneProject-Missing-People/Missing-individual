@@ -21,7 +21,7 @@ class CaseMatchedProvider with ChangeNotifier {
       _case = await fetchmatchCase(caseID);
       _errorMessage = ''; // Clear any previous error message
     } catch (e) {
-      _errorMessage = 'Failed to fetch the case';
+      _errorMessage = e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -86,25 +86,26 @@ export const CreateMissingPerson = async (req, res) => {
       }
     }
     parsedData.clothing = clothing;
-    console.log('Parsed Data: ', parsedData); // Debugging line
 
     let userID = req.user.userId;
 
     // Handling feature creation
     const result = await createFeature(parsedData, timeSinceDisappearance, userID, res);
-    if (typeof(result.message) === "string") {
+    console.log('result: ', result)
+    if (typeof(result) === "string") {
       return res.status(400).json({status: result.statusCode, message: result.message});
     }
-    console.log('result')
-    console.log(result);
+   console.log('after return')
 
     const images = req.files;
+
     const imageBuffers = images.map((image) => image.buffer);
     // Create a new missing person record in the database
     const newMissingPerson = new MissingPerson({
       userID,
       imageBuffers,
     });
+    console.log(imageBuffers);
     const response = await axios.post(
       "http://localhost:6000/add-face-feature",
       {
@@ -119,7 +120,6 @@ export const CreateMissingPerson = async (req, res) => {
     }
   
     await newMissingPerson.save();
-    console.log(newMissingPerson._id);
     result.createdFeature.missing_case_id = newMissingPerson._id;
     result.mergedFeature.missing_case_id = newMissingPerson._id;
 
@@ -153,6 +153,7 @@ export const GetMissingPerson = async (req, res) => {
       personIds: caseIds,
     });
 
+    console.log("missing perosn: " + matchesResponse.data.facematch);
     if (matchesResponse.status !== 200) {
       throw new Error('Failed to get face matches from external API');
     }
@@ -170,7 +171,6 @@ export const GetMissingPerson = async (req, res) => {
         })  // Convert buffers to Base64 strings if necessary
       }))
     }));
-
     res.status(200).json({ success: true, data: matchedPeopleResults });
   } catch (error) {
     console.error('Error getting missing person:', error.message);
@@ -180,10 +180,8 @@ export const GetMissingPerson = async (req, res) => {
 
 
 export const GetMergedId = async (req, res) => {
-  console.log('inside')
   try {
     const { caseId } = req.params;
-    console.log(caseId);
     
     // Search for the MergedFeature using the caseId
     const mergedFeature = await MergedFeaturesModel.findOne({ missing_case_id: caseId });
@@ -199,8 +197,11 @@ export const GetMergedId = async (req, res) => {
     const response =  await MergedFeaturesModel.findById(mergedFeatureId).lean().populate({
       path: 'missing_case_id',
       select: ['status', 'imageBuffers', 'dateReported']
+    })
+    .populate({
+      path: 'user_id',
+      select: ['name', 'email', 'phoneNo'] // Select fields you want to populate from User model
     });
-    console.log(response)
     // Use the response in the API response
     return res.status(200).json({ response });
   } catch (error) {
@@ -211,7 +212,10 @@ export const GetMergedId = async (req, res) => {
 
 export const UpdateMissingStatusToFound = async (req, res) => {
   try {
-    const { caseId } = req.params;
+    const { status, caseId, matchid } = req.body;
+  console.log(status);
+  console.log(caseId);
+  console.log(matchid);    
 
     // Find the missing person record by caseId
     const missingPerson = await MissingPerson.findById(caseId);
@@ -223,6 +227,7 @@ export const UpdateMissingStatusToFound = async (req, res) => {
     // Update the missing status to "found"
     missingPerson.status = "found";
     await missingPerson.save();
+    await axios.post('http://localhost:6000/update-match-status', { matchId: matchid, isMatch: "match"});
 
     return res.status(200).json({ message: "Missing status updated to found" });
   } catch (error) {
@@ -256,7 +261,6 @@ export const UpdateMissingStatusToMissing = async (req, res) => {
 export const UpdateMissingStatusToPending = async (req, res) => {
   try {
     const { caseId } = req.params;
-    console.log(caseId)
 
     // Find the missing person record by caseId
     const missingPerson = await MissingPerson.findById(caseId);

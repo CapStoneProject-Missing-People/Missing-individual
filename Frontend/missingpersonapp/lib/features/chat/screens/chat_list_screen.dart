@@ -30,9 +30,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
     final currentUser = userProvider.user;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Chats'),
-      ),
       body: chatProvider.isLoading
           ? Center(child: CircularProgressIndicator())
           : chatProvider.errorMessage.isNotEmpty
@@ -46,6 +43,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                         final chat = chatProvider.groupedChatSessions[otherUserId]!;
                         final otherUserName = chat.userId1 == currentUser.id ? chat.userId2 : chat.userId1;
                         final lastMessageTime = chat.time;
+                        final isChatWithSelf = otherUserId == currentUser.id;
 
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -54,6 +52,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                             messagePreview: chat.message,
                             time: TimeOfDay.fromDateTime(lastMessageTime).format(context),
                             isRead: chat.read,
+                            isChatWithSelf: isChatWithSelf,
                             onTap: () {
                               Navigator.push(
                                 context,

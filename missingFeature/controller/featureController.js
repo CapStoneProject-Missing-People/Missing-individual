@@ -6,6 +6,8 @@ import matchingStatus from "../models/matchingStatus.js"
 import mongoose from "mongoose";
 import { matchFeatures } from "../service/matchFeatures.js"
 import MergedFeaturesModel from "../models/mergedFeaturesSchema.js";
+import MissingPerson from "../models/missingPersonSchema.js";
+import axios from "axios";
 
 
 export const getOwnFeatures = async (req, res) => {
@@ -74,7 +76,6 @@ export const getFeatures = async (req, res) => {
         filterCriteria.user_id = req.user.userId;
       }
     }
-    
     const features = await MergedFeaturesModel.find(filterCriteria)
     .lean()
     .populate({
@@ -83,9 +84,9 @@ export const getFeatures = async (req, res) => {
     })
     .populate({
       path: 'user_id',
-      select: ['name', 'email'] // Select fields you want to populate from User model
-    });    console.log(features);
-
+      select: ['name', 'email', 'phoneNo'] // Select fields you want to populate from User model
+    });
+    console.log(features);
     res.status(200).json(features);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
@@ -102,6 +103,10 @@ export const getFeature = async (req, res) => {
     const feature = await MergedFeaturesModel.findById(req.params.caseId).lean().populate({
       path: 'missing_case_id',
       select: ['status', 'imageBuffers', 'dateReported']
+    })
+    .populate({
+      path: 'user_id',
+      select: ['name', 'email', 'phoneNo'] // Select fields you want to populate from User model
     });
 
     if (!feature) {
@@ -660,6 +665,9 @@ export const deleteFeature = async (req, res) => {
         "User don't have permission to update other users feature!"
       );
     }
+console.log(mergedFeature.missing_case_id);
+    await MissingPerson.findByIdAndDelete(mergedFeature.missing_case_id);
+    await axios.delete(`http://localhost:6000/delete-image/${mergedFeature.missing_case_id}`);
     await mergedFeature.deleteOne();
     Features.deleteOne(Features.mergedFeatureId);
     res
@@ -707,13 +715,42 @@ export const searchFeature = async (req, res) => {
 
 export const getPotentialMatchs = async (req, res) => {
   try {
-    console.log(req.user.userId)
-    const user_id = req.user.userId
-    const potentialMatches = await matchingStatus.find({ user_id: user_id });  
-    console.log('potential matches: ', potentialMatches) 
-    res.status(200).json({message: potentialMatches})
+    console.log("the user trying " + req.user.userId);
+    const user_id = req.user.userId;
+
+    // Find matching statuses for the user and populate the newCaseId and existingCaseId fields
+    const potentialMatches = await matchingStatus.find({ user_id: user_id })
+      .populate({
+        path: 'newCaseId existingCaseId',
+        model: 'MergedFeaturesModel',
+        populate: {
+          path: 'missing_case_id',
+          model: 'MissingPerson'
+        }
+      });
+console.log(potentialMatches);
+    // Transform the response to include the fields from MergedFeatures and MissingPerson
+    const matchesWithDetails = potentialMatches.map(match => {
+      const matchObj = match.toObject();
+      return {
+        matchingStatus: matchObj.matchingStatus,
+        _id: matchObj._id,
+        user_id: matchObj.user_id,
+        newCaseDetails: matchObj.newCaseId ? {
+          ...matchObj.newCaseId,
+        } : null,
+        existingCaseDetails: matchObj.existingCaseId ? {
+          ...matchObj.existingCaseId,
+        } : null
+      };
+    });
+
+    console.log('potential matches: ', matchesWithDetails);
+    console.log('potential match 0: ', matchesWithDetails[0]);
+    res.status(200).json({ message: matchesWithDetails });
   } catch (error) {
-    res.status(400).json({message: 'error getting potential matches'})
+    console.error('Error getting potential matches:', error);
+    res.status(400).json({ message: 'error getting potential matches' });
   }
-}
+};
 
