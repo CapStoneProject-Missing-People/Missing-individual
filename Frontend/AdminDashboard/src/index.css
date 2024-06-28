@@ -27,7 +27,7 @@
   @apply  text-gray-100;
 }
 @layer components {
-  .edit-modal {
+   .edit-modal {
     ::-webkit-scrollbar {
       width: 8px;
     }
@@ -45,7 +45,8 @@
       background: #555;
     }
   }
-}
+} 
 .new-color{
   background-color: #333131;
 }
+

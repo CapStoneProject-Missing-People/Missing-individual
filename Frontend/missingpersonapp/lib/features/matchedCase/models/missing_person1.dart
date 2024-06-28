@@ -28,4 +28,6 @@ class MissingPersonAdd {
     required this.eyeColorMatch,
     required this.bodySizeMatch,
   });
+
+  static fromJson(json) {}
 }

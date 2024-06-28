@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
+<key>NSAppTransportSecurity</key>
 <dict>
+<key>NSAllowsArbitraryLoads</key>
+<true/>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>We need your location to show your current position on the map.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>We need your location to show your current position on the map.</string>
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

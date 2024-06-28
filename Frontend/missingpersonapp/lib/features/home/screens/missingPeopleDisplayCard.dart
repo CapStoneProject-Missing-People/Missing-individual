@@ -5,6 +5,7 @@ import 'package:missingpersonapp/common/models/missing_person.dart';
 import 'package:missingpersonapp/common/screens/missing_person_detail1.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MissingPeopleDisplay extends StatelessWidget {
   final MissingPerson missingPerson;
@@ -23,11 +24,8 @@ class MissingPeopleDisplay extends StatelessWidget {
   Future<void> _shareMissingPerson(BuildContext context) async {
     final String shareContent = '''
 Missing Person Details:
-First Name: ${missingPerson.name.firstName}
-Middle Name: ${missingPerson.name.middleName}
-Last Name: ${missingPerson.name.lastName}
+First Name: ${missingPerson.name}
 Age: ${missingPerson.age}
-Skin Color: ${missingPerson.skinColor}
     ''';
 
     List<XFile> files = [];
@@ -55,8 +53,9 @@ Skin Color: ${missingPerson.skinColor}
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  MissingPersonDetails(missingPerson: missingPerson, header: "Missing Person Details"),
+              builder: (context) => MissingPersonDetails(
+                  missingPerson: missingPerson,
+                  header: "Missing Person Details"),
             ),
           );
         },
@@ -87,22 +86,25 @@ Skin Color: ${missingPerson.skinColor}
                 children: [
                   Row(
                     children: [
-                      const Text(
-                        'Name:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.grey,
-                        ),
-                      ),
                       RichText(
                         text: TextSpan(
                           children: highlightedName,
                           style: const TextStyle(
                             color: Colors.black,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
+                      SizedBox(width: 6),
+                      Text(missingPerson.middleName,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      
                     ],
                   ),
                   const SizedBox(height: 5),
@@ -151,18 +153,31 @@ Skin Color: ${missingPerson.skinColor}
                   const SizedBox(height: 5),
                   Row(
                     children: [
-                      const Text(
-                        'Phone:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      Text(
-                        '123-456-7890', // Placeholder phone number
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Colors.grey.shade800,
+                      GestureDetector(
+                        onTap: () async {
+                          final url = 'tel:${missingPerson.posterPhone}';
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.phone,
+                              color: Colors.green, // Change color as desired
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              missingPerson.posterPhone,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.grey.shade800,
+                                decorationThickness: 3,
+                              ),
+                            ), 
+                          ],
                         ),
                       ),
                     ],

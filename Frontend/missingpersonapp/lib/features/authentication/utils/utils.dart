@@ -4,13 +4,13 @@ import 'package:http/http.dart' as http;
 
 import 'package:fluttertoast/fluttertoast.dart';
 
-void showToast(BuildContext context, String text) {
+void showToast(BuildContext context, String text, Color bgColor) {
   Fluttertoast.showToast(
     msg: text,
     toastLength: Toast.LENGTH_SHORT,
     gravity: ToastGravity.BOTTOM,
-    timeInSecForIosWeb: 3,
-    backgroundColor: Colors.red,
+    timeInSecForIosWeb: 10,
+    backgroundColor: bgColor,
     textColor: Colors.white,
     fontSize: 16.0,
   );
@@ -23,18 +23,20 @@ void httpErrorHandle({
 }) {
   switch (response.statusCode) {
     case 200:
-      onSuccess();
-      break;
     case 201:
       onSuccess();
       break;
     case 400:
-      showToast(context, jsonDecode(response.body)['errors']);
-      break;
+    case 401:
+    case 403:
+    case 404:
     case 500:
-      showToast(context, jsonDecode(response.body)['errors']);
+      final errorMessage =
+          jsonDecode(response.body)['errors'];
+      showToast(context, errorMessage, Colors.red);
       break;
     default:
-      showToast(context, response.body);
+      showToast(
+          context, 'Unexpected error: ${response.statusCode}', Colors.red);
   }
 }

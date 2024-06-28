@@ -43,10 +43,10 @@ dependencies:
   flutter_dotenv: ^5.1.0
 
   # Image and media handling
-  image_picker: ^1.1.2
-  image_cropper: ^5.0.1  # Downgraded to a version that doesn't cause conflicts
+  image_picker: ^1.1.2  # Using higher version from the first list
+  image_cropper: 5.0.1  # Using higher version from the second list
   image_cropper_platform_interface: any
-  share_plus: ^9.0.0
+  share_plus: ^9.0.0  # Using higher version from the first list
   
   # HTTP and networking
   http: ^1.2.1
@@ -56,6 +56,7 @@ dependencies:
   provider: ^6.1.2
   shared_preferences: ^2.2.3
   flutter_secure_storage: ^9.2.2
+  hive_flutter: ^1.1.0
 
   # Utilities and UI
   flutter_launcher_icons: ^0.13.1
@@ -63,7 +64,7 @@ dependencies:
   carousel_slider: ^4.2.1
   smooth_page_indicator: ^1.1.0
   path_provider: ^2.1.3
-  intl: ^0.19.0
+  intl: ^0.19.0  # Using higher version from the first list
   logger: ^1.1.0
   uuid: ^4.4.0
   mime: ^1.0.5
@@ -72,7 +73,15 @@ dependencies:
   flutter_chat_ui: ^1.6.13
   open_filex: ^4.4.0
   flutter_local_notifications: ^17.1.2
-  hive_flutter: ^1.1.0
+  dio: ^5.4.3+1
+
+  # URL launcher and Geolocator
+  url_launcher: ^6.3.0
+  geolocator: ^8.2.1
+
+  # Rating bar
+  flutter_rating_bar: ^4.0.1
+  connectivity_plus: ^6.0.3
 
 dev_dependencies:
   flutter_test:
@@ -86,6 +95,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -28,6 +28,16 @@ const baseAttributes = {
     required: false,
     ref: "MissingPerson"
   },
+  mergedFeatureId: {
+    type: Schema.Types.ObjectId,
+    required: false,
+    ref: "Features_GT_2" || "Features_LTE_2"
+  },
+  missing_case_id: {
+    type: Schema.Types.ObjectId ,
+    required: false,
+    ref: "MissingPerson"
+  },
   name: Schema({
     firstName: {
       type: String,
@@ -48,6 +58,7 @@ const baseAttributes = {
   age: {
     type: Number,
     required: true,
+    max: 120, // Set maximum age constraint here
   },
   skin_color: {
     type: String,
@@ -70,7 +81,7 @@ const baseAttributes = {
     lower: {
       clothType: {
         type: String,
-        enum: ["trouser", "short", "nothing", "boxer"],
+        enum: ["trouser", "shorts", "nothing", "boxer"],
         required: true,
       },
       clothColor: {

@@ -24,7 +24,14 @@ const faceMatchSchema = new Schema({
     type: String,
     required: true,
   },
-
+  location: {
+      type: Array,
+      default: [],
+  },
+  contact: {
+    type: String,
+    default: '',
+  },
   isMatch: {
     type: String,
     enum: ['match', 'potential', 'nomatch'],

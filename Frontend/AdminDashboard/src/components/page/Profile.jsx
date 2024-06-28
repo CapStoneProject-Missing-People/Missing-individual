@@ -92,7 +92,7 @@ const Profile = () => {
                   {initial}
                 </div>
               )}
-              <label
+              {/* <label
                 htmlFor="profile"
                 className="absolute bottom-1 right-1 flex cursor-pointer items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
               >
@@ -105,7 +105,8 @@ const Profile = () => {
                   id="profile"
                   className="sr-only"
                 />
-              </label> 
+              </label> */}
+
             </div>
           </div>
           <div className="max-w-lg mx-auto bg-white drop-shadow-2xl rounded-md p-6">

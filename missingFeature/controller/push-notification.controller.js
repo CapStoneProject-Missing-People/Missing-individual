@@ -84,7 +84,7 @@ export const sendPushNotificationFunc = async ({
       },
       token: fcmToken,
     };
-
+console.log(message);
     const response = await admin.messaging().send(message);
     console.log("Successfully sent FCM message:", response);
     return { success: true, response };
@@ -143,6 +143,7 @@ export const sendNotificationToAllUsersAndGuests = async (
         fcmToken: guest,
       });
     }
+    console.log("Notification sent to all users and guests");
   } catch (error) {
     console.error(
       "Error sending notifications to all users and guests:",
@@ -277,6 +278,7 @@ const DelelteUserFCM = async (fcmToken) => {
 export const FetchNotifications = async (req, res) => {
   try {
     const userId = req.user.userId;
+    console.log("the user: " + req.user.phone_number);
     const notifications = await Notification.find({ user: userId }).sort({
       createdAt: -1,
     });

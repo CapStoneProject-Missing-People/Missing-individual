@@ -4,6 +4,7 @@ import Table1 from './Table1'; // Make sure the path is correct
 
 const DataFetchingComponent = () => {
   const [data, setData] = useState([]);
+  const [error, setError] = useState('');
   
   useEffect(() => {
     const fetchData = async () => {
@@ -15,7 +16,7 @@ const DataFetchingComponent = () => {
         const response = await axios.get("http://localhost:4000/api/admin/getAllUsers", { headers });
         setData(response.data);
       } catch (error) {
-        console.error("Error fetching data: ", error);
+        setError('You Do not have permission!');
       }
     };
     fetchData();

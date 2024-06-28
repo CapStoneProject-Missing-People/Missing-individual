@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { MdOutlineFeedback } from "react-icons/md";
 import axios from 'axios';
+import "../../../css/scrollbar.css"
 
 const DropdownFeedback = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -32,6 +33,16 @@ const DropdownFeedback = () => {
     };
 
     fetchFeedback();
+
+    // Event listener for new feedback
+    const handleNewFeedback = (event) => {
+      setFeedbackData(prevFeedbackData => [event.detail, ...prevFeedbackData].slice(0, 5));
+    };
+    document.addEventListener('feedbackAdded', handleNewFeedback);
+
+    return () => {
+      document.removeEventListener('feedbackAdded', handleNewFeedback);
+    };
   }, []);
 
   // Close on click outside
@@ -86,20 +97,33 @@ const DropdownFeedback = () => {
         <div className="px-4 py-3 bg-blue-500 border-b border-gray-200 dark:border-strokedark">
           <h5 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Feedbacks</h5>
         </div>
-        <div className="px-4.5 py-3 overflow-y-auto">
-          {feedbackData.length > 0 ? (
-            feedbackData.map((feedback, index) => (
-              
-              <div key={index} className="mb-2">
-                <p className="text-sm text-gray-700"><span className='font-medium text-gray-900'>Name: </span> {feedback.user_id.name}</p>
-                <p className="text-sm mb-2 text-gray-700"><span className='font-medium text-gray-900'>Feedback: </span> {feedback.feedback}</p>
-                <hr />
-              </div>
-            ))
-          ) : (
-            <p className="text-sm text-gray-700">No feedback available</p>
-          )}
-        </div>
+        <NavLink to="/feedbacks">
+          <div className="px-4 py-3 space-y-3">
+            {feedbackData.length > 0 ? (
+              feedbackData.map((feedback, index) => (
+                <div key={index} className="mb-2">
+                  {feedback.user_id ? (
+                    <>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        <span className='font-semibold text-gray-900 dark:text-gray-100'>Name: </span> {feedback.user_id.name}
+                      </p>
+                      <p className="text-sm mb-2 text-gray-700 dark:text-gray-300">
+                        <span className='font-semibold text-gray-900 dark:text-gray-100'>Feedback: </span> {feedback.feedback}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      <span className='font-semibold text-gray-900 dark:text-gray-100'>Anonymous: </span> {feedback.feedback}
+                    </p>
+                  )}
+                  <hr className="border-gray-200 dark:border-strokedark" />
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-gray-700 dark:text-gray-300">No feedback available</p>
+            )}
+          </div>
+        </NavLink>
       </div>
       {/* <!-- Dropdown End --> */}
     </li>

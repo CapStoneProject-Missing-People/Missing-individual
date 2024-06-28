@@ -1,13 +1,15 @@
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:missingpersonapp/features/authentication/models/missing_person_model.dart';
-import 'package:missingpersonapp/features/authentication/models/user.dart';
 import 'package:missingpersonapp/features/authentication/provider/missing_person_provider.dart';
 import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';
-import 'package:missingpersonapp/features/authentication/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'dart:typed_data';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:missingpersonapp/features/authentication/utils/utils.dart';
 
 class MissingPersonDetails extends StatefulWidget {
   final MissingPersonSpecific missingPerson;
@@ -20,6 +22,13 @@ class MissingPersonDetails extends StatefulWidget {
 
 class _MissingPersonDetailsState extends State<MissingPersonDetails> {
   int activeIndex = 0;
+  List<Uint8List> photos = [];
+
+  @override
+  void initState() {
+    super.initState();
+    photos = List.from(widget.missingPerson.photos);
+  }
 
   Future<void> editField(
       BuildContext context, String field, String currentValue) async {
@@ -63,13 +72,41 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
           widget.missingPerson,
           field,
           newValue,
+          context
         );
       } catch (error) {
         // Handle the error appropriately
         print('Error updating missing person field: $error');
         // Show a user-friendly message using a SnackBar, AlertDialog, etc.
-        showToast(context, error.toString());
+        showToast(context, error.toString(), Colors.red);
       }
+    }
+  }
+
+  Future<void> pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final bytes = await pickedFile.readAsBytes();
+      setState(() {
+        photos.add(bytes);
+      });
+    }
+  }
+
+  Future<void> submitImages() async {
+    try {
+      Provider.of<MissingPersonProvider>(context, listen: false)
+          .updateMissingPersonPhotos(
+        widget.missingPerson,
+        photos,
+        context
+      );
+      showToast(context, 'Images updated successfully!', Colors.green);
+    } catch (error) {
+      print('Error updating images: $error');
+      showToast(context, error.toString(), Colors.red);
     }
   }
 
@@ -147,10 +184,52 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CarouselSlider.builder(
-                itemCount: missingPerson.photos.length,
+                itemCount: photos.length + 1,
                 itemBuilder: (context, index, realIndex) {
-                  final imageBytes = missingPerson.photos[index];
-                  return buildImage(imageBytes, index);
+                  if (index < photos.length) {
+                    final imageBytes = photos[index];
+                    return Stack(
+                      children: [
+                        buildImage(imageBytes, index),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => setState(() {
+                              photos.removeAt(index);
+                            }),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.add_a_photo,
+                              size: 50, color: Colors.blue),
+                          onPressed: pickImage,
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Tap to add a new photo',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: submitImages,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue, // background color
+                            foregroundColor:
+                                Colors.white, // text (foreground) color
+                          ),
+                          child: Text('Submit'),
+                        ),
+                      ],
+                    );
+                  }
                 },
                 options: CarouselOptions(
                   height: 350,
@@ -161,8 +240,8 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
               ),
               SizedBox(height: 12),
               Center(
-                child: missingPerson.photos.length > 1
-                    ? buildIndicator(activeIndex, missingPerson.photos)
+                child: photos.length > 1
+                    ? buildIndicator(activeIndex, photos)
                     : Container(), // Return an empty container if condition is false
               ),
               SizedBox(height: 20),
@@ -213,6 +292,13 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
               SizedBox(height: 5),
               buildContainer('Description', missingPerson.description,
                   Icons.book, context),
+              SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: submitImages,
+                  child: Text('Submit'),
+                ),
+              ),
             ],
           ),
         ),
@@ -227,12 +313,27 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
         count: images.length,
       );
 
-  Widget buildImage(Uint8List imageBytes, int index) {
+  /* Widget buildImage(Uint8List imageBytes, int index) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 5),
       child: Image.memory(
         imageBytes,
         fit: BoxFit.cover,
+      ),
+    );
+  } */
+  Widget buildImage(Uint8List imageBytes, int index) {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 5),
+      width: double.infinity, // Ensure container takes full width
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        child: Image.memory(
+          imageBytes,
+          fit: BoxFit.cover, // Ensures image covers the container
+          width: double.infinity, // Ensures image takes full width
+          height: 350, // Set a fixed height for consistency
+        ),
       ),
     );
   }

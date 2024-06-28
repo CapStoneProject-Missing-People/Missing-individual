@@ -39,14 +39,19 @@ class _HomePageContentState extends State<HomePageContent> {
   }
 
   Future<void> _fetchAllMissingPeople() async {
-    final provider = Provider.of<AllMissingPeopleProvider>(context, listen: false);
-    await provider.fetchMissingPersons();
-    _loadPageItems();
+    final provider =
+        Provider.of<AllMissingPeopleProvider>(context, listen: false);
+    await provider.fetchMissingPersons(context);
+    if (mounted) {
+      _loadPageItems();
+    }
   }
 
   void _loadPageItems() {
-    final provider = Provider.of<AllMissingPeopleProvider>(context, listen: false);
-    final List<Map<String, dynamic>> filteredPeople = _applySearch(provider.missingPersons);
+    final provider =
+        Provider.of<AllMissingPeopleProvider>(context, listen: false);
+    final List<Map<String, dynamic>> filteredPeople =
+        _applySearch(provider.missingPersons);
     setState(() {
       _displayedMissingPeople.clear();
       final int startIndex = (_currentPage - 1) * _itemsPerPage;
@@ -66,8 +71,8 @@ class _HomePageContentState extends State<HomePageContent> {
 
     return missingPersons
         .map((person) {
-          final name = '${person.name.firstName} ${person.name.middleName} ${person.name.lastName}';
-          final skinColor = person.skinColor;
+          final name = person.name;
+          final skinColor = person.skin_color;
           final age = person.age.toString();
 
           final lowerCaseName = name.toLowerCase();
@@ -154,10 +159,35 @@ class _HomePageContentState extends State<HomePageContent> {
 
     if (provider.isLoading) {
       return const Center(child: CircularProgressIndicator());
-    }
+    } 
 
     if (provider.errorMessage.isNotEmpty) {
-      return Center(child: Text(provider.errorMessage));
+      return Container(
+        color: Colors.white,
+        padding: EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                provider.errorMessage,
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _fetchAllMissingPeople,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+      
     }
 
     if (_displayedMissingPeople.isEmpty) {
@@ -167,24 +197,27 @@ class _HomePageContentState extends State<HomePageContent> {
     return Column(
       children: [
         Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.all(12.0),
-            itemCount: _displayedMissingPeople.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              mainAxisExtent: 410,
+          child: RefreshIndicator(
+            onRefresh: _fetchAllMissingPeople,
+            child: GridView.builder(
+              padding: const EdgeInsets.all(12.0),
+              itemCount: _displayedMissingPeople.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                mainAxisExtent: 410,
+              ),
+              itemBuilder: (context, index) {
+                final item = _displayedMissingPeople[index];
+                return MissingPeopleDisplay(
+                  missingPerson: item['person'],
+                  highlightedName: item['textSpansName'],
+                  highlightedSkinColor: item['textSpansSkinColor'],
+                  highlightedAge: item['textSpansAge'],
+                );
+              },
             ),
-            itemBuilder: (context, index) {
-              final item = _displayedMissingPeople[index];
-              return MissingPeopleDisplay(
-                missingPerson: item['person'],
-                highlightedName: item['textSpansName'],
-                highlightedSkinColor: item['textSpansSkinColor'],
-                highlightedAge: item['textSpansAge'],
-              );
-            },
           ),
         ),
         Row(
@@ -201,13 +234,15 @@ class _HomePageContentState extends State<HomePageContent> {
             ),
             Text('Page $_currentPage'),
             TextButton(
-              onPressed: _currentPage * _itemsPerPage < _applySearch(provider.missingPersons).length
+              onPressed: _currentPage * _itemsPerPage <
+                      _applySearch(provider.missingPersons).length
                   ? _goToNextPage
                   : null,
               child: Text(
                 'Next',
                 style: TextStyle(
-                  color: _currentPage * _itemsPerPage < _applySearch(provider.missingPersons).length
+                  color: _currentPage * _itemsPerPage <
+                          _applySearch(provider.missingPersons).length
                       ? Colors.blue
                       : Colors.grey,
                 ),
@@ -220,7 +255,10 @@ class _HomePageContentState extends State<HomePageContent> {
   }
 
   void _goToNextPage() {
-    if (_currentPage * _itemsPerPage < _applySearch(Provider.of<AllMissingPeopleProvider>(context, listen: false).missingPersons).length) {
+    final provider =
+        Provider.of<AllMissingPeopleProvider>(context, listen: false);
+    if (_currentPage * _itemsPerPage <
+        _applySearch(provider.missingPersons).length) {
       setState(() {
         _currentPage++;
         _loadPageItems();

@@ -90,17 +90,7 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
                           ),
                           child: const Text('Delete Account'),
                         ),
-                        // Deactivate Button
-                        ElevatedButton(
-                          onPressed: () {
-                            // Handle deactivation
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.orange[400],
-                          ),
-                          child: const Text('Deactivate'),
-                        ),
+                        
                       ],
                     ),
                   ),

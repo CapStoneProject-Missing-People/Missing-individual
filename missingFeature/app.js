@@ -15,6 +15,7 @@ import { connectionDb } from "./config/dbConnection.js";
 import { routers } from "./routes/routes.js";
 import { feedBackRouter } from "./routes/feedBackRouter.js";
 import { adminRouters } from "./routes/adminRouter.js";
+import Notification from "./models/NotificationModel.js";
 
 dotenv.config();  // Load environment variables from .env file
 
@@ -25,7 +26,18 @@ const io = new Server(server, {
     origin: '*',
   },
 });
-connectionDb();
+connectionDb().then(() => {
+  console.log("Data base connection established");
+
+  // periodically delete old notifications
+  setInterval(async () => {
+    console.log("checking for old notifications to delete");
+    await Notification.deleteOldNotifications();
+}, 3600*1000);
+}).catch((err) => {
+  console.log("Error connecting to database", err);
+});
+
 
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_STRING;

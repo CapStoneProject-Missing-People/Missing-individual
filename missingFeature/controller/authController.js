@@ -8,31 +8,37 @@ dotenvConfig();
 
 // Handle errors
 const handleErrors = (err) => {
-  let errors = { email: "", password: "", role: "", phoneNo: "" };
 
-  // Incorrect email
-  if (err.message === "incorrect email") {
-    errors.email = "that email is not registered";
-    return errors.email;
-  }
-
-  // Incorrect password
-  if (err.message === "incorrect password") {
-    errors.password = "that password is incorrect";
-    return errors.password;
-  }
-
-  // Duplicate error code
-  if (err.code === 11000 && err.keyPattern.phoneNo) {
-    errors.phoneNo = "that phone number is already registered";
-    console.log(err);
-    return errors.phoneNo;
-  }
-  if (err.code === 11000 && err.keyPattern.email) {
-    errors.email = "that email is already registered";
-    console.log(err);
-    return errors.email;
-  }
+    let errors = { email: "", password: "", role: "", phoneNo: "" };
+  
+    // Incorrect email
+    if (err.message === "incorrect email") {
+      errors.email = "That email is not registered";
+      return errors.email;
+    }
+  
+    // Incorrect password
+    if (err.message === "incorrect password") {
+      errors.password = "That password is incorrect";
+      return errors.password;
+    }
+  
+    if (err.message === "Password too short") {
+      errors.password = "Minimum password length is 6 characters";
+      return errors.password;
+    }
+  
+    // Duplicate error code
+    if (err.code === 11000 && err.keyPattern.phoneNo) {
+      errors.phoneNo = "That phone number is already registered";
+      console.log(err);
+      return errors.phoneNo;
+    }
+    if (err.code === 11000 && err.keyPattern.email) {
+      errors.email = "That email is already registered";
+      console.log(err);
+      return errors.email;
+    }
 
   // Cast error for role
 
@@ -197,9 +203,9 @@ export const admin_login_post = async (req, res) => {
     AddActionLog({
       action: "admin_login",
       user_id: email || "",
-      user_agent: req.headers["User-Agent"],
-      method: req.method,
-      ip: req.ip,
+      user_agent: req.headers["User-Agent"]||"",
+      method: req.method||"",
+      ip: req.ip||"",
       status: 500,
       error: err.message || "Internal Server Error",
       logLevel: "error",

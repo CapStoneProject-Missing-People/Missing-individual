@@ -30,9 +30,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
     final currentUser = userProvider.user;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Chats'),
-      ),
       body: chatProvider.isLoading
           ? Center(child: CircularProgressIndicator())
           : chatProvider.errorMessage.isNotEmpty

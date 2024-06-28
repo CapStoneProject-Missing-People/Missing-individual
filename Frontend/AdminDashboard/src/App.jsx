@@ -101,6 +101,16 @@ const App = () => {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/reports"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MainReportPage />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
         {/* Redirect to Login page for any other route */}
         <Route path="*" element={<Navigate to="/" replace />} /> 
       </Routes>

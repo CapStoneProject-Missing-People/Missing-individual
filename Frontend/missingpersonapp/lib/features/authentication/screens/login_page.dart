@@ -1,9 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:missingpersonapp/features/authentication/components/my_button.dart';
 import 'package:missingpersonapp/features/authentication/components/my_textfield.dart';
 import 'package:missingpersonapp/features/authentication/screens/register_page.dart';
@@ -43,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 30,
               ),
-              Icon(Icons.lock, size: 100),
+              Icon(Icons.lock, size: 100, color: Colors.blue),
               SizedBox(
                 height: 20,
               ),
@@ -73,20 +70,6 @@ class _LoginPageState extends State<LoginPage> {
 
               SizedBox(
                 height: 10,
-              ),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Forgot Password?",
-                      style:
-                          TextStyle(color: Colors.blue.shade600, fontSize: 16),
-                    ),
-                  ],
-                ),
               ),
               SizedBox(
                 height: 25,

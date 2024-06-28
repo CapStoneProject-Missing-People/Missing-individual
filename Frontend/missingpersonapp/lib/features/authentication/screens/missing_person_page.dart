@@ -22,7 +22,7 @@ class _MissingPersonPageState extends State<MissingPersonPage> {
   Future<void> fetchMissingPersons() async {
     try {
       await Provider.of<MissingPersonProvider>(context, listen: false)
-          .fetchMissingPersons();
+          .fetchMissingPersons(context);
     } catch (e) {
       // Handle the exception, e.g., display an error message
       print('Error fetching missing persons: $e');
@@ -31,7 +31,7 @@ class _MissingPersonPageState extends State<MissingPersonPage> {
           content: Text('Error fetching missing persons: $e'),
         ),
       ); */
-      showToast(context, e.toString());
+      showToast(context, e.toString(), Colors.red);
     }
   }
 
@@ -41,15 +41,15 @@ class _MissingPersonPageState extends State<MissingPersonPage> {
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.background,
-        title: Text('Missing Persons'),
+        title: const Text('My Posts'),
       ),
       body: Consumer<MissingPersonProvider>(
         builder: (context, provider, child) {
           if (provider.missingPersons.isEmpty) {
             return Center(
               child: Container(
-                padding: EdgeInsets.all(16.0),
-                margin: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
+                margin: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(10.0),
@@ -70,7 +70,7 @@ class _MissingPersonPageState extends State<MissingPersonPage> {
             padding: const EdgeInsets.all(10),
             child: GridView.builder(
               itemCount: provider.missingPersons.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 // childAspectRatio: (1 / 1.5),

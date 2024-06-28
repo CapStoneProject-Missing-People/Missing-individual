@@ -11,32 +11,14 @@ import { MenuContext } from "../../../context/MenuContext";
 import { MdOutlineFeedback, MdDashboard, MdOutlineManageAccounts } from "react-icons/md";
 import { FaArrowsDownToPeople } from "react-icons/fa6";
 import { SiMicrosoftonenote } from "react-icons/si";
-import { TbTextRecognition } from "react-icons/tb";
+import { TbTextRecognition, TbReportAnalytics } from "react-icons/tb";
 import { FaUser } from "react-icons/fa";
 import Logo from "./newlogo.png"
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+
 const subsubMenuList = [
-  {
-    name: "Storage",
-    icon: RiBuilding3Line,
-    menus: ["storage1", "storage2", "storage3", "storage4"],
-  },
-];
-
-const subMenusList = [
-  {
-    name: "Features",
-    icon: TbTextRecognition,
-    menus: ["Facial recognition", "Description match"],
-  },
- 
-];
-
-const Sidebar = () => {
-  let isTabletMid = useMediaQuery({ query: "(max-width: 768px)" });
-  const { isOpen, toggleMenu } = useContext(MenuContext);
   const [open, setOpen] = useState(isTabletMid ? false : true);
   const sidebarRef = useRef();
   const { pathname } = useLocation();
@@ -130,11 +112,13 @@ const Sidebar = () => {
           />
           </NavLink>
           
-          <NavLink to={"/dashboard"}>
-            <span className="text-xl text-gray-200 whitespace-pre">
+          {isOpen === true && (
+        <NavLink to="/dashboard">
+          <span className="text-xl text-gray-200 whitespace-pre">
             FindMe
           </span>
-          </NavLink>
+        </NavLink>
+      )}
           
         </div>
 
@@ -213,22 +197,17 @@ const Sidebar = () => {
                 Image Recognition
               </NavLink>
             </li>
-            
-
-            {/* {(isOpen || isTabletMid) && (
-              <div className="border-y py-5 border-slate-300 ">
-                
-                {subMenusList?.map((menu) => (
-                  <div
-                    key={menu.name}
-                    className="flex flex-col gap-1 text-gray-400 "
-                  >
-                    <Submenu data={menu} isOpen={subMenuOpen} toggleSubMenu={toggleSubMenu}/>
-                    
-                  </div>
-                ))}
-              </div>
-            )} */}
+            <li>
+              <NavLink to={"/reports"} className={({ isActive }) =>
+                  `link text-gray-200 hover:bg-sky-700 ${isActive ? "bg-sky-600" : ""}`
+                }>
+                <TbReportAnalytics
+                  size={23}
+                  className="min-w-max text-gray-200"
+                />
+                Reports
+              </NavLink>
+            </li>
             
           </ul>
           

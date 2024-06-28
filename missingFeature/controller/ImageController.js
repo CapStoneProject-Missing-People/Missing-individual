@@ -36,8 +36,7 @@ export const fetchAllMissingPeopleWithNames = async (req, res) => {
       }
     });
 
-    console.log(results[0]['id'])
-    console.log(results[1]['id'])
+    
     res.status(200).json(results);
   } catch (error) {
     console.error("Error fetching missing people with names:", error);
@@ -71,9 +70,7 @@ export const updateImageBuffers = async (req, res) => {
       );
     }
 
-    res
-      .status(200)
-      .json({ message: "Image buffers updated successfully", missingPerson });
+    res.status(200).json({ message: "Image buffers updated successfully", missingPerson });
   } catch (error) {
     console.error("Error updating image buffers:", error);
     res.status(500).json({ error: "Internal server error" });
