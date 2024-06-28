@@ -21,7 +21,6 @@ const DataFetchingComponent = () => {
     };
     fetchData();
   }, []);
- if (error) return <div className='font-bold p-4'>{error}</div>;
   return (
     <div>
       <Table1 data={data} />

@@ -41,3 +41,102 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+
+
+# Miscellaneous
+*.log
+pubspec.lock
+*.lock
+*.json
+
+# Byte-compiled / optimized / DLL files
+*.class
+*.dll
+*.exe
+*.so
+*.dylib
+*.pyc
+*.pyo
+*.pdb
+
+# Packages
+.packages
+.pdm-cache/
+.pub/
+build/
+
+# Generated files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+.camerax/
+.mvn/
+gen/
+out/
+.idea
+.dart_tool/
+android/local.properties
+android/.gradle/
+android/app/google-services.json
+android/key.properties
+android/app/*.keystore
+ios/Pods
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Runner.xcworkspace/
+web/.dart_tool/
+web/.packages
+web/build/
+
+# IntelliJ related files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# VS Code related files
+.vscode/
+
+# Android related files
+/android/.gradle
+/android/captures/
+/android/gradle/
+/android/local.properties
+
+# iOS related files
+ios/Flutter/.last_build_id
+ios/Pods
+ios/Runner.xcworkspace
+ios/build
+
+# Web related files
+build/web/
+
+# macOS related files
+macos/.symlinks
+macos/Pods
+
+# Windows related files
+windows/.symlinks
+windows/Pods
+
+# Linux related files
+linux/.symlinks
+linux/Pods
+
+# Fuchsia related files
+.fuchsia
+
+# Dart analysis related files
+.analysis_options.yaml
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/

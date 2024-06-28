@@ -106,6 +106,7 @@ const Profile = () => {
                   className="sr-only"
                 />
               </label> */}
+
             </div>
           </div>
           <div className="max-w-lg mx-auto bg-white drop-shadow-2xl rounded-md p-6">

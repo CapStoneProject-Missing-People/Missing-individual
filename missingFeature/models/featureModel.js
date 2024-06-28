@@ -6,7 +6,17 @@ const baseAttributes = {
   user_id: {
     type: Schema.Types.ObjectId ,
     required: true,
-    ref: "User",
+    ref: "user",
+  },
+  mergedFeatureId: {
+    type: Schema.Types.ObjectId,
+    required: false,
+    ref: "Features_GT_2" || "Features_LTE_2"
+  },
+  missing_case_id: {
+    type: Schema.Types.ObjectId ,
+    required: false,
+    ref: "MissingPerson"
   },
   mergedFeatureId: {
     type: Schema.Types.ObjectId,
@@ -52,7 +62,7 @@ const baseAttributes = {
   },
   skin_color: {
     type: String,
-    enum: ["fair", "black", "white", "tseyim"],
+    enum: ["fair", "black", "white", "tseyim", "light"],
     required: true,
   },
   clothing: Schema({
@@ -84,7 +94,7 @@ const baseAttributes = {
   }),
   body_size: {
     type: String,
-    enum: ["thin", "average", "muscular", "overweight", "obese", "fit", "athletic", "curvy", "petite", "fat"],
+    enum: ["thin", "average", "muscular", "overweight", "obese", "fit", "athletic", "curvy", "petite", "fat", "medium"],
   },
   description: {
     type: String,
