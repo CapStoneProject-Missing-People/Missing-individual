@@ -6,3 +6,145 @@ face-recognition/node_modules/
 missingFeature/.env
 missingFeature/uploads
 /Frontend/missingpersonapp/lib/features/authentication/utils/constants.dart
+
+# dart and flutter
+
+# Miscellaneous
+/Frontend/missingpersonapp/*.class
+/Frontend/missingpersonapp/*.log
+/Frontend/missingpersonapp/*.pyc
+/Frontend/missingpersonapp/*.swp
+/Frontend/missingpersonapp/.DS_Store
+/Frontend/missingpersonapp/.atom/
+/Frontend/missingpersonapp/.buildlog/
+/Frontend/missingpersonapp/.history
+/Frontend/missingpersonapp/.svn/
+migrate_working_dir/
+
+# IntelliJ related
+/Frontend/missingpersonapp/*.iml
+/Frontend/missingpersonapp/*.ipr
+/Frontend/missingpersonapp/*.iws
+/Frontend/missingpersonapp/.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+/Frontend/missingpersonapp/**/doc/api/
+/Frontend/missingpersonapp/**/ios/Flutter/.last_build_id
+/Frontend/missingpersonapp/.dart_tool/
+/Frontend/missingpersonapp/.flutter-plugins
+/Frontend/missingpersonapp/.flutter-plugins-dependencies
+/Frontend/missingpersonapp/.pub-cache/
+/Frontend/missingpersonapp/.pub/
+/Frontend/missingpersonapp//build/
+
+# Symbolication related
+/Frontend/missingpersonapp/app.*.symbols
+
+# Obfuscation related
+/Frontend/missingpersonapp/app.*.map.json
+
+# Android Studio will place build artifacts here
+/Frontend/missingpersonapp//android/app/debug
+/Frontend/missingpersonapp//android/app/profile
+/Frontend/missingpersonapp//android/app/release
+
+# Miscellaneous
+/Frontend/missingpersonapp/*.log
+/Frontend/missingpersonapp/pubspec.lock
+/Frontend/missingpersonapp/*.lock
+/Frontend/missingpersonapp/*.json
+
+# Byte-compiled / optimized / DLL files
+/Frontend/missingpersonapp/*.class
+/Frontend/missingpersonapp/*.dll
+/Frontend/missingpersonapp/*.exe
+/Frontend/missingpersonapp/*.so
+/Frontend/missingpersonapp/*.dylib
+/Frontend/missingpersonapp/*.pyc
+/Frontend/missingpersonapp/*.pyo
+/Frontend/missingpersonapp/*.pdb
+
+# Packages
+/Frontend/missingpersonapp/.packages
+/Frontend/missingpersonapp/.pdm-cache/
+/Frontend/missingpersonapp/.pub/
+/Frontend/missingpersonapp//build/
+
+# Generated files
+/Frontend/missingpersonapp/.dart_tool/
+/Frontend/missingpersonapp/.flutter-plugins
+/Frontend/missingpersonapp/.flutter-plugins-dependencies
+/Frontend/missingpersonapp/.packages
+/Frontend/missingpersonapp/.pub-cache/
+/Frontend/missingpersonapp/.pub/
+/Frontend/missingpersonapp//build/
+/Frontend/missingpersonapp/.camerax/
+/Frontend/missingpersonapp/.mvn/
+/Frontend/missingpersonapp/gen/
+/Frontend/missingpersonapp/out/
+/Frontend/missingpersonapp/.idea
+/Frontend/missingpersonapp/.dart_tool/
+/Frontend/missingpersonapp/android/local.properties
+/Frontend/missingpersonapp/android/.gradle/
+/Frontend/missingpersonapp/android/app/google-services.json
+/Frontend/missingpersonapp/android/key.properties
+/Frontend/missingpersonapp/android/app/*.keystore
+/Frontend/missingpersonapp/ios/Pods
+/Frontend/missingpersonapp/ios/.symlinks/
+/Frontend/missingpersonapp/ios/Flutter/Flutter.framework
+/Frontend/missingpersonapp/ios/Flutter/Flutter.podspec
+/Frontend/missingpersonapp/ios/Flutter/Generated.xcconfig
+/Frontend/missingpersonapp/ios/Runner.xcworkspace/
+/Frontend/missingpersonapp/web/.dart_tool/
+/Frontend/missingpersonapp/web/.packages
+/Frontend/missingpersonapp/web/build/
+
+# IntelliJ related files
+/Frontend/missingpersonapp/.idea/
+/Frontend/missingpersonapp/*.iml
+/Frontend/missingpersonapp/*.ipr
+/Frontend/missingpersonapp/*.iws
+
+# VS Code related files
+/Frontend/missingpersonapp/.vscode/
+
+# Android related files
+/Frontend/missingpersonapp/android/.gradle
+/Frontend/missingpersonapp/android/captures/
+/Frontend/missingpersonapp/android/gradle/
+/Frontend/missingpersonapp/android/local.properties
+
+# iOS related files
+/Frontend/missingpersonapp/ios/Flutter/.last_build_id
+/Frontend/missingpersonapp/ios/Pods
+/Frontend/missingpersonapp/ios/Runner.xcworkspace
+/Frontend/missingpersonapp/ios/build
+
+# Web related files
+/Frontend/missingpersonapp/build/web/
+
+# macOS related files
+/Frontend/missingpersonapp/macos/.symlinks
+/Frontend/missingpersonapp/macos/Pods
+
+# Windows related files
+/Frontend/missingpersonapp/windows/.symlinks
+/Frontend/missingpersonapp/windows/Pods
+
+# Linux related files
+/Frontend/missingpersonapp/linux/.symlinks
+/Frontend/missingpersonapp/linux/Pods
+
+# Fuchsia related files
+/Frontend/missingpersonapp/.fuchsia
+
+# Dart analysis related files
+/Frontend/missingpersonapp/.analysis_options.yaml
+/Frontend/missingpersonapp/.flutter-plugins
+/Frontend/missingpersonapp/.flutter-plugins-dependencies
+/Frontend/missingpersonapp/.dart_tool/
