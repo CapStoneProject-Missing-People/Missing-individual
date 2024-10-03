@@ -185,12 +185,6 @@ We welcome contributions! Feel free to **open issues** or submit **pull requests
 
 ---
 
-## 📜 License
-
-This project is licensed under the Apache-2.0 License.
-
----
-
 **Screenshots and Demo**
 
 <!-- Add images or GIF/video demo here -->
@@ -211,5 +205,8 @@ This project is licensed under the Apache-2.0 License.
 
 By incorporating visual elements such as screenshots, GIFs, or videos, you can make the README more interactive and engaging. Let me know if you'd like any further tweaks!
 
+---
+
+## 📜 License
 Apache-2.0 license
 
