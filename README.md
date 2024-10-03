@@ -22,7 +22,7 @@ This project aims to help in **search and rescue operations** by leveraging **fa
 
 [💻 Technologies Used](#-technologies-used)
 
-- [⚙️ Getting Started](#getting-started)
+[⚙ Getting Started](#-getting-started)
 
 [🚀 Usage](#-usage)
 
@@ -87,7 +87,7 @@ The goal is to leverage advanced **facial recognition** and **text matching** to
 
 ---
 
-## ⚙️ Getting Started
+## ⚙ Getting Started
 
 Here’s how to get a local copy of the project running on your machine.
 
