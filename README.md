@@ -203,7 +203,7 @@ We welcome contributions! Feel free to **open issues** or submit **pull requests
 
 ---
 
-By incorporating visual elements such as screenshots, GIFs, or videos, you can make the README more interactive and engaging. Let me know if you'd like any further tweaks!
+here video or gif
 
 ---
 
