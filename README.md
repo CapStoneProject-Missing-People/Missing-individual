@@ -16,19 +16,19 @@ This project aims to help in **search and rescue operations** by leveraging **fa
 
 ## 📑 Table of Contents
 
-[🧐 About](#about)
+[🧐 About](#-about)
 
-[✨ Key Features](#key-features)
+[✨ Key Features](#-key-features)
 
-[💻 Technologies Used](#technologies-used)
+[💻 Technologies Used](#-technologies-used)
 
-[⚙️ Getting Started](#getting-started)
+[⚙️ Getting Started](#-getting-started)
 
-[🚀 Usage](#usage)
+[🚀 Usage](#-usage)
 
-[🤝 Contributing](#contributing)
+[🤝 Contributing](#-contributing)
 
-[📜 License](#license)
+[📜 License](#-license)
 
 ---
 
