@@ -22,7 +22,7 @@ This project aims to help in **search and rescue operations** by leveraging **fa
 
 [💻 Technologies Used](#-technologies-used)
 
-[⚙️ Getting Started](#getting-started)
+- [⚙️ Getting Started](#getting-started)
 
 [🚀 Usage](#-usage)
 
