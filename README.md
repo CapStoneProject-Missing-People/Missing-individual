@@ -193,7 +193,7 @@ We welcome contributions! Feel free to **open issues** or submit **pull requests
 <!-- Add images or GIF/video demo here -->
 <table align="center">
   <tr>
-  <td><img src="https://ucb5ccbda82bc976eb7d38f9fa00.previews.dropboxusercontent.com/p/thumb/ACZ9zAdZ0gp7QTskPuLXKKcQCiEpd_YorEoijv-iHV4uHj8iepxlW-qWMabxuizG1KbeKS4ZEa_PHpLZ94PPdMzx8S7nq-GPZl-adf1FI4wL4R12bdmG90QsYB-OwjJCRXBaCe98sZX9i2uoy0ZmUCvGp2_cZU7o1r3nvIvIxqikTiGC_IkdaRomxTW8g5lxfvIun1o7NiRCs_ez74akzqiiM9qGTbfj3_6lHcpfYX_y-TgaLBkwdltfQgDJwcuGwW4T-RRuW_2rxerb15ciljqref6RLDIsgjUpR-ftECCwCbb_tdJg-xgyHpq1zGttrRacb3DTGLoCdRmP0ow3_tiPw-6013lerTrVcBtwT4FJTsu0XviLst_8ez9UZ5pJBmxsDHCfiSI3-cF0o8rZkgKV/p.jpeg?is_prewarmed=true" alt="Add Post Page" width="300"/></td>
+  <td><img src="XRecorder_16092024_170818.jpg" alt="Add Post Page" width="300"/></td>
   <td><img src="https://ucca51228b7d74b178cc096db352.previews.dropboxusercontent.com/p/thumb/ACZAQzchFT2jbAByOfzUxnIl5vcoCzDjIPIhA_z44QhO4e-vRJrirG0K_pxOKwfKjCRHvY4keFlLW9gZF0lf2hxcILThfnWDnvMMx1icV--VnUBaTJ04ia6jAp6ICrk9o7XoI-cFxx0qqorFcvmWWC__x7qs5nBgyzQaWPWXTJJL16lCJa_U7-Em49dI14lKRsbwAl0kIRaoQmrcg4a8aFG0hxz1lDKVvE4bB88rhPzhET7Zig3w-NKhjD1RsxrjI1ub9kDwXoMZKIG2j8XZoz5VIAP9qOPZ676bMzo-UnSX4in-W6T3GtaVnnXf0WhwPgsBIPaIEFqsEGWOnkdlNntgniG9i2l7dQp6ruv7POqTYVH-sDLRVdnnHh4bMn-6pM4shsXlb7PfUIYkj2z_F5vK/p.jpeg?is_prewarmed=true" alt="Notification page" width="300"/></td>
 </tr>
 </table>
