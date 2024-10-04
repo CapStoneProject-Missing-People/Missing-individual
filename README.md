@@ -84,6 +84,8 @@ The goal is to leverage advanced **facial recognition** and **text matching** to
 
 🖼 Open-source `face-api.js` for facial recognition
 
+**Description Matching**:
+
 📝 Transformers for text and description matching
 
 ---
