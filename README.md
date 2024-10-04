@@ -202,11 +202,12 @@ We welcome contributions! Feel free to **open issues** or submit **pull requests
 
 ---
 
-### 🎥 Watch the demo below:
+### 🎥 Watch the demo on Youtube:
 
 <!-- Add a GIF or video showcasing the app's functionalities -->
 <a href="https://www.youtube.com/watch?v=pBoSRwMv704" target="_blank">
-  <img src="https://img.youtube.com/vi/pBoSRwMv704/0.jpg" alt="Watch the video" />
+  click here
+  <img width=300 src="https://img.youtube.com/vi/pBoSRwMv704/0.jpg" alt="Watch the video" />
 </a>
 
 ---
