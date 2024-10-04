@@ -213,8 +213,6 @@ We welcome contributions! Feel free to **open issues** or submit **pull requests
 
 ---
 
----
-
 ## 📜 License
 Apache-2.0 license
 
