@@ -205,8 +205,9 @@ We welcome contributions! Feel free to **open issues** or submit **pull requests
 ### 🎥 Watch the demo below:
 
 <!-- Add a GIF or video showcasing the app's functionalities -->
-[![Watch the video](face_id.jfif)](https://www.dropbox.com/scl/fi/klyslw75t149yyd0ryk6z/video_2024-10-03_18-00-09.mp4?rlkey=jjfnvjity6htja6amqn89tnt9&e=1&st=8ufp7q2g&dl=0)
-
+<a href="https://www.youtube.com/watch?v=pBoSRwMv704" target="_blank">
+  <img src="https://img.youtube.com/vi/pBoSRwMv704/0.jpg" alt="Watch the video" />
+</a>
 
 ---
 
