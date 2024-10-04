@@ -194,7 +194,7 @@ We welcome contributions! Feel free to **open issues** or submit **pull requests
 <table align="center">
   <tr>
   <td><img src="XRecorder_16092024_170818.jpg" alt="Add Post Page" width="300"/></td>
-  <td><img src="https://ucca51228b7d74b178cc096db352.previews.dropboxusercontent.com/p/thumb/ACZAQzchFT2jbAByOfzUxnIl5vcoCzDjIPIhA_z44QhO4e-vRJrirG0K_pxOKwfKjCRHvY4keFlLW9gZF0lf2hxcILThfnWDnvMMx1icV--VnUBaTJ04ia6jAp6ICrk9o7XoI-cFxx0qqorFcvmWWC__x7qs5nBgyzQaWPWXTJJL16lCJa_U7-Em49dI14lKRsbwAl0kIRaoQmrcg4a8aFG0hxz1lDKVvE4bB88rhPzhET7Zig3w-NKhjD1RsxrjI1ub9kDwXoMZKIG2j8XZoz5VIAP9qOPZ676bMzo-UnSX4in-W6T3GtaVnnXf0WhwPgsBIPaIEFqsEGWOnkdlNntgniG9i2l7dQp6ruv7POqTYVH-sDLRVdnnHh4bMn-6pM4shsXlb7PfUIYkj2z_F5vK/p.jpeg?is_prewarmed=true" alt="Notification page" width="300"/></td>
+  <td><img src="XRecorder_16092024_170703.jpg" alt="Notification page" width="300"/></td>
 </tr>
 </table>
 
