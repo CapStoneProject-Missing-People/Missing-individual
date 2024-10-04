@@ -2,6 +2,7 @@
   <h1>🚧 Facial Recognition Missing Person Finder</h1>
 </div>
 
+> An intelligent tool leveraging **facial recognition** to locate missing persons.
 
 <div align="center">
   <img src="face_id.jfif" alt="recognizing face image" width="300">
@@ -195,16 +196,12 @@ We welcome contributions! Feel free to **open issues** or submit **pull requests
 </tr>
 </table>
 
-
----
-
-**Contact**: [Leulseged B. Ayalew](mailto:leulbekele191@gmail.com)
-
 ---
 
 ### 🎥 Watch the demo on Youtube:
 
-<!-- Add a GIF or video showcasing the app's functionalities -->
+> **Note**: If you'd like to open the video or link in a new tab, you can right-click the link and select **"Open link in new tab"**, or use **Ctrl + Click** (on Windows/Linux) or **Cmd + Click** (on macOS).
+
 <a href="https://www.youtube.com/watch?v=pBoSRwMv704" target="_blank">
   click here
   <img width=300 src="https://img.youtube.com/vi/pBoSRwMv704/0.jpg" alt="Watch the video" />
@@ -212,7 +209,9 @@ We welcome contributions! Feel free to **open issues** or submit **pull requests
 
 ---
 
-here video or gif
+**Contact**: [Leulseged B. Ayalew](mailto:leulbekele191@gmail.com)
+
+---
 
 ---
 
