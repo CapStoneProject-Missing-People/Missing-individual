@@ -212,6 +212,7 @@ We welcome contributions! Feel free to **open issues** or submit **pull requests
 ---
 
 **Contact**: [Leulseged B. Ayalew](mailto:leulbekele191@gmail.com)
+             [Dawit Yenew](mailto:dawityenew.12@gmail.com)
 
 ---
 
