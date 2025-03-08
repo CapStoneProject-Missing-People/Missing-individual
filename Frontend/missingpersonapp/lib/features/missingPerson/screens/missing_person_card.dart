@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:missingpersonapp/features/missingPerson/models/missing_person_model.dart';
 import 'package:missingpersonapp/features/missingPerson/provider/missing_person_provider.dart';
 import 'package:missingpersonapp/features/missingPerson/screens/missing_person_detail.dart';

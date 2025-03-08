@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io'; // For SocketException
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:missingpersonapp/common/services/fcm-service.dart';
@@ -10,10 +12,20 @@ import 'package:missingpersonapp/features/authentication/utils/utils.dart';
 import 'package:missingpersonapp/features/home/screens/home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class AuthService {
   final FcmService _fcmService = FcmService();
 
+  // Check network connectivity
+  Future<bool> _checkNetworkConnectivity(BuildContext context) async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      showToast(context, 'No internet connection', Colors.red);
+      return false;
+    }
+    return true;
+  }
 
   // Sign up user
   Future<void> signUpUser({
@@ -24,6 +36,9 @@ class AuthService {
     required String phoneNo,
   }) async {
     try {
+      // Check network connectivity
+      if (!await _checkNetworkConnectivity(context)) return;
+
       User user = User(
         id: '',
         name: name,
@@ -58,9 +73,19 @@ class AuthService {
           );
         },
       );
-    } catch (e) {
-      showToast(context, 'A network error occurred', Colors.red);
-      print(e.toString());
+    } on SocketException catch (e) {
+      showToast(context, 'No internet connection', Colors.red);
+      print('SocketException: $e');
+    } on TimeoutException catch (e) {
+      showToast(context, 'Request timed out', Colors.red);
+      print('TimeoutException: $e');
+    } on http.ClientException catch (e) {
+      showToast(context, 'Failed to connect to the server', Colors.red);
+      print('ClientException: $e');
+    } catch (e, stackTrace) {
+      showToast(context, 'An unexpected error occurred', Colors.red);
+      print('Error: $e');
+      print('Stack Trace: $stackTrace'); // Print the stack trace for debugging
     }
   }
 
@@ -71,6 +96,9 @@ class AuthService {
     required String password,
   }) async {
     try {
+      // Check network connectivity
+      if (!await _checkNetworkConnectivity(context)) return;
+
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       final navigator = Navigator.of(context);
       http.Response res = await http.post(
@@ -105,15 +133,28 @@ class AuthService {
           );
         },
       );
-    } catch (e) {
-      showToast(context, 'A network error occurred', Colors.red);
-      print(e.toString());
+    } on SocketException catch (e) {
+      showToast(context, 'No internet connection', Colors.red);
+      print('SocketException: $e');
+    } on TimeoutException catch (e) {
+      showToast(context, 'Request timed out', Colors.red);
+      print('TimeoutException: $e');
+    } on http.ClientException catch (e) {
+      showToast(context, 'Failed to connect to the server', Colors.red);
+      print('ClientException: $e');
+    } catch (e, stackTrace) {
+      showToast(context, 'An unexpected error occurred', Colors.red);
+      print('Error: $e');
+      print('Stack Trace: $stackTrace'); // Print the stack trace for debugging
     }
   }
 
   // Get user data
   Future<void> getUserData(BuildContext context) async {
     try {
+      // Check network connectivity
+      if (!await _checkNetworkConnectivity(context)) return;
+
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('authorization');
@@ -154,15 +195,31 @@ class AuthService {
           },
         );
       }
-    } catch (err) {
-      showToast(context, 'A network error occurred', Colors.red);
-      print(err.toString());
+    } on SocketException catch (e) {
+      showToast(context, 'No internet connection', Colors.red);
+      print('SocketException: $e');
+    } on TimeoutException catch (e) {
+      showToast(context, 'Request timed out', Colors.red);
+      print('TimeoutException: $e');
+    } on http.ClientException catch (e) {
+      showToast(context, 'Failed to connect to the server', Colors.red);
+      print('ClientException: $e');
+    } catch (e, stackTrace) {
+      showToast(context, 'An unexpected error occurred', Colors.red);
+      print('Error: $e');
+      print('Stack Trace: $stackTrace'); // Print the stack trace for debugging
     }
   }
 
   // Check if token is valid
   Future<bool> isTokenValid(String token) async {
     try {
+      // Check network connectivity
+      var connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        return false;
+      }
+
       var tokenRes = await http.post(
         Uri.parse('${Constants.postUri}/api/users/tokenIsValid'),
         headers: <String, String>{
@@ -172,41 +229,69 @@ class AuthService {
       );
       var response = jsonDecode(tokenRes.body);
       return response == true;
-    } catch (e) {
-      print(e.toString());
+    } on SocketException catch (e) {
+      print('SocketException: $e');
+      return false;
+    } on TimeoutException catch (e) {
+      print('TimeoutException: $e');
+      return false;
+    } on http.ClientException catch (e) {
+      print('ClientException: $e');
+      return false;
+    } catch (e, stackTrace) {
+      print('Error: $e');
+      print('Stack Trace: $stackTrace'); // Print the stack trace for debugging
       return false;
     }
   }
 
   // Sign out user
   Future<void> signOut(BuildContext context) async {
-    final navigator = Navigator.of(context);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    try {
+      // Check network connectivity
+      if (!await _checkNetworkConnectivity(context)) return;
 
-    // Notify the server about the logout
-    await http.get(
-      Uri.parse('${Constants.postUri}/api/users/tokenIsValid'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'authorization': "Bearer $token",
-      },
-    );
+      final navigator = Navigator.of(context);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('authorization');
 
-    // Clear token and user data
-    prefs.setString('authorization', '');
-    Provider.of<UserProvider>(context, listen: false).clearUser();
+      // Notify the server about the logout
+      await http.get(
+        Uri.parse('${Constants.postUri}/api/users/tokenIsValid'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'authorization': "Bearer $token",
+        },
+      );
 
-    String? fcmToken = await _fcmService.getToken();
-    if (fcmToken != null) {
-      await _fcmService.sendTokenToBackend(fcmToken);
+      // Clear token and user data
+      prefs.setString('authorization', '');
+      Provider.of<UserProvider>(context, listen: false).clearUser();
+
+      String? fcmToken = await _fcmService.getToken();
+      if (fcmToken != null) {
+        await _fcmService.sendTokenToBackend(fcmToken);
+      }
+
+      navigator.pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+        (route) => false,
+      );
+    } on SocketException catch (e) {
+      showToast(context, 'No internet connection', Colors.red);
+      print('SocketException: $e');
+    } on TimeoutException catch (e) {
+      showToast(context, 'Request timed out', Colors.red);
+      print('TimeoutException: $e');
+    } on http.ClientException catch (e) {
+      showToast(context, 'Failed to connect to the server', Colors.red);
+      print('ClientException: $e');
+    } catch (e, stackTrace) {
+      showToast(context, 'An unexpected error occurred', Colors.red);
+      print('Error: $e');
+      print('Stack Trace: $stackTrace'); // Print the stack trace for debugging
     }
-
-    navigator.pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => const HomePage(),
-      ),
-      (route) => false,
-    );
   }
 }

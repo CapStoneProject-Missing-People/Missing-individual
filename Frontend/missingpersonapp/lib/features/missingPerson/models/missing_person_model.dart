@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:missingpersonapp/features/authentication/models/subClass/clothing.dart';
-import 'package:missingpersonapp/features/authentication/models/subClass/missingCase.dart';
-import 'package:missingpersonapp/features/authentication/models/subClass/name.dart';
+import 'package:missingpersonapp/features/missingPerson/subClass/clothing.dart';
+import 'package:missingpersonapp/features/missingPerson/subClass/missingCase.dart';
+import 'package:missingpersonapp/features/missingPerson/subClass/name.dart';
 
 class MissingPersonSpecific {
   String id;

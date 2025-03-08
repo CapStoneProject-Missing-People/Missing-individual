@@ -202,7 +202,7 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
         }
       }
     });
-    }
+  }
 
   void _removeImage(int index) {
     setState(() {
@@ -214,163 +214,134 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Card(
-            color: Colors.white,
-            shadowColor: Colors.grey[200],
-            elevation: 8.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildTextField(_firstNameController, 'First Name'),
-                  const SizedBox(height: 10),
-                  _buildTextField(_middleNameController, 'Middle Name'),
-                  const SizedBox(height: 10),
-                  _buildTextField(_lastNameController, 'Last Name'),
-                  
-                  const SizedBox(height: 10),
-                  _buildTextField(_lastTimeSeenController,
-                      'Last Time Seen (in months)', TextInputType.number),
-                  const SizedBox(height: 10),
-                  _buildDropdown('Gender:', _selectedGender, ['male', 'female'],
-                      (newValue) {
-                    setState(() {
-                      _selectedGender = newValue!;
-                    });
-                  }),
-                  const SizedBox(height: 10),
-                  _buildTextField(_ageController, 'Age', TextInputType.number),
-                  const SizedBox(height: 10),
-                  _buildDropdown('Skin Color:', _selectedSkinColor,
-                      ['fair', 'black', 'white', 'tseyim'], (newValue) {
-                    setState(() {
-                      _selectedSkinColor = newValue!;
-                    });
-                  }),
-                  const SizedBox(height: 10),
-                  _buildDropdown('Body Size:', _selectedBodySize,
-                      ['thin', 'average','muscular','overweight', 'obese','fit','athletic','curvy','petite','fat'], (newValue) {
-                    setState(() {
-                      _selectedBodySize = newValue!;
-                    });
-                  }),
-                  const SizedBox(height: 10),
-                  _buildTextField(_eyeDescriptionController, 'Eye Description'),
-                  const SizedBox(height: 10),
-                  _buildTextField(_noseDescriptionController, 'Nose Description'),
-                  const SizedBox(height: 10),
-                  _buildTextField(_hairDescriptionController, 'Hair Description'),
-                  if (_showClothDetails) ...[
-                    const SizedBox(height: 10),
-                    _buildDropdown('Upper Cloth Type:', _selectedUpperClothType,
-                        ['tshirt','hoodie','sweater','sweetshirt'], (newValue) {
-                      setState(() {
-                        _selectedUpperClothType = newValue!;
-                      });
-                    }),
-                    const SizedBox(height: 10),
-                    _buildDropdown('Upper Cloth Color:', _selectedUpperClothColor,
-                        ['red', 'blue', 'white', 'black','orange','light blue','brown','blue black','yellow'], (newValue) {
-                      setState(() {
-                        _selectedUpperClothColor = newValue!;
-                      });
-                    }),
-                    const SizedBox(height: 10),
-                    _buildDropdown('Lower Cloth Type:', _selectedLowerClothType,
-                        ['trouser', 'shorts', 'nothing', 'boxer'], (newValue) {
-                      setState(() {
-                        _selectedLowerClothType = newValue!;
-                      });
-                    }),
-                    const SizedBox(height: 10),
-                    _buildDropdown('Lower Cloth Color:', _selectedLowerClothColor,
-                        ['blue','black','white','red','orange', 'light blue','brown','blue black','yellow'], (newValue) {
-                      setState(() {
-                        _selectedLowerClothColor = newValue!;
-                      });
-                    }),
-                    const SizedBox(height: 10),
-                  _buildTextField(_lastPlaceSeenController, 'Last Place Seen'),
-                  ],
-                    _buildTextField(_medicalInformation, "Medical Information"),
-                    _buildTextField(_circumstanceOfDisappearance, "Circumstance of Disappearance"),
-                  const SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: pickImages,
-                    icon: const Icon(Icons.add_a_photo, color: Color.fromARGB(255, 98, 146, 228)),
-                    label: const Text('Add Images', style: TextStyle(color: Color.fromARGB(255, 98, 146, 228)),),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildImageGrid(),
-                  const SizedBox(height: 10),
-                  if (_isSubmitting)
-                    const Center(child: CircularProgressIndicator())
-                  else
-                    ElevatedButton(
-                      onPressed: _validateAndSubmit,
-                      child: const Text('Submit', style: TextStyle(color: Color.fromARGB(255, 71, 162, 236)),
-                    ),
-                    ),
-                ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildTextField(_firstNameController, 'First Name'),
+              const SizedBox(height: 10),
+              _buildTextField(_middleNameController, 'Middle Name'),
+              const SizedBox(height: 10),
+              _buildTextField(_lastNameController, 'Last Name'),
+              const SizedBox(height: 10),
+              _buildTextField(_lastTimeSeenController, 'Last Time Seen (in months)', TextInputType.number),
+              const SizedBox(height: 10),
+              _buildDropdown('Gender:', _selectedGender, ['male', 'female'], (newValue) {
+                setState(() {
+                  _selectedGender = newValue!;
+                });
+              }),
+              const SizedBox(height: 10),
+              _buildTextField(_ageController, 'Age', TextInputType.number),
+              const SizedBox(height: 10),
+              _buildDropdown('Skin Color:', _selectedSkinColor, ['fair', 'black', 'white', 'tseyim'], (newValue) {
+                setState(() {
+                  _selectedSkinColor = newValue!;
+                });
+              }),
+              const SizedBox(height: 10),
+              _buildDropdown('Body Size:', _selectedBodySize, ['thin', 'average', 'muscular', 'overweight', 'obese', 'fit', 'athletic', 'curvy', 'petite', 'fat'], (newValue) {
+                setState(() {
+                  _selectedBodySize = newValue!;
+                });
+              }),
+              const SizedBox(height: 10),
+              _buildTextField(_eyeDescriptionController, 'Eye Description'),
+              const SizedBox(height: 10),
+              _buildTextField(_noseDescriptionController, 'Nose Description'),
+              const SizedBox(height: 10),
+              _buildTextField(_hairDescriptionController, 'Hair Description'),
+              if (_showClothDetails) ...[
+                const SizedBox(height: 10),
+                _buildDropdown('Upper Cloth Type:', _selectedUpperClothType, ['tshirt', 'hoodie', 'sweater', 'sweetshirt'], (newValue) {
+                  setState(() {
+                    _selectedUpperClothType = newValue!;
+                  });
+                }),
+                const SizedBox(height: 10),
+                _buildDropdown('Upper Cloth Color:', _selectedUpperClothColor, ['red', 'blue', 'white', 'black', 'orange', 'light blue', 'brown', 'blue black', 'yellow'], (newValue) {
+                  setState(() {
+                    _selectedUpperClothColor = newValue!;
+                  });
+                }),
+                const SizedBox(height: 10),
+                _buildDropdown('Lower Cloth Type:', _selectedLowerClothType, ['trouser', 'shorts', 'nothing', 'boxer'], (newValue) {
+                  setState(() {
+                    _selectedLowerClothType = newValue!;
+                  });
+                }),
+                const SizedBox(height: 10),
+                _buildDropdown('Lower Cloth Color:', _selectedLowerClothColor, ['blue', 'black', 'white', 'red', 'orange', 'light blue', 'brown', 'blue black', 'yellow'], (newValue) {
+                  setState(() {
+                    _selectedLowerClothColor = newValue!;
+                  });
+                }),
+                const SizedBox(height: 10),
+                _buildTextField(_lastPlaceSeenController, 'Last Place Seen'),
+              ],
+              const SizedBox(height: 10),
+              _buildTextField(_medicalInformation, "Medical Information"),
+              const SizedBox(height: 10),
+              _buildTextField(_circumstanceOfDisappearance, "Circumstance of Disappearance"),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: pickImages,
+                icon: const Icon(Icons.add_a_photo, color: Colors.white),
+                label: const Text('Add Images', style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                ),
               ),
-            ),
+              const SizedBox(height: 10),
+              _buildImageGrid(),
+              const SizedBox(height: 10),
+              if (_isSubmitting)
+                const Center(child: CircularProgressIndicator())
+              else
+                ElevatedButton(
+                  onPressed: _validateAndSubmit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                  child: const Text('Submit', style: TextStyle(color: Colors.white)),
+                ),
+            ],
           ),
         ),
       ),
     );
   }
 
-Widget _buildTextField(
+  Widget _buildTextField(
     TextEditingController controller,
     String label, [
     TextInputType keyboardType = TextInputType.text,
   ]) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.blue,
-          ),
-          hintText: 'Enter the $label',
-          hintStyle: TextStyle(color: Colors.blue[200]),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(
-              color: Colors.blue,
-              width: 2,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(
-              color: Colors.blueAccent,
-              width: 2,
-            ),
-          ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-          filled: true,
-          fillColor: Colors.grey[200],
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.blue),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.blue),
         ),
-        keyboardType: keyboardType,
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Please enter $label';
-          }
-          return null;
-        },
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+        ),
       ),
+      keyboardType: keyboardType,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter $label';
+        }
+        return null;
+      },
     );
   }
 
@@ -380,89 +351,63 @@ Widget _buildTextField(
     List<String> items,
     ValueChanged<String?> onChanged,
   ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    return DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.blue),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.blue),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.blue, width: 2),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: DropdownButton<String>(
-            value: value,
-            icon: const Icon(Icons.arrow_downward, color: Colors.blue),
-            iconSize: 24,
-            elevation: 16,
-            underline: Container(
-              height: 2,
-              color: Colors.transparent,
-            ),
-            onChanged: onChanged,
-            items: items.map<DropdownMenuItem<String>>((String item) {
-              return DropdownMenuItem<String>(
-                value: item,
-                child: SizedBox(
-                  width: 90,
-                  child: Text(
-                    item,
-                    style: const TextStyle(
-                      color: Colors.blue,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-      ],
+      ),
+      items: items.map<DropdownMenuItem<String>>((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: onChanged,
     );
   }
 
   Widget _buildImageGrid() {
     return _images.isEmpty
         ? const Text('No images selected.')
-        : SizedBox(
-            height: 80, // Adjust the height as needed
-            child: GridView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _images.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                crossAxisSpacing: 4.0,
-                mainAxisSpacing: 4.0,
-              ),
-              itemBuilder: (BuildContext context, int index) {
-                return Stack(
-                  children: [
-                    SizedBox(
-                      height: 80,
-                      width: 80, // Adjust the width as needed
-                      child: Image.file(
-                        _images[index],
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () => _removeImage(index),
-                        child: const CircleAvatar(
-                          radius: 12,
-                          backgroundColor: Colors.red,
-                          child: Icon(Icons.close, size: 16, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
+        : GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 8.0,
+              mainAxisSpacing: 8.0,
             ),
+            itemCount: _images.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
+                      _images[index],
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned(
+                    top: 5,
+                    right: 5,
+                    child: GestureDetector(
+                      onTap: () => _removeImage(index),
+                      child: const CircleAvatar(
+                        radius: 12,
+                        backgroundColor: Colors.red,
+                        child: Icon(Icons.close, size: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           );
   }
 }
