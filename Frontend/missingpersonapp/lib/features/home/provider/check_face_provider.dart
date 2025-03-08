@@ -9,7 +9,7 @@ class CheckFaceProvider extends ChangeNotifier {
   bool _loading = false;
   String? _personId;
   String? _matchId;
-  TextEditingController _contactController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
   Position? _currentPosition;
   String? _shareLocationValue;
 
@@ -62,7 +62,6 @@ class CheckFaceProvider extends ChangeNotifier {
 
   Future<void> shareLocation(BuildContext context) async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    ;
     LocationPermission permission;
 
     if (!serviceEnabled) {
@@ -117,7 +116,7 @@ class CheckFaceProvider extends ChangeNotifier {
       SnackBar(
         backgroundColor: Colors.transparent,
         content:
-            Text(_shareLocationValue!, style: TextStyle(color: Colors.green)),
+            Text(_shareLocationValue!, style: const TextStyle(color: Colors.green)),
       ),
     );
   }
@@ -155,7 +154,7 @@ class CheckFaceProvider extends ChangeNotifier {
             SnackBar(
               backgroundColor: Colors.transparent,
               content: Text('Error updating match: ${response.statusCode}',
-                  style: TextStyle(color: Colors.red)),
+                  style: const TextStyle(color: Colors.red)),
             ),
           );
         }

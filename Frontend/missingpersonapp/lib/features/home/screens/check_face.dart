@@ -7,7 +7,7 @@ import 'package:missingpersonapp/features/home/screens/match_detail.dart';
 class CheckFace extends StatelessWidget {
   final String imagePath;
 
-  const CheckFace({Key? key, required this.imagePath}) : super(key: key);
+  const CheckFace({super.key, required this.imagePath});
 
   @override
   Widget build(BuildContext context) {

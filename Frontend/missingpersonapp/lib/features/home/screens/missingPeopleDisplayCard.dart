@@ -96,7 +96,7 @@ Age: ${missingPerson.age}
                           ),
                         ),
                       ),
-                      SizedBox(width: 6),
+                      const SizedBox(width: 6),
                       Text(missingPerson.middleName,
                         style: const TextStyle(
                           color: Colors.black,

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:missingpersonapp/common/models/missing_person.dart';
@@ -57,8 +56,8 @@ class AllMissingPeopleProvider extends ChangeNotifier {
   Widget getErrorMessageWidget() {
     return _errorMessage.isNotEmpty
         ? Container(
-            padding: EdgeInsets.all(16),
-            margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             decoration: BoxDecoration(
               color: Colors.redAccent,
               borderRadius: BorderRadius.circular(10),
@@ -66,15 +65,15 @@ class AllMissingPeopleProvider extends ChangeNotifier {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Icon(
+                const Icon(
                   Icons.error_outline,
                   color: Colors.white,
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     _errorMessage,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                     ),
@@ -83,7 +82,7 @@ class AllMissingPeopleProvider extends ChangeNotifier {
               ],
             ),
           )
-        : SizedBox.shrink();
+        : const SizedBox.shrink();
   }
 
   String _getErrorMessage(dynamic e) {

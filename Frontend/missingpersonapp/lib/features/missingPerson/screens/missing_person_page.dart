@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:missingpersonapp/features/authentication/provider/missing_person_provider.dart';
-import 'package:missingpersonapp/features/authentication/screens/missing_person_card.dart';
+import 'package:missingpersonapp/features/missingPerson/provider/missing_person_provider.dart';
+import 'package:missingpersonapp/features/missingPerson/screens/missing_person_card.dart';
 import 'package:missingpersonapp/features/authentication/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 class MissingPersonPage extends StatefulWidget {
-  MissingPersonPage({super.key});
+  const MissingPersonPage({super.key});
 
   @override
   State<MissingPersonPage> createState() => _MissingPersonPageState();

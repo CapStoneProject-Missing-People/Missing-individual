@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:missingpersonapp/features/compare/model/matched-compare.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:http/http.dart' as http;

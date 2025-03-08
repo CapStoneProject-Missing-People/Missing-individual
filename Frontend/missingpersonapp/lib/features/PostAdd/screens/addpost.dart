@@ -38,7 +38,7 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   String _selectedLowerClothType = 'trouser';
   String _selectedLowerClothColor = 'blue';
 
-  List<File> _images = [];
+  final List<File> _images = [];
   bool _showClothDetails = true;
   bool _isSubmitting = false;
 
@@ -184,27 +184,25 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
 
   Future<void> pickImages() async {
     final ImagePicker picker = ImagePicker();
-    final List<XFile>? pickedFiles = await picker.pickMultiImage();
-    if (pickedFiles != null) {
-      setState(() {
-        for (var file in pickedFiles) {
-          if (_images.any((existingFile) => existingFile.path == file.path)) {
-            Fluttertoast.showToast(
-              msg: 'Duplicate image: ${file.name}',
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.orange,
-              textColor: Colors.white,
-              fontSize: 16.0,
-            );
-          } else {
-            _images.add(File(file.path));
-          }
+    final List<XFile> pickedFiles = await picker.pickMultiImage();
+    setState(() {
+      for (var file in pickedFiles) {
+        if (_images.any((existingFile) => existingFile.path == file.path)) {
+          Fluttertoast.showToast(
+            msg: 'Duplicate image: ${file.name}',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.orange,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        } else {
+          _images.add(File(file.path));
         }
-      });
+      }
+    });
     }
-  }
 
   void _removeImage(int index) {
     setState(() {
@@ -408,7 +406,7 @@ Widget _buildTextField(
             items: items.map<DropdownMenuItem<String>>((String item) {
               return DropdownMenuItem<String>(
                 value: item,
-                child: Container(
+                child: SizedBox(
                   width: 90,
                   child: Text(
                     item,
@@ -442,7 +440,7 @@ Widget _buildTextField(
               itemBuilder: (BuildContext context, int index) {
                 return Stack(
                   children: [
-                    Container(
+                    SizedBox(
                       height: 80,
                       width: 80, // Adjust the width as needed
                       child: Image.file(

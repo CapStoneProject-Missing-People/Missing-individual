@@ -131,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                   filters: _filters,
                 )
               : _selectedIndex == 1
-                  ? AuthGuard(child: MissingPersonAddPage())
+                  ? const AuthGuard(child: MissingPersonAddPage())
                   : _selectedIndex == 2
                       ? const ComparePersonPage()
                       : _selectedIndex == 3

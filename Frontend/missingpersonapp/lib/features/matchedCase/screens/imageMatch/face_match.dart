@@ -88,8 +88,8 @@ class CustomExpansionTile extends StatelessWidget {
   const CustomExpansionTile({
     required this.title,
     required this.children,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

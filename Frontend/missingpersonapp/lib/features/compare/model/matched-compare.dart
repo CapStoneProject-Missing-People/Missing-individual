@@ -6,6 +6,7 @@ import 'package:missingpersonapp/features/authentication/models/subClass/clothin
 import 'package:missingpersonapp/features/authentication/models/subClass/missingCase.dart';
 import 'package:missingpersonapp/features/authentication/models/subClass/name.dart';
 
+
 class MatchedPersonCompare {
   String id;
   String user_id;

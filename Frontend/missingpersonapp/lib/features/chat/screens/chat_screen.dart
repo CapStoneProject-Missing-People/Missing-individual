@@ -14,7 +14,7 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 class ChatScreen extends StatefulWidget {
   final String receiverId;
 
-  ChatScreen({required this.receiverId});
+  const ChatScreen({super.key, required this.receiverId});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -201,17 +201,17 @@ class _ChatScreenState extends State<ChatScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Delete Message'),
-          content: Text('Are you sure you want to delete this message?'),
+          title: const Text('Delete Message'),
+          content: const Text('Are you sure you want to delete this message?'),
           actions: [
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Delete'),
+              child: const Text('Delete'),
               onPressed: () {
                 Navigator.of(context).pop();
                 _deleteMessage(message);
@@ -235,15 +235,15 @@ class _ChatScreenState extends State<ChatScreen> {
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Chat'),
+          title: const Text('Chat'),
         ),
-        body: Center(child: CircularProgressIndicator()),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat'),
+        title: const Text('Chat'),
       ),
       body: Column(
         children: [
@@ -261,15 +261,15 @@ class _ChatScreenState extends State<ChatScreen> {
                     mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
                     children: [
                       Container(
-                        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                        padding: EdgeInsets.all(10),
+                        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: isMe ? Colors.blue[100] : Colors.grey[200],
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                            bottomLeft: isMe ? Radius.circular(10) : Radius.circular(0),
-                            bottomRight: isMe ? Radius.circular(0) : Radius.circular(10),
+                            topLeft: const Radius.circular(10),
+                            topRight: const Radius.circular(10),
+                            bottomLeft: isMe ? const Radius.circular(10) : const Radius.circular(0),
+                            bottomRight: isMe ? const Radius.circular(0) : const Radius.circular(10),
                           ),
                         ),
                         child: Column(
@@ -284,12 +284,12 @@ class _ChatScreenState extends State<ChatScreen> {
                             if (message.content.isNotEmpty)
                               Text(
                                 message.content,
-                                style: TextStyle(fontSize: 16),
+                                style: const TextStyle(fontSize: 16),
                               ),
-                            SizedBox(height: 5),
+                            const SizedBox(height: 5),
                             Text(
                               message.timestamp.toString(),
-                              style: TextStyle(fontSize: 12, color: Colors.grey),
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
                             ),
                           ],
                         ),
@@ -305,7 +305,7 @@ class _ChatScreenState extends State<ChatScreen> {
             child: Row(
               children: [
                 IconButton(
-                  icon: Icon(Icons.image, color: Colors.blue, size: 30),
+                  icon: const Icon(Icons.image, color: Colors.blue, size: 30),
                   onPressed: _pickImage,
                 ),
                 Expanded(
@@ -323,7 +323,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send, color: Colors.blue, size: 30),
+                  icon: const Icon(Icons.send, color: Colors.blue, size: 30),
                   onPressed: () {
                     if (_messageController.text.isNotEmpty) {
                       _sendMessage(_messageController.text);

@@ -8,7 +8,7 @@ import 'package:missingpersonapp/features/Notifications/provider/missingcase-pro
 import 'package:intl/intl.dart';
 
 class NotificationPage extends StatefulWidget {
-  const NotificationPage({Key? key}) : super(key: key);
+  const NotificationPage({super.key});
 
   @override
   State<NotificationPage> createState() => _NotificationPageState();
@@ -87,7 +87,7 @@ class _NotificationPageState extends State<NotificationPage> {
 class NotificationDetailPage extends StatelessWidget {
   final NotificationModel notification;
 
-  NotificationDetailPage({required this.notification});
+  const NotificationDetailPage({super.key, required this.notification});
 
   @override
   Widget build(BuildContext context) {

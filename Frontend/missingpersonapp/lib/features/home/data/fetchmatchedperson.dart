@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 
 Future<MissingPerson> fetchmatchCase(String caseID) async {
-  print('the id: ' + caseID);
+  print('the id: $caseID');
   final response = await http.get(
     Uri.parse("${Constants.postUri}/api/get-match/$caseID",),
   );
@@ -16,7 +16,7 @@ Future<MissingPerson> fetchmatchCase(String caseID) async {
         (jsonData['missing_case_id']['imageBuffers'] as List<dynamic>)
             .map((imageUrl) => base64Decode(imageUrl))
             .toList();
-          print('the data is: ' + jsonData.toString());
+          print('the data is: $jsonData');
     return MissingPerson(
             name: jsonData['name']['firstName'] ?? '',
             middleName: jsonData['name']['middleName'] ?? '',

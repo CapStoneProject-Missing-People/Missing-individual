@@ -72,14 +72,14 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   const SizedBox(height: 40),
                   // App Logo
-                  Icon(
+                  const Icon(
                     Icons.lock,
                     size: 100,
                     color: Colors.white,
                   ),
                   const SizedBox(height: 20),
                   // Welcome Text
-                  Text(
+                  const Text(
                     "Welcome Back",
                     style: TextStyle(
                       color: Colors.white,
@@ -120,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.only(top: 20),
                       child: Text(
                         _errorMessage!,
-                        style: TextStyle(color: Colors.red),
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
                   const SizedBox(height: 20),
@@ -129,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: () {
                       // Add forgot password logic
                     },
-                    child: Text(
+                    child: const Text(
                       'Forgot Password?',
                       style: TextStyle(
                         color: Colors.white,
@@ -187,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           );
                         },
-                        child: Text(
+                        child: const Text(
                           'Register Now',
                           style: TextStyle(
                             color: Colors.white,

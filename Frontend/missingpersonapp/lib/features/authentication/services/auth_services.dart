@@ -52,7 +52,7 @@ class AuthService {
           );
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (context) => LoginPage(),
+              builder: (context) => const LoginPage(),
             ),
             (route) => false,
           );
@@ -204,7 +204,7 @@ class AuthService {
 
     navigator.pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (context) => HomePage(),
+        builder: (context) => const HomePage(),
       ),
       (route) => false,
     );

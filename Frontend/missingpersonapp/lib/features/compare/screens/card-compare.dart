@@ -134,7 +134,7 @@ class CompareMatchedPersonCard extends StatefulWidget {
   final List<FeatureCompare> featureCompareList;
   final int? lastTimeSeen;
 
-  CompareMatchedPersonCard({super.key, required this.featureCompareList, this.lastTimeSeen});
+  const CompareMatchedPersonCard({super.key, required this.featureCompareList, this.lastTimeSeen});
 
   @override
   _CompareMatchedPersonCardState createState() => _CompareMatchedPersonCardState();
@@ -182,7 +182,7 @@ class _CompareMatchedPersonCardState extends State<CompareMatchedPersonCard> {
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
                       'Aggregate Similarity: ${featureCompare.aggregateSimilarity}%',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.green,
                         fontWeight: FontWeight.bold,
                         fontSize: 18, // Adjust the size as needed
@@ -198,7 +198,7 @@ class _CompareMatchedPersonCardState extends State<CompareMatchedPersonCard> {
                             showAll = true;
                           });
                         },
-                        child: Text('Show More'),
+                        child: const Text('Show More'),
                       ),
                     ),
                   if (showAll)
@@ -209,7 +209,7 @@ class _CompareMatchedPersonCardState extends State<CompareMatchedPersonCard> {
                             showAll = false;
                           });
                         },
-                        child: Text('Show Less'),
+                        child: const Text('Show Less'),
                       ),
                     ),
                   Center(
@@ -225,12 +225,12 @@ class _CompareMatchedPersonCardState extends State<CompareMatchedPersonCard> {
                       style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue, // background (button) color
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                           horizontal: 60.0, vertical: 15.0), // Button size
                       textStyle:
-                          TextStyle(fontSize: 18), // foreground (text) color
+                          const TextStyle(fontSize: 18), // foreground (text) color
                     ),
-                      child: Text('View Profile'),
+                      child: const Text('View Profile'),
                     ),
                   ),
                 ],
@@ -245,7 +245,7 @@ class _CompareMatchedPersonCardState extends State<CompareMatchedPersonCard> {
   Widget _buildListTile(IconData icon, String text, {Color textColor = Colors.black}) {
     return ListTile(
       leading: Container(
-        padding: EdgeInsets.all(3),
+        padding: const EdgeInsets.all(3),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.white,

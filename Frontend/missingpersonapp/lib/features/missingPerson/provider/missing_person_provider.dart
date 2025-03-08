@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:missingpersonapp/features/authentication/models/missing_person_model.dart';
+import 'package:missingpersonapp/features/missingPerson/models/missing_person_model.dart';
 import 'package:missingpersonapp/features/authentication/models/user.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:missingpersonapp/features/authentication/utils/utils.dart';

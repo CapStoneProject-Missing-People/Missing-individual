@@ -4,14 +4,14 @@ import 'dart:convert';
 class FullScreenImage extends StatelessWidget {
   final String base64Image;
 
-  FullScreenImage({required this.base64Image});
+  const FullScreenImage({super.key, required this.base64Image});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Center(
         child: InteractiveViewer(

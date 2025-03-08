@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 class AuthGuard extends StatelessWidget {
   final Widget child;
 
-  AuthGuard({required this.child});
+  const AuthGuard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +28,8 @@ class AuthGuard extends StatelessWidget {
                 return false; // Prevent the default back button behavior
               },
               child: AlertDialog(
-                title: Text('Login Required'),
-                content: Text('You need to be logged in to access this page.'),
+                title: const Text('Login Required'),
+                content: const Text('You need to be logged in to access this page.'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -41,7 +41,7 @@ class AuthGuard extends StatelessWidget {
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.red, // Text color
                     ),
-                    child: Text('Cancel'),
+                    child: const Text('Cancel'),
                   ),
                   ElevatedButton(
                     onPressed: () {
@@ -55,7 +55,7 @@ class AuthGuard extends StatelessWidget {
                       backgroundColor: Colors.blue, // Background color
                       foregroundColor: Colors.white, // Text color
                     ),
-                    child: Text('Login'),
+                    child: const Text('Login'),
                   ),
                 ],
               ),
@@ -63,7 +63,7 @@ class AuthGuard extends StatelessWidget {
           );
         }
       });
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     } else {
       return child;
     }

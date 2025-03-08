@@ -4,7 +4,7 @@ class ProfileDetailItem extends StatelessWidget {
   final String label;
   final String value;
 
-  const ProfileDetailItem({
+  const ProfileDetailItem({super.key, 
     required this.label,
     required this.value,
   });

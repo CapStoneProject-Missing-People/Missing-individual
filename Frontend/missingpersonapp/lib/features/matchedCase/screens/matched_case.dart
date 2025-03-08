@@ -16,7 +16,7 @@ class _MatchedCasesState extends State<MatchedCases> {
 
   // List of pages to switch between
   final List<Widget> _pages = [
-    ExistingCasesScreen(),
+    const ExistingCasesScreen(),
     const MissingPersonImageMatch(),
     const OverAllMatch(),
   ];

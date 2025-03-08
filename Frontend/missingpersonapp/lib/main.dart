@@ -12,10 +12,10 @@ import 'package:missingpersonapp/features/Notifications/screens/display_notifica
 import 'package:missingpersonapp/features/PostAdd/screens/addpost.dart';
 import 'package:missingpersonapp/features/Profile/screens/profile_page.dart';
 import 'package:missingpersonapp/features/Settings/settings.dart';
-import 'package:missingpersonapp/features/authentication/provider/missing_person_provider.dart';
+import 'package:missingpersonapp/features/missingPerson/provider/missing_person_provider.dart';
 import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';
 import 'package:missingpersonapp/features/authentication/screens/login_page.dart';
-import 'package:missingpersonapp/features/authentication/screens/missing_person_page.dart';
+import 'package:missingpersonapp/features/missingPerson/screens/missing_person_page.dart';
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/chat/models/message.dart';
 import 'package:missingpersonapp/features/chat/providers/chat_provider.dart';
@@ -155,7 +155,7 @@ Future<Widget> _getInitialScreen(BuildContext context) async {
     return const HomePage();
   } catch (e) {
     print("Error occurred: $e"); // Log the error for debugging
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -200,11 +200,11 @@ Future<Widget> _getInitialScreen(BuildContext context) async {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.error, color: Colors.red, size: 64),
-                    SizedBox(height: 16),
+                    const Icon(Icons.error, color: Colors.red, size: 64),
+                    const SizedBox(height: 16),
                     Text(
                       'Error: ${snapshot.error}',
-                      style: TextStyle(fontSize: 18, color: Colors.red),
+                      style: const TextStyle(fontSize: 18, color: Colors.red),
                     ),
                   ],
                 ),
@@ -216,18 +216,18 @@ Future<Widget> _getInitialScreen(BuildContext context) async {
         },
       ),
       routes: {
-        '/login': (context) => LoginPage(),
+        '/login': (context) => const LoginPage(),
         '/manageProfile': (context) =>
-            AuthGuard(child: const ManageProfilePage()),
-        '/addPost': (context) => AuthGuard(child: const MissingPersonAddPage()),
-        '/feedBack': (context) => AuthGuard(child: const FeedbackPage()),
-        '/matchedPeople': (context) => AuthGuard(child: const MatchedCases()),
+            const AuthGuard(child: ManageProfilePage()),
+        '/addPost': (context) => const AuthGuard(child: MissingPersonAddPage()),
+        '/feedBack': (context) => const AuthGuard(child: FeedbackPage()),
+        '/matchedPeople': (context) => const AuthGuard(child: MatchedCases()),
         '/notification': (context) =>
-            AuthGuard(child: const NotificationPage()),
-        '/compare': (context) => ComparePersonPage(),
+            const AuthGuard(child: NotificationPage()),
+        '/compare': (context) => const ComparePersonPage(),
         '/missingPersonPosted': (context) =>
-            AuthGuard(child: MissingPersonPage()),
-          '/settings': (context) => SettingsPage(),
+            const AuthGuard(child: MissingPersonPage()),
+          '/settings': (context) => const SettingsPage(),
           '/chatList': (context) => AuthGuard(child: ChatListScreen(
           userId: Provider.of<UserProvider>(context, listen: false).user.id,
         )),

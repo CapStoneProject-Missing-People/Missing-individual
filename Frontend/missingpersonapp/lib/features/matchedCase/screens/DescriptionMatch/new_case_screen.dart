@@ -39,7 +39,7 @@ extension CaseDetailsExtension on CaseDetails {
       final CaseDetails newCaseDetails;
       final MatchingStatus matchingStatus;
 
-      NewCaseDetailsScreen({
+      const NewCaseDetailsScreen({super.key, 
         required this.newCaseDetails,
         required this.matchingStatus,
       });
@@ -48,12 +48,12 @@ extension CaseDetailsExtension on CaseDetails {
       Widget build(BuildContext context) {
         return Scaffold(
       appBar: AppBar(
-        title: Text('New Case Details'),
+        title: const Text('New Case Details'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Card(
-          color: Color.fromARGB(255, 254, 255, 255),
+          color: const Color.fromARGB(255, 254, 255, 255),
           elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
@@ -62,7 +62,7 @@ extension CaseDetailsExtension on CaseDetails {
             child: Column(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(15.0)),
                   child: CarouselSlider(
                     items: newCaseDetails.missingCaseId.imageBuffers.map((buffer) {
                       return Image.memory(buffer, fit: BoxFit.cover, width: double.infinity);
@@ -85,9 +85,9 @@ extension CaseDetailsExtension on CaseDetails {
                         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
-                      Text('Age: ${newCaseDetails.age}', style: TextStyle(fontSize: 16)),
-                      Text('Skin Color: ${newCaseDetails.skinColor}', style: TextStyle(fontSize: 16)),
-                      Text('Description: ${newCaseDetails.description}', style: TextStyle(fontSize: 16)),
+                      Text('Age: ${newCaseDetails.age}', style: const TextStyle(fontSize: 16)),
+                      Text('Skin Color: ${newCaseDetails.skinColor}', style: const TextStyle(fontSize: 16)),
+                      Text('Description: ${newCaseDetails.description}', style: const TextStyle(fontSize: 16)),
                       const SizedBox(height: 10),
                       const Text('Matching Scores:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
                         MatchingScore(label: 'Age Score', value: matchingStatus.age),
@@ -114,7 +114,7 @@ extension CaseDetailsExtension on CaseDetails {
                               ),
                             );
                           },
-                          child: Text('See Details'),
+                          child: const Text('See Details'),
                         ),
                       ),
                     ],
@@ -133,7 +133,7 @@ class MatchingScore extends StatelessWidget {
   final String label;
   final int value;
 
-  const MatchingScore({
+  const MatchingScore({super.key, 
     required this.label,
     required this.value,
   });
@@ -143,8 +143,8 @@ class MatchingScore extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Container(
-        padding: EdgeInsets.all(12.0),
-        margin: EdgeInsets.all(2.0),
+        padding: const EdgeInsets.all(12.0),
+        margin: const EdgeInsets.all(2.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10.0),
           color: Colors.white,
@@ -154,7 +154,7 @@ class MatchingScore extends StatelessWidget {
           children: [
             Text(
               label,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             Text(
               '$value%',

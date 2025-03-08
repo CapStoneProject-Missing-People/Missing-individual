@@ -13,7 +13,7 @@ Future<List<MissingPerson>> fetchMissingPeople(BuildContext context) async {
     // HTTP GET request with a timeout
     final response = await http.get(
       Uri.parse("${Constants.postUri}/api/features/getAll"),
-    ).timeout(Duration(seconds: 65), onTimeout: () {
+    ).timeout(const Duration(seconds: 65), onTimeout: () {
       throw TimeoutException("The connection has timed out, Please try again!"); // Throws TimeoutException
     });
 

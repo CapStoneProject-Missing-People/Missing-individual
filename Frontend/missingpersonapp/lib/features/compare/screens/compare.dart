@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'package:missingpersonapp/features/compare/data/fetchCompare.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
-import 'package:missingpersonapp/features/authentication/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -39,7 +37,7 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
 
   String? _selectedGender = 'Select Gender';
   String? _selectedSkinColor = 'Select Skin Color';
-  String? _selectedBodySize = 'Select Body Size';
+  final String _selectedBodySize = 'Select Body Size';
   String? _selectedUpperClothType = 'Select Upper Cloth Type';
   String? _selectedUpperClothColor = 'Select Upper Cloth Color';
   String? _selectedLowerClothType = 'Select Lower Cloth Type';
@@ -177,7 +175,7 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
             ? _selectedLowerClothColor
             : null,
         'bodySize':
-            _selectedBodySize != null && _selectedBodySize != 'Select Body Size'
+            _selectedBodySize != 'Select Body Size'
                 ? _selectedBodySize
                 : null,
         'eyeDescription': _eyeDescriptionController.text.isNotEmpty
@@ -204,10 +202,10 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
       print("Person to compare: $personToCompare");
 
       // Save lastTimeSeen to the state variable
-      var _lastTimeSeen = personToCompare['lastTimeSeen'] as int?;
+      var lastTimeSeen = personToCompare['lastTimeSeen'] as int?;
 
       final url = Uri.parse(
-          '${Constants.postUri}/api/features/compare/${_lastTimeSeen}');
+          '${Constants.postUri}/api/features/compare/$lastTimeSeen');
 
       print("URL: $url");
 
@@ -240,7 +238,7 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
               MaterialPageRoute(
                 builder: (context) => CompareMatchedPersonCard(
                   featureCompareList: featureCompareList,
-                  lastTimeSeen: _lastTimeSeen, // Pass lastTimeSeen here
+                  lastTimeSeen: lastTimeSeen, // Pass lastTimeSeen here
                 ),
               ),
             );
@@ -378,10 +376,10 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue, // background (button) color
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                           horizontal: 60.0, vertical: 15.0), // Button size
                       textStyle:
-                          TextStyle(fontSize: 18), // foreground (text) color
+                          const TextStyle(fontSize: 18), // foreground (text) color
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator()
@@ -413,7 +411,7 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(
+        borderSide: const BorderSide(
           color: Colors.blue, // Outline color when text field is active
         ),
       ),

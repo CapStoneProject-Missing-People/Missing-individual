@@ -7,8 +7,7 @@ import 'package:provider/provider.dart';
 class ShowPushNotificationTap extends StatelessWidget {
   final String theCase;
 
-  const ShowPushNotificationTap({Key? key, required this.theCase})
-      : super(key: key);
+  const ShowPushNotificationTap({super.key, required this.theCase});
 
   @override
   Widget build(BuildContext context) {

@@ -159,7 +159,7 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
 class EditProfileDialog extends StatefulWidget {
   final User user;
 
-  const EditProfileDialog({required this.user});
+  const EditProfileDialog({super.key, required this.user});
 
   @override
   _EditProfileDialogState createState() => _EditProfileDialogState();

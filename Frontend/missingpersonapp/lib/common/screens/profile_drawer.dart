@@ -71,7 +71,7 @@ class ProfileDrawer extends StatelessWidget {
                           child: CircleAvatar(
                             backgroundColor: Colors.grey[300],
                             radius: 24,
-                            child: Icon(
+                            child: const Icon(
                               Icons.person,
                               color: Colors.white,
                               size: 25,
@@ -85,7 +85,7 @@ class ProfileDrawer extends StatelessWidget {
                             Navigator.pushNamed(context,
                                 '/login'); // Navigate to the login page
                           },
-                          child: Text(
+                          child: const Text(
                             'Login',
                             style: TextStyle(
                               fontSize: 20,

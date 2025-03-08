@@ -8,7 +8,7 @@ import 'package:missingpersonapp/features/chat/widgets/chatItem.dart';
 class ChatListScreen extends StatefulWidget {
   final String userId;
 
-  ChatListScreen({required this.userId});
+  const ChatListScreen({super.key, required this.userId});
 
   @override
   _ChatListScreenState createState() => _ChatListScreenState();
@@ -31,11 +31,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
     return Scaffold(
       body: chatProvider.isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : chatProvider.errorMessage.isNotEmpty
               ? Center(child: Text(chatProvider.errorMessage))
               : chatProvider.groupedChatSessions.isEmpty
-                  ? Center(child: Text('No chats found'))
+                  ? const Center(child: Text('No chats found'))
                   : ListView.builder(
                       itemCount: chatProvider.groupedChatSessions.length,
                       itemBuilder: (context, index) {

@@ -25,7 +25,6 @@ class MatchedCaseProvider with ChangeNotifier {
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body)['data'];
-print('matched cases: ${data[0]}');
       _matchedCases = data.map<MatchedCase>((item) {
         return MatchedCase.fromJson(item);
       }).toList();
@@ -36,7 +35,6 @@ print('matched cases: ${data[0]}');
   }
 
   Future<void> updateStatusToFound(String id, String matchid) async {
-    print('the ids are: ${id} and ${matchid}');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('authorization');
 
@@ -65,7 +63,7 @@ print('matched cases: ${data[0]}');
   }
   Future<void> deleteMatchedCase(String id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    prefs.getString('authorization');
 
     final response = await http.delete(
       Uri.parse('${Constants.faceApi}/delete-match/$id'),

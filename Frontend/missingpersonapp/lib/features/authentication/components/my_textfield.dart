@@ -24,7 +24,7 @@ class MyTextField extends StatelessWidget {
       child: TextField(
         controller: controller,
         keyboardType: keyboardType,
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
@@ -66,7 +66,7 @@ class _PasswordFieldState extends State<PasswordField> {
       child: TextField(
         controller: widget.controller,
         obscureText: _obscureText,
-        style: TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
           hintText: widget.hintText,
           hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),

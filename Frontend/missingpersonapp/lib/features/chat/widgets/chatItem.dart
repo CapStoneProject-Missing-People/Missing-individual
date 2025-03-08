@@ -9,14 +9,14 @@ class ChatItem extends StatelessWidget {
   final VoidCallback onTap;
 
   const ChatItem({
-    Key? key,
+    super.key,
     required this.username,
     required this.messagePreview,
     required this.time,
     required this.isRead,
     required this.isChatWithSelf,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,29 +32,29 @@ class ChatItem extends StatelessWidget {
               color: Colors.grey.withOpacity(0.3),
               spreadRadius: 1,
               blurRadius: 5,
-              offset: Offset(0, 1),
+              offset: const Offset(0, 1),
             ),
           ],
         ),
         child: Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 24,
               backgroundImage: NetworkImage('https://via.placeholder.com/150'), // Replace with your image URL
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     username,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     messagePreview,
                     style: TextStyle(
@@ -66,7 +66,7 @@ class ChatItem extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             if (!isChatWithSelf)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -78,7 +78,7 @@ class ChatItem extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Icon(
                     isRead ? Icons.check_circle : Icons.check_circle_outline,
                     color: isRead ? Colors.blue : Colors.grey,

@@ -9,10 +9,10 @@ class HomePageContent extends StatefulWidget {
   final Map<String, dynamic> filters;
 
   const HomePageContent({
-    Key? key,
+    super.key,
     required this.searchText,
     required this.filters,
-  }) : super(key: key);
+  });
 
   @override
   _HomePageContentState createState() => _HomePageContentState();
@@ -164,7 +164,7 @@ class _HomePageContentState extends State<HomePageContent> {
     if (provider.errorMessage.isNotEmpty) {
       return Container(
         color: Colors.white,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -78,14 +78,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   const SizedBox(height: 40),
                   // App Logo
-                  Icon(
+                  const Icon(
                     Icons.lock,
                     size: 100,
                     color: Colors.white,
                   ),
                   const SizedBox(height: 20),
                   // Welcome Text
-                  Text(
+                  const Text(
                     "Create Account",
                     style: TextStyle(
                       color: Colors.white,
@@ -140,7 +140,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       padding: const EdgeInsets.only(top: 20),
                       child: Text(
                         _errorMessage!,
-                        style: TextStyle(color: Colors.red),
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
                   const SizedBox(height: 20),
@@ -165,7 +165,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           );
                         },
-                        child: Text(
+                        child: const Text(
                           'Log In',
                           style: TextStyle(
                             color: Colors.white,

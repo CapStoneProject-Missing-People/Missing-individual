@@ -7,7 +7,7 @@ class MyDraggableSheet extends StatefulWidget {
   final Function onFilterChanged;
   final Function onClose;
 
-  MyDraggableSheet({
+  const MyDraggableSheet({super.key, 
     required this.visible,
     required this.child,
     required this.onFilterChanged,

@@ -39,7 +39,7 @@ class _OverAllMatchState extends State<OverAllMatch> {
           if (matchedCaseProvider.isLoading || descriptionMatchProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (matchedCaseProvider.hasError || descriptionMatchProvider.hasError) {
-            return Center(child: Text('Error loading data.'));
+            return const Center(child: Text('Error loading data.'));
           } else {
             final matchedCases = matchedCaseProvider.matchedCases;
             final descriptionMatches = descriptionMatchProvider.matches;
@@ -58,7 +58,7 @@ class _OverAllMatchState extends State<OverAllMatch> {
             }
 
             if (similarCases.isEmpty) {
-              return Center(child: Text('No similar cases found.'));
+              return const Center(child: Text('No similar cases found.'));
             }
 
             return ListView.builder(
@@ -88,21 +88,21 @@ class _OverAllMatchState extends State<OverAllMatch> {
                     ),
                     Expanded(
                       child: Card(
-                        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Image.memory(matchedCase.imageBuffers[0], fit: BoxFit.cover, width: double.infinity),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Text(
                                 'ID: ${matchedCase.id}',
-                                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 5),
+                              const SizedBox(height: 5),
                               Text('Status: ${matchedCase.status}'),
-                              Text('Matches: ${matchedCase.matches.length}', style: TextStyle(color: Colors.blueAccent)),
+                              Text('Matches: ${matchedCase.matches.length}', style: const TextStyle(color: Colors.blueAccent)),
                             ],
                           ),
                         ),

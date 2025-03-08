@@ -16,8 +16,7 @@ class MissingPersonDetails extends StatefulWidget {
   final String header;
 
   const MissingPersonDetails(
-      {Key? key, required this.missingPerson, required this.header})
-      : super(key: key);
+      {super.key, required this.missingPerson, required this.header});
 
   @override
   State<MissingPersonDetails> createState() => _MissingPersonDetailsState();
@@ -26,7 +25,7 @@ class MissingPersonDetails extends StatefulWidget {
 class _MissingPersonDetailsState extends State<MissingPersonDetails> {
   int activeIndex = 0;
   bool isChatVisible = true;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -165,35 +164,35 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
                         : Container(),
                   ),
                   const SizedBox(height: 20),
-                  buildContainer('First Name', '${widget.missingPerson.name}',
+                  buildContainer('First Name', widget.missingPerson.name,
                       Icons.person, context),
-                  buildContainer('Middle name', '${widget.missingPerson.middleName}',
+                  buildContainer('Middle name', widget.missingPerson.middleName,
                       Icons.person, context),
-                  buildContainer('Last name', '${widget.missingPerson.lastName}',
+                  buildContainer('Last name', widget.missingPerson.lastName,
                       Icons.person, context),
-                  buildContainer('Gender', '${widget.missingPerson.gender}',
+                  buildContainer('Gender', widget.missingPerson.gender,
                       Icons.calendar_month, context),
                   buildContainer('Age', '${widget.missingPerson.age}',
                       Icons.calendar_month, context),
-                  buildContainer('Status', '${widget.missingPerson.status}',
+                  buildContainer('Status', widget.missingPerson.status,
                       Icons.calendar_month, context),
-                  buildContainer('Skin Color', '${widget.missingPerson.skin_color}',
+                  buildContainer('Skin Color', widget.missingPerson.skin_color,
                       Icons.color_lens_outlined, context),
                   buildContainer('Description',
-                      '${widget.missingPerson.description}', Icons.book, context),
+                      widget.missingPerson.description, Icons.book, context),
                   buildContainer('Time Since Disappearance', '${widget.missingPerson.timeSinceDisappearance} months',
                       Icons.timelapse, context),
-                  buildContainer('Date Reported', '${widget.missingPerson.dateReported}',
+                  buildContainer('Date Reported', widget.missingPerson.dateReported,
                       Icons.date_range, context),
-                  buildContainer('Last Seen Location', '${widget.missingPerson.lastSeenLocation}',
+                  buildContainer('Last Seen Location', widget.missingPerson.lastSeenLocation,
                       Icons.location_city, context),
-                  buildContainer('medical Information', '${widget.missingPerson.medicalInformation}',
+                  buildContainer('medical Information', widget.missingPerson.medicalInformation,
                       Icons.medical_information, context),
-                  buildContainer('Circumstance of Disappearance', '${widget.missingPerson.circumstanceOfDisappearance}',
+                  buildContainer('Circumstance of Disappearance', widget.missingPerson.circumstanceOfDisappearance,
                       Icons.dashboard, context),
-                  buildContainer('Contact using this Phone', '${widget.missingPerson.posterPhone}',
+                  buildContainer('Contact using this Phone', widget.missingPerson.posterPhone,
                       Icons.phone, context),
-                  buildContainer('Contact using this email', '${widget.missingPerson.posterEmail}',
+                  buildContainer('Contact using this email', widget.missingPerson.posterEmail,
                       Icons.email, context),
                 ],
               ),
@@ -207,7 +206,7 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
               child: Column(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                     onPressed: () {
                       setState(() {
                         isChatVisible = false;
@@ -225,7 +224,7 @@ class _MissingPersonDetailsState extends State<MissingPersonDetails> {
                         ),
                       );
                     },
-                    child: Icon(Icons.chat),
+                    child: const Icon(Icons.chat),
                   ),
                 ],
               ),

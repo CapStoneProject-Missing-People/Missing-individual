@@ -10,12 +10,12 @@ class DetailMatchPage extends StatefulWidget {
   final List<Uint8List> images;
   final String id;
 
-  DetailMatchPage({
-    Key? key,
+  const DetailMatchPage({
+    super.key,
     required this.match,
     required this.images,
     required this.id,
-  }) : super(key: key);
+  });
 
   @override
   State<DetailMatchPage> createState() => _DetailMatchPageState();
@@ -49,7 +49,7 @@ class _DetailMatchPageState extends State<DetailMatchPage> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Container(
+            SizedBox(
               height: 200,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
@@ -102,7 +102,7 @@ class _DetailMatchPageState extends State<DetailMatchPage> {
 
                   height: 60,
                   color: Colors.grey[200],
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.location_on, color: Colors.blue, size: 32,),
