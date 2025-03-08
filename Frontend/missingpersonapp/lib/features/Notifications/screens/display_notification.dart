@@ -26,9 +26,6 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notifications'),
-      ),
       body: FutureBuilder<List<NotificationModel>>(
         future: futureNotifications,
         builder: (context, snapshot) {

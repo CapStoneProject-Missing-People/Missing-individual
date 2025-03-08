@@ -16,7 +16,9 @@ class DescriptionMatchProvider with ChangeNotifier {
 
   Future<void> fetchMatches() async {
     _isLoading = true;
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
 
     try {
       _matches = await apiService.getPotentialMatches();

@@ -33,7 +33,10 @@ class AllMissingPeopleProvider extends ChangeNotifier {
   void _setLoading(bool loading) {
     if (_isLoading != loading) {
       _isLoading = loading;
+      // Defer notifyListeners to the next frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       notifyListeners();
+    });
     }
   }
 

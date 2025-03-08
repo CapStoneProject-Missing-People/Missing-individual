@@ -3,7 +3,7 @@ import 'package:missingpersonapp/features/Profile/services/profile_manage.dart';
 import 'package:missingpersonapp/features/authentication/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UserProvider extends ChangeNotifier {
+class UserProvider with ChangeNotifier {
   User _user =
       User(id: '', name: '', email: '', token: '', password: '', phoneNo: '');
   bool _notificationsEnabled = true; // Default value

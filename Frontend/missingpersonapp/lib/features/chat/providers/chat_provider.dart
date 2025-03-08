@@ -27,7 +27,7 @@ class ChatProvider extends ChangeNotifier {
       _chatSessions = await fetchChatSessionsFromApi(userId);
       _errorMessage = ''; // Clear error message if fetch is successful
     } catch (e) {
-      _errorMessage = 'Failed to fetch chat sessions: $e';
+      _errorMessage = 'Nothing to Show';
     } finally {
       _isLoading = false;
       notifyListeners();

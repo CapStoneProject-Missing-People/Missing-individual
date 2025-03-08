@@ -42,10 +42,13 @@ public final class GeneratedPluginRegistrant {
     }
     try {
       flutterEngine.getPlugins().add(new com.it_nomads.fluttersecurestorage.FlutterSecureStoragePlugin());
+    } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin flutter_secure_storage, com.it_nomads.fluttersecurestorage.FlutterSecureStoragePlugin", e);
     }
     try {
       flutterEngine.getPlugins().add(new io.github.ponnamkarthik.toast.fluttertoast.FlutterToastPlugin());
     } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin fluttertoast, io.github.ponnamkarthik.toast.fluttertoast.FlutterToastPlugin", e);
     }
     try {
       flutterEngine.getPlugins().add(new com.baseflow.geolocator.GeolocatorPlugin());
@@ -63,16 +66,17 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin image_picker_android, io.flutter.plugins.imagepicker.ImagePickerPlugin", e);
     }
     try {
-
       flutterEngine.getPlugins().add(new com.crazecoder.openfile.OpenFilePlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin open_filex, com.crazecoder.openfile.OpenFilePlugin", e);
     }
+    try {
       flutterEngine.getPlugins().add(new io.flutter.plugins.pathprovider.PathProviderPlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin path_provider_android, io.flutter.plugins.pathprovider.PathProviderPlugin", e);
     }
     try {
+      flutterEngine.getPlugins().add(new dev.fluttercommunity.plus.share.SharePlusPlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin share_plus, dev.fluttercommunity.plus.share.SharePlusPlugin", e);
     }

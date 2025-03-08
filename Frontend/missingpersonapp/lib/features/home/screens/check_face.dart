@@ -52,8 +52,8 @@ class CheckFace extends StatelessWidget {
                         height: 200,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            const BoxShadow(
+                          boxShadow: const [
+                            BoxShadow(
                               color: Colors.black26,
                               blurRadius: 10,
                               offset: Offset(0, 4),
@@ -74,7 +74,7 @@ class CheckFace extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 20),
                           child: Column(
                             children: [
-                               TextButton(
+                               provider.personId != null ? TextButton(
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -92,7 +92,7 @@ class CheckFace extends StatelessWidget {
                           ),
                         ),
                         child: const Text('Click to See Missing Person...', style: TextStyle(color: Colors.blue),),
-                      ),
+                      ): const SizedBox(),
                       const SizedBox(height: 40),
                               Text(
                                 provider.apiResult!,

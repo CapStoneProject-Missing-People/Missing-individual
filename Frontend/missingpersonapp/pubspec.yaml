@@ -81,7 +81,7 @@ dependencies:
 
   # Rating bar
   flutter_rating_bar: ^4.0.1
-  connectivity_plus: ^6.0.3
+  connectivity_plus: ^6.1.3
 
 dev_dependencies:
   flutter_test:
