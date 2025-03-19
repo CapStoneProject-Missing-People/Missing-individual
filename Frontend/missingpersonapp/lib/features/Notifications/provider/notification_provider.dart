@@ -3,8 +3,10 @@ import 'package:missingpersonapp/features/Notifications/models/notification_mode
 
 class NotificationProvider with ChangeNotifier {
   int _unreadCount = 0;
+  List<NotificationModel> _notifications = [];
 
   int get unreadCount => _unreadCount;
+  List<NotificationModel> get notifications => _notifications;
 
   Future<void> fetchNotifications() async {
     // Simulate fetching notifications and counting unread ones

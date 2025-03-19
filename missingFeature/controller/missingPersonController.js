@@ -6,6 +6,7 @@ import MergedFeaturesModel from "../models/mergedFeaturesSchema.js";
 
 export const CreateMissingPerson = async (req, res) => {
   try {
+    console.log('create missing person');
     const { timeSinceDisappearance } = req.params;
     let baseReq;
     if (timeSinceDisappearance > 2) {

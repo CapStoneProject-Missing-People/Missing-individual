@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/missingPerson/models/missing_person_model.dart';
 import 'package:missingpersonapp/features/authentication/models/user.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
@@ -20,13 +21,13 @@ class MissingPersonProvider extends ChangeNotifier {
   List<MissingPersonSpecific> get missingPersons => _missingPersons;
 
   Future<void> fetchMissingPersons(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    final token = await AuthService();
+    String? accessToken = await token.getValidAccessToken(context);
     final http.Response response = await http.get(
       Uri.parse('${Constants.postUri}/api/features/getOwnFeatures'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
     );
 
@@ -131,7 +132,6 @@ class MissingPersonProvider extends ChangeNotifier {
       } else if (str == 'middle name') {
         return 'name.middlename';
       }
-
 
       List<String> parts = str.split(' ');
       if (parts.length >= 2) {

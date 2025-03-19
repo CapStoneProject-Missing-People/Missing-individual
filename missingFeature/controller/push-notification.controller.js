@@ -278,7 +278,7 @@ const DelelteUserFCM = async (fcmToken) => {
 export const FetchNotifications = async (req, res) => {
   try {
     const userId = req.user.userId;
-    console.log("the user: " + req.user.phone_number);
+    console.log("the user: " + req.user.userId);
     const notifications = await Notification.find({ user: userId }).sort({
       createdAt: -1,
     });

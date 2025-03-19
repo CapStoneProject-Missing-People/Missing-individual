@@ -21,23 +21,32 @@ void httpErrorHandle({
   required BuildContext context,
   required VoidCallback onSuccess,
 }) {
+  print("HTTP Response Status Code: ${response.statusCode}");
+  print("HTTP Response Headers: ${response.headers}");
+  print("HTTP Response Body: ${response.body}");
+
   switch (response.statusCode) {
     case 200:
-    case 201:
-      onSuccess();
+      try {
+        onSuccess();
+      } catch (e, stackTrace) {
+        print("Error in onSuccess callback: $e");
+        print("Stack trace: $stackTrace");
+        showToast(context, e.toString(), Colors.red);
+      }
       break;
     case 400:
-    case 401:
-    case 403:
-    case 404:
+      showToast(context, jsonDecode(response.body)['msg'] ?? 'Bad Request',
+          Colors.red);
+      break;
     case 500:
-      final errorMessage =
-          jsonDecode(response.body)['errors'];
-      showToast(context, errorMessage, Colors.red);
+      showToast(
+          context,
+          jsonDecode(response.body)['error'] ?? 'Internal Server Error',
+          Colors.red);
       break;
     default:
-      showToast(
-          context, 'Unexpected error: ${response.statusCode}', Colors.red);
+      showToast(context, response.body ?? 'An error occurred', Colors.red);
   }
 }
 

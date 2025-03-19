@@ -3,10 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:missingpersonapp/common/screens/glass_morphic_button.dart';
 import 'package:missingpersonapp/features/PostAdd/models/addpost_model.dart';
+import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MissingPersonAddPage extends StatefulWidget {
   const MissingPersonAddPage({super.key});
@@ -17,18 +20,22 @@ class MissingPersonAddPage extends StatefulWidget {
 
 class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _middleNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _lastPlaceSeenController = TextEditingController();
+  final TextEditingController _lastPlaceSeenController =
+      TextEditingController();
   final TextEditingController _lastTimeSeenController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _medicalInformation = TextEditingController();
-  final TextEditingController _circumstanceOfDisappearance = TextEditingController();
-  final TextEditingController _eyeDescriptionController = TextEditingController();
-  final TextEditingController _noseDescriptionController = TextEditingController();
-  final TextEditingController _hairDescriptionController = TextEditingController();
+  final TextEditingController _circumstanceOfDisappearance =
+      TextEditingController();
+  final TextEditingController _eyeDescriptionController =
+      TextEditingController();
+  final TextEditingController _noseDescriptionController =
+      TextEditingController();
+  final TextEditingController _hairDescriptionController =
+      TextEditingController();
 
   String _selectedGender = 'male';
   String _selectedSkinColor = 'fair';
@@ -39,6 +46,7 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   String _selectedLowerClothColor = 'blue';
 
   final List<File> _images = [];
+  bool _isFirstTime = true;
   bool _showClothDetails = true;
   bool _isSubmitting = false;
 
@@ -46,6 +54,13 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   void initState() {
     super.initState();
     _lastTimeSeenController.addListener(_checkLastTimeSeen);
+    _checkFirstTime().then((_) {
+      if (_isFirstTime) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showFirstTimeTooltips(context);
+        });
+      }
+    });
   }
 
   void _checkLastTimeSeen() {
@@ -106,13 +121,27 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   }
 
   Future<bool> postData(MissingPersonAddingModel missingPerson) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
-    final url = Uri.parse('${Constants.postUri}/api/createMissingPerson/${missingPerson.lastTimeSeen}');
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final url = Uri.parse(
+        '${Constants.postUri}/api/createMissingPerson/${missingPerson.lastTimeSeen}');
 
     try {
+      final accessToken = await authService.getValidAccessToken(context);
+      if (accessToken == null) {
+        Fluttertoast.showToast(
+          msg: 'Authentication failed. Please log in again.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        return false;
+      }
+
       var request = http.MultipartRequest('POST', url);
-      request.headers['Authorization'] = 'Bearer $token';
+      request.headers['Authorization'] = 'Bearer $accessToken';
       request.fields['firstName'] = missingPerson.firstName;
       request.fields['middleName'] = missingPerson.middleName;
       request.fields['lastName'] = missingPerson.lastName;
@@ -130,13 +159,12 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
       request.fields['noseDescription'] = missingPerson.noseDescription;
       request.fields['hairDescription'] = missingPerson.hairDescription;
       request.fields['medicalInformation'] = _medicalInformation.text;
-      request.fields['circumstanceOfDisappearance'] = _circumstanceOfDisappearance.text;
+      request.fields['circumstanceOfDisappearance'] =
+          _circumstanceOfDisappearance.text;
 
       for (var i = 0; i < _images.length; i++) {
-        request.files.add(await http.MultipartFile.fromPath(
-          'images',
-          _images[i].path,
-        ));
+        request.files
+            .add(await http.MultipartFile.fromPath('images', _images[i].path));
       }
 
       var response = await request.send();
@@ -154,6 +182,9 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
           textColor: Colors.white,
           fontSize: 16.0,
         );
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/');
+        }
         return true;
       } else {
         final message = parsedResponse['message'];
@@ -182,6 +213,16 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
     }
   }
 
+  Future<void> _checkFirstTime() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isFirstTime = prefs.getBool('isFirstTime') ?? true;
+    });
+    if (_isFirstTime) {
+      prefs.setBool('isFirstTime', false);
+    }
+  }
+
   Future<void> pickImages() async {
     final ImagePicker picker = ImagePicker();
     final List<XFile> pickedFiles = await picker.pickMultiImage();
@@ -204,6 +245,81 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
     });
   }
 
+  void _openImagePreview(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.file(
+                _images[index],
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showFirstTimeTooltips(BuildContext context) {
+    if (_isFirstTime) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.grey.shade800,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              title: const Text(
+                'How to Use the Image Picker',
+                style: TextStyle(color: Colors.white),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '1. Tap an image to view it in full screen.',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    '2. Swipe an image to remove it.',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Got it!',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      });
+    }
+  }
+
   void _removeImage(int index) {
     setState(() {
       _images.removeAt(index);
@@ -213,103 +329,165 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildTextField(_firstNameController, 'First Name'),
-              const SizedBox(height: 10),
-              _buildTextField(_middleNameController, 'Middle Name'),
-              const SizedBox(height: 10),
-              _buildTextField(_lastNameController, 'Last Name'),
-              const SizedBox(height: 10),
-              _buildTextField(_lastTimeSeenController, 'Last Time Seen (in months)', TextInputType.number),
-              const SizedBox(height: 10),
-              _buildDropdown('Gender:', _selectedGender, ['male', 'female'], (newValue) {
-                setState(() {
-                  _selectedGender = newValue!;
-                });
-              }),
-              const SizedBox(height: 10),
-              _buildTextField(_ageController, 'Age', TextInputType.number),
-              const SizedBox(height: 10),
-              _buildDropdown('Skin Color:', _selectedSkinColor, ['fair', 'black', 'white', 'tseyim'], (newValue) {
-                setState(() {
-                  _selectedSkinColor = newValue!;
-                });
-              }),
-              const SizedBox(height: 10),
-              _buildDropdown('Body Size:', _selectedBodySize, ['thin', 'average', 'muscular', 'overweight', 'obese', 'fit', 'athletic', 'curvy', 'petite', 'fat'], (newValue) {
-                setState(() {
-                  _selectedBodySize = newValue!;
-                });
-              }),
-              const SizedBox(height: 10),
-              _buildTextField(_eyeDescriptionController, 'Eye Description'),
-              const SizedBox(height: 10),
-              _buildTextField(_noseDescriptionController, 'Nose Description'),
-              const SizedBox(height: 10),
-              _buildTextField(_hairDescriptionController, 'Hair Description'),
-              if (_showClothDetails) ...[
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.grey.shade900, Colors.grey.shade800],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildTextField(_firstNameController, 'First Name'),
                 const SizedBox(height: 10),
-                _buildDropdown('Upper Cloth Type:', _selectedUpperClothType, ['tshirt', 'hoodie', 'sweater', 'sweetshirt'], (newValue) {
+                _buildTextField(_middleNameController, 'Middle Name'),
+                const SizedBox(height: 10),
+                _buildTextField(_lastNameController, 'Last Name'),
+                const SizedBox(height: 10),
+                _buildTextField(_lastTimeSeenController,
+                    'Last Time Seen (in months)', TextInputType.number),
+                const SizedBox(height: 10),
+                _buildDropdown('Gender:', _selectedGender, ['male', 'female'],
+                    (newValue) {
                   setState(() {
-                    _selectedUpperClothType = newValue!;
+                    _selectedGender = newValue!;
                   });
                 }),
                 const SizedBox(height: 10),
-                _buildDropdown('Upper Cloth Color:', _selectedUpperClothColor, ['red', 'blue', 'white', 'black', 'orange', 'light blue', 'brown', 'blue black', 'yellow'], (newValue) {
+                _buildTextField(_ageController, 'Age', TextInputType.number),
+                const SizedBox(height: 10),
+                _buildDropdown('Skin Color:', _selectedSkinColor,
+                    ['fair', 'black', 'white', 'tseyim'], (newValue) {
                   setState(() {
-                    _selectedUpperClothColor = newValue!;
+                    _selectedSkinColor = newValue!;
                   });
                 }),
                 const SizedBox(height: 10),
-                _buildDropdown('Lower Cloth Type:', _selectedLowerClothType, ['trouser', 'shorts', 'nothing', 'boxer'], (newValue) {
+                _buildDropdown('Body Size:', _selectedBodySize, [
+                  'thin',
+                  'average',
+                  'muscular',
+                  'overweight',
+                  'obese',
+                  'fit',
+                  'athletic',
+                  'curvy',
+                  'petite',
+                  'fat'
+                ], (newValue) {
                   setState(() {
-                    _selectedLowerClothType = newValue!;
+                    _selectedBodySize = newValue!;
                   });
                 }),
                 const SizedBox(height: 10),
-                _buildDropdown('Lower Cloth Color:', _selectedLowerClothColor, ['blue', 'black', 'white', 'red', 'orange', 'light blue', 'brown', 'blue black', 'yellow'], (newValue) {
-                  setState(() {
-                    _selectedLowerClothColor = newValue!;
-                  });
-                }),
+                _buildTextField(_eyeDescriptionController, 'Eye Description'),
                 const SizedBox(height: 10),
-                _buildTextField(_lastPlaceSeenController, 'Last Place Seen'),
-              ],
-              const SizedBox(height: 10),
-              _buildTextField(_medicalInformation, "Medical Information"),
-              const SizedBox(height: 10),
-              _buildTextField(_circumstanceOfDisappearance, "Circumstance of Disappearance"),
-              const SizedBox(height: 10),
-              ElevatedButton.icon(
-                onPressed: pickImages,
-                icon: const Icon(Icons.add_a_photo, color: Colors.white),
-                label: const Text('Add Images', style: TextStyle(color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                ),
-              ),
-              const SizedBox(height: 10),
-              _buildImageGrid(),
-              const SizedBox(height: 10),
-              if (_isSubmitting)
-                const Center(child: CircularProgressIndicator())
-              else
-                ElevatedButton(
-                  onPressed: _validateAndSubmit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
+                _buildTextField(_noseDescriptionController, 'Nose Description'),
+                const SizedBox(height: 10),
+                _buildTextField(_hairDescriptionController, 'Hair Description'),
+                if (_showClothDetails) ...[
+                  const SizedBox(height: 10),
+                  _buildDropdown('Upper Cloth Type:', _selectedUpperClothType, [
+                    'tshirt',
+                    'hoodie',
+                    'sweater',
+                    'sweetshirt'
+                  ], (newValue) {
+                    setState(() {
+                      _selectedUpperClothType = newValue!;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                  _buildDropdown(
+                      'Upper Cloth Color:', _selectedUpperClothColor, [
+                    'red',
+                    'blue',
+                    'white',
+                    'black',
+                    'orange',
+                    'light blue',
+                    'brown',
+                    'blue black',
+                    'yellow'
+                  ], (newValue) {
+                    setState(() {
+                      _selectedUpperClothColor = newValue!;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                  _buildDropdown('Lower Cloth Type:', _selectedLowerClothType,
+                      ['trouser', 'shorts', 'nothing', 'boxer'], (newValue) {
+                    setState(() {
+                      _selectedLowerClothType = newValue!;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                  _buildDropdown(
+                      'Lower Cloth Color:', _selectedLowerClothColor, [
+                    'blue',
+                    'black',
+                    'white',
+                    'red',
+                    'orange',
+                    'light blue',
+                    'brown',
+                    'blue black',
+                    'yellow'
+                  ], (newValue) {
+                    setState(() {
+                      _selectedLowerClothColor = newValue!;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                  _buildTextField(_lastPlaceSeenController, 'Last Place Seen'),
+                ],
+                const SizedBox(height: 10),
+                _buildTextField(_medicalInformation, "Medical Information"),
+                const SizedBox(height: 10),
+                _buildTextField(_circumstanceOfDisappearance,
+                    "Circumstance of Disappearance"),
+                const SizedBox(height: 10),
+                GlassmorphismButton(
+                  onPressed: pickImages,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_a_photo_outlined, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'Add Images',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  child: const Text('Submit', style: TextStyle(color: Colors.white)),
                 ),
-            ],
+                const SizedBox(height: 10),
+                _buildImageGrid(),
+                const SizedBox(height: 10),
+                if (_isSubmitting)
+                  const Center(child: CircularProgressIndicator())
+                else
+                  GlassmorphismButton(
+                    onPressed: _validateAndSubmit,
+                    child: const Text(
+                      'Submit',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  )
+              ],
+            ),
           ),
         ),
       ),
@@ -323,12 +501,13 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
   ]) {
     return TextFormField(
       controller: controller,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.blue),
+        labelStyle: const TextStyle(color: Colors.white70),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.blue),
+          borderSide: const BorderSide(color: Colors.white70),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -355,12 +534,14 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
       value: value,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.blue),
+        labelStyle: const TextStyle(color: Colors.white70),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.blue),
+          borderSide: const BorderSide(color: Colors.white70),
         ),
       ),
+      dropdownColor: Colors.grey.shade800,
+      style: const TextStyle(color: Colors.white),
       items: items.map<DropdownMenuItem<String>>((String item) {
         return DropdownMenuItem<String>(
           value: item,
@@ -373,39 +554,58 @@ class _MissingPersonAddPageState extends State<MissingPersonAddPage> {
 
   Widget _buildImageGrid() {
     return _images.isEmpty
-        ? const Text('No images selected.')
+        ? const Center(
+            child: Text(
+              'No images selected.',
+              style: TextStyle(color: Colors.white70),
+            ),
+          )
         : GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
+              crossAxisCount: 3, // 3 columns
+              crossAxisSpacing: 8.0, // Horizontal spacing between items
+              mainAxisSpacing: 8.0, // Vertical spacing between items
+              childAspectRatio: 1, // Square aspect ratio (1:1)
             ),
             itemCount: _images.length,
             itemBuilder: (BuildContext context, int index) {
-              return Stack(
-                children: [
-                  ClipRRect(
+              return Dismissible(
+                key: Key(_images[index].path),
+                direction: DismissDirection.horizontal,
+                onDismissed: (direction) => _removeImage(index),
+                background: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(10),
-                    child: Image.file(
-                      _images[index],
-                      fit: BoxFit.cover,
-                    ),
                   ),
-                  Positioned(
-                    top: 5,
-                    right: 5,
-                    child: GestureDetector(
-                      onTap: () => _removeImage(index),
-                      child: const CircleAvatar(
-                        radius: 12,
-                        backgroundColor: Colors.red,
-                        child: Icon(Icons.close, size: 16, color: Colors.white),
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.delete_outline,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                child: GestureDetector(
+                  onTap: () => _openImagePreview(context, index),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.file(
+                        _images[index],
+                        fit: BoxFit
+                            .cover, // Crop the image to fill the container
+                        width: double.infinity, // Ensure full width
+                        height: double.infinity, // Ensure full height
                       ),
                     ),
                   ),
-                ],
+                ),
               );
             },
           );

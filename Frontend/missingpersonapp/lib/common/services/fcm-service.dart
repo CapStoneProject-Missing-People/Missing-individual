@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:missingpersonapp/features/Notifications/provider/notification_provider.dart';
 import 'package:missingpersonapp/features/Notifications/screens/show_push_notification_click.dart';
+import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:missingpersonapp/features/home/screens/match_detail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -110,13 +111,13 @@ class FcmService {
   }
 
   Future<void> sendTokenToBackend(String token) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final userToken = prefs.getString('authorization');
-    final isLoggedIn = userToken != null && userToken.isNotEmpty;
+    final userToken = await AuthService().getTokens();
+    final isLoggedIn = userToken['isLoggedIn'] == 'true';
+    final accessToken = userToken['accessToken'];
     print('Is logged in: $isLoggedIn');
 
     if (isLoggedIn) {
-      await updateUserFcmToken(token, userToken);
+      // await updateUserFcmToken(token, accessToken!);
     } else {
       await storeGuestFcmToken(token);
     }

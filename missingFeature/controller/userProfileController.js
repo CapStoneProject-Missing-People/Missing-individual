@@ -28,6 +28,7 @@ export const getUserProfile = async (req, res) => {
 //@route PUT /api/profile/update
 //@access private
 export const updateUserProfile = async (req, res) => {
+  console.log('updating')
   const userID = req.user.userId;
   const { email, name, phoneNo } = req.body;
 

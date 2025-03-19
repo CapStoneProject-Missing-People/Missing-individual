@@ -1,10 +1,11 @@
-import 'dart:convert';
-import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:missingpersonapp/features/compare/model/compare-model.dart';
-import 'package:missingpersonapp/features/compare/screens/card-compare.dart'; // Import the card-compare.dart page
+import 'package:missingpersonapp/features/compare/screens/card-compare.dart';
+import 'package:missingpersonapp/common/screens/glass_morphic_button.dart'; // Import the Glassmorphic Button
 
 class ComparePersonPage extends StatefulWidget {
   const ComparePersonPage({super.key});
@@ -15,7 +16,6 @@ class ComparePersonPage extends StatefulWidget {
 
 class _ComparePersonPageState extends State<ComparePersonPage> {
   final _formKey = GlobalKey<FormState>();
-
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _middleNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -175,9 +175,7 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
             ? _selectedLowerClothColor
             : null,
         'bodySize':
-            _selectedBodySize != 'Select Body Size'
-                ? _selectedBodySize
-                : null,
+            _selectedBodySize != 'Select Body Size' ? _selectedBodySize : null,
         'eyeDescription': _eyeDescriptionController.text.isNotEmpty
             ? _eyeDescriptionController.text
             : null,
@@ -199,27 +197,15 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
                 : null,
       };
 
-      print("Person to compare: $personToCompare");
-
-      // Save lastTimeSeen to the state variable
-      var lastTimeSeen = personToCompare['lastTimeSeen'] as int?;
-
       final url = Uri.parse(
-          '${Constants.postUri}/api/features/compare/$lastTimeSeen');
-
-      print("URL: $url");
+          '${Constants.postUri}/api/features/compare/${personToCompare['lastTimeSeen']}');
 
       try {
         var response = await http.post(
           url,
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: {'Content-Type': 'application/json'},
           body: jsonEncode(personToCompare),
         );
-
-        print('Response status: ${response.statusCode}');
-        print('Response body: ${response.body}');
 
         setState(() {
           _isLoading = false;
@@ -238,7 +224,7 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
               MaterialPageRoute(
                 builder: (context) => CompareMatchedPersonCard(
                   featureCompareList: featureCompareList,
-                  lastTimeSeen: lastTimeSeen, // Pass lastTimeSeen here
+                  lastTimeSeen: personToCompare['lastTimeSeen'] as int?,
                 ),
               ),
             );
@@ -247,10 +233,8 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
               msg: "No Match Found",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 5,
               backgroundColor: Colors.red,
               textColor: Colors.white,
-              fontSize: 16.0,
             );
           }
         }
@@ -258,15 +242,12 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
         setState(() {
           _isLoading = false;
         });
-        print('Network error: $e');
         Fluttertoast.showToast(
           msg: "Network error: $e",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 5,
           backgroundColor: Colors.red,
           textColor: Colors.white,
-          fontSize: 16.0,
         );
       }
     }
@@ -275,172 +256,172 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  Card(
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          _buildTextFormField(
-                              _firstNameController, 'First Name'),
-                          _buildTextFormField(
-                              _middleNameController, 'Middle Name'),
-                          _buildTextFormField(_lastNameController, 'Last Name'),
-                          _buildTextFormField(_ageController, 'Age',
-                              isNumeric: true),
-                          _buildDropdownButtonFormField(
-                              'Gender', genderItems, _selectedGender, (value) {
-                            setState(() {
-                              _selectedGender = value;
-                            });
-                          }),
-                          _buildDropdownButtonFormField(
-                              'Skin Color', skinColorItems, _selectedSkinColor,
-                              (value) {
-                            setState(() {
-                              _selectedSkinColor = value;
-                            });
-                          }),
-                          _buildTextFormField(
-                              _lastPlaceSeenController, 'Last Place Seen'),
-                          _buildTextFormField(_lastTimeSeenController,
-                              'Last Time Seen (Months)',
-                              isNumeric: true),
-                          if (_showClothDetails) ...[
-                            _buildDropdownButtonFormField(
-                                'Upper Cloth Type',
-                                upperClothTypeItems,
-                                _selectedUpperClothType, (value) {
-                              setState(() {
-                                _selectedUpperClothType = value;
-                              });
-                            }),
-                            _buildDropdownButtonFormField(
-                                'Upper Cloth Color',
-                                upperClothColorItems,
-                                _selectedUpperClothColor, (value) {
-                              setState(() {
-                                _selectedUpperClothColor = value;
-                              });
-                            }),
-                            _buildDropdownButtonFormField(
-                                'Lower Cloth Type',
-                                lowerClothTypeItems,
-                                _selectedLowerClothType, (value) {
-                              setState(() {
-                                _selectedLowerClothType = value;
-                              });
-                            }),
-                            _buildDropdownButtonFormField(
-                                'Lower Cloth Color',
-                                lowerClothColorItems,
-                                _selectedLowerClothColor, (value) {
-                              setState(() {
-                                _selectedLowerClothColor = value;
-                              });
-                            }),
-                          ],
-                          //if (_showAdditionalDetails) ...[
-                          _buildTextFormField(
-                              _eyeDescriptionController, 'Eye Description'),
-                          _buildTextFormField(
-                              _noseDescriptionController, 'Nose Description'),
-                          _buildTextFormField(
-                              _hairDescriptionController, 'Hair Description'),
-                          _buildTextFormField(_lastAddressDescController,
-                              'Last Address Description'),
-                          _buildTextFormField(
-                              _medicalInformation, 'Medical Information'),
-                          _buildTextFormField(_circumstanceOfDisappearance,
-                              'Circumstance Of Disappearance'),
-                          // ],
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : _validateAndCompare,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // background (button) color
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 60.0, vertical: 15.0), // Button size
-                      textStyle:
-                          const TextStyle(fontSize: 18), // foreground (text) color
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('Compare'),
-                  ),
-                ],
-              ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.grey.shade900, Colors.grey.shade800],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                _buildGlassCard(
+                  children: [
+                    _buildTextFormField(_firstNameController, 'First Name'),
+                    _buildTextFormField(_middleNameController, 'Middle Name'),
+                    _buildTextFormField(_lastNameController, 'Last Name'),
+                    _buildTextFormField(_ageController, 'Age', isNumeric: true),
+                    _buildDropdown('Gender', genderItems, _selectedGender,
+                        (value) {
+                      setState(() {
+                        _selectedGender = value;
+                      });
+                    }),
+                    _buildDropdown(
+                        'Skin Color', skinColorItems, _selectedSkinColor,
+                        (value) {
+                      setState(() {
+                        _selectedSkinColor = value;
+                      });
+                    }),
+                    _buildTextFormField(
+                        _lastPlaceSeenController, 'Last Place Seen'),
+                    _buildTextFormField(
+                        _lastTimeSeenController, 'Last Time Seen (Months)',
+                        isNumeric: true),
+                    if (_showClothDetails) ...[
+                      _buildDropdown('Upper Cloth Type', upperClothTypeItems,
+                          _selectedUpperClothType, (value) {
+                        setState(() {
+                          _selectedUpperClothType = value;
+                        });
+                      }),
+                      _buildDropdown('Upper Cloth Color', upperClothColorItems,
+                          _selectedUpperClothColor, (value) {
+                        setState(() {
+                          _selectedUpperClothColor = value;
+                        });
+                      }),
+                      _buildDropdown('Lower Cloth Type', lowerClothTypeItems,
+                          _selectedLowerClothType, (value) {
+                        setState(() {
+                          _selectedLowerClothType = value;
+                        });
+                      }),
+                      _buildDropdown('Lower Cloth Color', lowerClothColorItems,
+                          _selectedLowerClothColor, (value) {
+                        setState(() {
+                          _selectedLowerClothColor = value;
+                        });
+                      }),
+                    ],
+                    _buildTextFormField(
+                        _eyeDescriptionController, 'Eye Description'),
+                    _buildTextFormField(
+                        _noseDescriptionController, 'Nose Description'),
+                    _buildTextFormField(
+                        _hairDescriptionController, 'Hair Description'),
+                    _buildTextFormField(
+                        _lastAddressDescController, 'Last Address Description'),
+                    _buildTextFormField(
+                        _medicalInformation, 'Medical Information'),
+                    _buildTextFormField(_circumstanceOfDisappearance,
+                        'Circumstance Of Disappearance'),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                GlassmorphismButton(
+                  onPressed: _isLoading
+                      ? () {} // Fallback empty function when loading
+                      : () async {
+                          if (!_isLoading) {
+                            await _validateAndCompare();
+                          }
+                        },
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Compare',
+                          style: TextStyle(fontSize: 18, color: Colors.white)),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildTextFormField(
-    TextEditingController controller,
-    String labelText, {
-    bool isNumeric = false,
-  }) {
-    return Padding(
-  padding: const EdgeInsets.symmetric(vertical: 10),
-  child: TextFormField(
-    controller: controller,
-    keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-    decoration: InputDecoration(
-      labelText: labelText,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+  Widget _buildGlassCard({required List<Widget> children}) {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
       ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(
-          color: Colors.blue, // Outline color when text field is active
+      color: Colors.white.withOpacity(0.1),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: children,
         ),
       ),
-    ),
-    validator: (value) {
-      if (value == null || value.isEmpty) {
-        return '$labelText cannot be empty';
-      }
-      return null;
-    },
-  ),
-);
+    );
   }
 
-  Widget _buildDropdownButtonFormField(
-    String labelText,
-    List<String> items,
-    String? selectedItem,
-    void Function(String?) onChanged,
-  ) {
+  Widget _buildTextFormField(TextEditingController controller, String labelText,
+      {bool isNumeric = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: const TextStyle(color: Colors.white70),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.white70),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+          ),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return '$labelText cannot be empty';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildDropdown(String labelText, List<String> items,
+      String? selectedItem, ValueChanged<String?> onChanged) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: DropdownButtonFormField<String>(
         decoration: InputDecoration(
           labelText: labelText,
+          labelStyle: const TextStyle(color: Colors.white70),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.white70),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
           ),
         ),
+        dropdownColor: Colors.grey.shade800,
+        style: const TextStyle(color: Colors.white),
         value: selectedItem,
         onChanged: onChanged,
         items: items.map((item) {

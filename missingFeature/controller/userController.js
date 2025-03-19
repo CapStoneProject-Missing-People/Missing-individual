@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import User from "../models/userModel.js";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
 //@desc register a user
 //@route Get /api/users/register
@@ -13,7 +13,7 @@ export const registerUser = async (req, res) => {
   }
 
   const userAvailable = await User.findOne({ email });
-  console.log(userAvailable)
+  console.log(userAvailable);
   if (userAvailable) {
     res.status(400);
     throw new Error("User already registered");
@@ -46,36 +46,71 @@ export const loginUser = async (req, res) => {
     throw new Error("all fields are mandatory");
   }
 
-  const user = await User.findOne({ email });
-  console.log(`Before: ${user}`)
-  let correctPassword = await bcrypt.compare(password, user.password)
-  console.log(correctPassword)
-  if (user && correctPassword) {
-    console.log('hello')
-    const accessToken = jwt.sign(
-      {
-        user: {
-          email: user.email,
-          id: user._id
-        },
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(401);
+      throw new Error("email or password is incorrect");
+    }
 
+    const correctPassword = await bcrypt.compare(password, user.password);
+    if (!correctPassword) {
+      res.status(401);
+      throw new Error("email or password is incorrect");
+    }
+
+    // Create tokens
+    const accessToken = jwt.sign({ id: user._id }, process.env.PRIV_KEY, {
+      expiresIn: accessTokenMaxAge,
+    });
+
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: refreshTokenMaxAge }
+    );
+
+    // Save refresh token to user document
+    user.refreshToken = refreshToken;
+    user.lastLogin = new Date();
+    await user.save();
+
+    // Set refresh token as HTTP-only cookie
+    res.cookie("jwt", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: refreshTokenMaxAge * 1000,
+    });
+
+    // Send response with access token and user data
+    res.status(200).json({
+      accessToken,
+      refreshToken, // Also sending in body for Flutter app
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        phoneNo: user.phoneNo,
+        role: user.role,
+        notificationsEnabled: user.notificationsEnabled,
       },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "40m" }
-    )
-    console.log('hello again')
-
-    res.status(200).json({ accessToken })
-  }else{
-    res.status(401)
-    throw new Error ('email or password is incorrect')
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(error.status || 500).json({
+      message: error.message || "An error occurred during login",
+    });
   }
-
 };
 
 //@desc current user
 //@route Get /api/users/current
 //@access private
 export const currentUser = async (req, res) => {
-  res.json(req.user)
+  res.json(req.user);
 };
+
+// Token expiration times (matching authController.js)
+const accessTokenMaxAge = 7 * 24 * 60 * 60; // 15 minutes
+const refreshTokenMaxAge = 7 * 24 * 60 * 60; // 7 days

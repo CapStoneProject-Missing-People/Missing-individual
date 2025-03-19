@@ -158,12 +158,22 @@ class _HomePageContentState extends State<HomePageContent> {
     final provider = Provider.of<AllMissingPeopleProvider>(context);
 
     if (provider.isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    } 
+      return const Center(
+        child: CircularProgressIndicator(
+          color: Colors.white, // White loading indicator
+        ),
+      );
+    }
 
     if (provider.errorMessage.isNotEmpty) {
       return Container(
-        color: Colors.white,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.grey.shade900, Colors.grey.shade800],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Column(
@@ -181,76 +191,128 @@ class _HomePageContentState extends State<HomePageContent> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _fetchAllMissingPeople,
-                child: const Text('Retry'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Blue button
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+                child: const Text(
+                  'Retry',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
         ),
       );
-      
     }
 
     if (_displayedMissingPeople.isEmpty) {
-      return const Center(child: Text('No missing persons found.'));
-    }
-
-    return Column(
-      children: [
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: _fetchAllMissingPeople,
-            child: GridView.builder(
-              padding: const EdgeInsets.all(12.0),
-              itemCount: _displayedMissingPeople.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                mainAxisExtent: 410,
-              ),
-              itemBuilder: (context, index) {
-                final item = _displayedMissingPeople[index];
-                return MissingPeopleDisplay(
-                  missingPerson: item['person'],
-                  highlightedName: item['textSpansName'],
-                  highlightedSkinColor: item['textSpansSkinColor'],
-                  highlightedAge: item['textSpansAge'],
-                );
-              },
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.grey.shade900, Colors.grey.shade800],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: const Center(
+          child: Text(
+            'No missing persons found.',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TextButton(
-              onPressed: _currentPage > 1 ? _goToPreviousPage : null,
-              child: Text(
-                'Previous',
-                style: TextStyle(
-                  color: _currentPage > 1 ? Colors.blue : Colors.grey,
-                ),
-              ),
-            ),
-            Text('Page $_currentPage'),
-            TextButton(
-              onPressed: _currentPage * _itemsPerPage <
-                      _applySearch(provider.missingPersons).length
-                  ? _goToNextPage
-                  : null,
-              child: Text(
-                'Next',
-                style: TextStyle(
-                  color: _currentPage * _itemsPerPage <
-                          _applySearch(provider.missingPersons).length
-                      ? Colors.blue
-                      : Colors.grey,
-                ),
-              ),
-            ),
-          ],
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.grey.shade900, Colors.grey.shade800],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-      ],
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _fetchAllMissingPeople,
+              child: GridView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: _displayedMissingPeople.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16,
+                  mainAxisSpacing: 16,
+                  mainAxisExtent: 400, // Adjust height as needed
+                ),
+                itemBuilder: (context, index) {
+                  final item = _displayedMissingPeople[index];
+                  return MissingPeopleDisplay(
+                    missingPerson: item['person'],
+                    highlightedName: item['textSpansName'],
+                    highlightedSkinColor: item['textSpansSkinColor'],
+                    highlightedAge: item['textSpansAge'],
+                  );
+                },
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade900.withOpacity(0.8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: _currentPage > 1 ? _goToPreviousPage : null,
+                  child: Text(
+                    'Previous',
+                    style: TextStyle(
+                      color: _currentPage > 1 ? Colors.blue : Colors.grey,
+                    ),
+                  ),
+                ),
+                Text(
+                  'Page $_currentPage',
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                TextButton(
+                  onPressed: _currentPage * _itemsPerPage <
+                          _applySearch(provider.missingPersons).length
+                      ? _goToNextPage
+                      : null,
+                  child: Text(
+                    'Next',
+                    style: TextStyle(
+                      color: _currentPage * _itemsPerPage <
+                              _applySearch(provider.missingPersons).length
+                          ? Colors.blue
+                          : Colors.grey,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 

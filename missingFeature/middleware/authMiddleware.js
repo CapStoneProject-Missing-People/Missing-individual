@@ -13,6 +13,7 @@ export const requireAuth = (req, res, next) => {
   if (!authHeader)
     return res.status(401).json({ msg: "unauthorized login first" });
   const token = authHeader.split(" ")[1];
+  console.log('token is', token);
   if (token) {
     jwt.verify(token, process.env.PRIV_KEY, async (err, decodedToken) => {
       if (err) {

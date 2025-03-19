@@ -56,6 +56,14 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    refreshToken: {
+      type: String,
+      default: null,
+    },
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -82,6 +90,8 @@ userSchema.statics.login = async function (email, password) {
     }
     const auth = await bcrypt.compare(password, user.password);
     if (auth) {
+      user.lastLogin = new Date();
+      await user.save();
       return user;
     }
     throw new Error("incorrect password");
@@ -97,11 +107,18 @@ userSchema.statics.adminlogin = async function (email, password) {
     }
     const auth = await bcrypt.compare(password, user.password);
     if (auth) {
+      user.lastLogin = new Date();
+      await user.save();
       return user;
     }
     throw new Error("incorrect password");
   }
   throw new Error("incorrect email");
+};
+
+// Method to validate refresh token
+userSchema.methods.validateRefreshToken = function (refreshToken) {
+  return this.refreshToken === refreshToken;
 };
 
 const User = model("User", userSchema);

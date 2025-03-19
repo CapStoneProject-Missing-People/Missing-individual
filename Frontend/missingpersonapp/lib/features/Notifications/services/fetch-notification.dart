@@ -1,16 +1,21 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:missingpersonapp/features/Notifications/models/notification_model.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
-  final String baseUrl = ''; // Replace with your backend URL
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   Future<List<NotificationModel>> fetchNotifications() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     print('fetching');
-    String? token = prefs.getString('authorization');
+    final token = await _secureStorage.read(key: 'accessToken');
+    print('token: $token');
+
+    if (token == null) {
+      throw Exception('User is not logged in');
+    }
+
     final response = await http.get(
       Uri.parse('${Constants.postUri}/api/notifications'),
       headers: {

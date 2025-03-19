@@ -32,14 +32,11 @@ import 'package:missingpersonapp/features/matchedCase/screens/matched_case.dart'
 import 'package:missingpersonapp/features/matchedCase/service/missing_person_match_service.dart';
 import 'package:missingpersonapp/firebase_options.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('Handling a background message: ${message.messageId}');
   print('Message data: ${message.data}');
-  // Handle the message data here as needed
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -49,29 +46,29 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-// Initialize Hive
   await Hive.initFlutter();
-  
-  // Register Hive adapters
   Hive.registerAdapter(MessageAdapter());
-  
-  // Open Hive boxes
   await Hive.openBox<Message>('messages');
   await Hive.openBox('authBox');
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(MultiProvider(
     providers: [
+      Provider<AuthService>(
+        create: (_) => AuthService(),
+      ),
       ChangeNotifierProvider(create: (_) => UserProvider()),
       ChangeNotifierProvider(create: (_) => AllMissingPeopleProvider()),
       ChangeNotifierProvider(create: (_) => CaseProvider()),
       ChangeNotifierProvider(create: (_) => MatchedCaseProvider()),
       ChangeNotifierProvider(create: (_) => CaseMatchedProvider()),
       ChangeNotifierProvider(create: (_) => FeedbackProvider()),
-      ChangeNotifierProvider(create: (_) => DescriptionMatchProvider(apiService: DescriptionMatchService())),
+      ChangeNotifierProvider(
+        create: (_) =>
+            DescriptionMatchProvider(apiService: DescriptionMatchService()),
+      ),
       ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ChangeNotifierProvider(create: (_) => ChatProvider()),
-
       ChangeNotifierProxyProvider<UserProvider, MissingPersonProvider>(
         create: (context) {
           final user = Provider.of<UserProvider>(context, listen: false).user;
@@ -96,82 +93,35 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final AuthService authService = AuthService();
   final FcmService fcmService = FcmService();
+  bool _isLoading = true; // To show a loading indicator while checking session
 
   @override
   void initState() {
     super.initState();
-    authService.getUserData(context);
-    fcmService.initialize(context);
-
-    // Load user preferences
-    Provider.of<UserProvider>(context, listen: false).loadUserPreferences();
+    _initializeApp();
   }
-Future<Widget> _getInitialScreen(BuildContext context) async {
-  try {
-    // Check network connectivity
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.none) {
-      throw Exception("No network connection");
-    }
 
-    // Get shared preferences and user data concurrently
-    final prefsFuture = SharedPreferences.getInstance();
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final userFuture = authService.getUserData(context);
+  Future<void> _initializeApp() async {
+    // Delay initialization until after the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      print('Initializing app...');
 
-    // Await both futures concurrently
-    final results = await Future.wait([
-      prefsFuture,
-      userFuture,
-    ]);
+      // Check if the user is already logged in
+      final isLoggedIn = await authService.tryAutoLogin(context);
+      print('Auto login result: $isLoggedIn');
 
-    final prefs = results[0] as SharedPreferences;
-    final user = userProvider.user;
-    String? token = prefs.getString('authorization');
-    print("Token is: $token");
-
-    if (token != null && token.isNotEmpty) {
-      // Check if the token is still valid
-      bool isValid = await AuthService().isTokenValid(token).timeout(
-            const Duration(seconds: 65), // Set a timeout for the token validation
-            onTimeout: () {
-              throw TimeoutException("Token validation timed out");
-            },
-          );
-
-      if (isValid) {
-        await AuthService().getUserData(context);
-        print("User name: ${user.name}");
-        print("Email: ${user.email}");
-        return const HomePage();
-      } else {
-        print("Token is not valid");
+      if (isLoggedIn) {
+        // Fetch user data if the session is valid
+        await authService.getUserData(context);
+        print('User data fetched after auto login.');
       }
-    } else {
-      print("No token found");
-    }
 
-    // Navigate to HomePage regardless of the token status
-    return const HomePage();
-  } catch (e) {
-    print("Error occurred: $e"); // Log the error for debugging
-    return const Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.error, color: Colors.red, size: 64),
-            SizedBox(height: 16),
-            Text(
-              'Could not connect to the network.',
-              style: TextStyle(fontSize: 18, color: Colors.red),
-            ),
-          ],
-        ),
-      ),
-    );
+      setState(() {
+        _isLoading = false; // Stop loading
+      });
+    });
   }
-}
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -179,43 +129,27 @@ Future<Widget> _getInitialScreen(BuildContext context) async {
       title: 'MissingPerson',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        // Set a transparent AppBar theme
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent, // Transparent background
+          elevation: 0, // Remove shadow
+          iconTheme: IconThemeData(color: Colors.white), // White icons
+        ),
         textSelectionTheme: const TextSelectionThemeData(
           cursorColor: Colors.green,
           selectionColor: Colors.grey,
           selectionHandleColor: Colors.grey,
         ),
       ),
-      home: FutureBuilder<Widget>(
-        future: _getInitialScreen(context),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error, color: Colors.red, size: 64),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error: ${snapshot.error}',
-                      style: const TextStyle(fontSize: 18, color: Colors.red),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          } else {
-            return snapshot.data!;
-          }
-        },
-      ),
+      initialRoute: '/', // Set initialRoute
       routes: {
+        '/': (context) => _isLoading
+            ? const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            : const HomePage(), // Default route
         '/login': (context) => const LoginPage(),
         '/manageProfile': (context) =>
             const AuthGuard(child: ManageProfilePage()),
@@ -227,12 +161,14 @@ Future<Widget> _getInitialScreen(BuildContext context) async {
         '/compare': (context) => const ComparePersonPage(),
         '/missingPersonPosted': (context) =>
             const AuthGuard(child: MissingPersonPage()),
-          '/settings': (context) => const SettingsPage(),
-          '/chatList': (context) => AuthGuard(child: ChatListScreen(
-          userId: Provider.of<UserProvider>(context, listen: false).user.id,
-        )),
+        '/settings': (context) => const AuthGuard(child: SettingsPage()),
+        '/chatList': (context) => AuthGuard(
+              child: ChatListScreen(
+                userId:
+                    Provider.of<UserProvider>(context, listen: false).user.id,
+              ),
+            ),
       },
     );
   }
 }
-
