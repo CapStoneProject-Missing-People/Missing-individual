@@ -21,7 +21,7 @@ class MissingPersonProvider extends ChangeNotifier {
   List<MissingPersonSpecific> get missingPersons => _missingPersons;
 
   Future<void> fetchMissingPersons(BuildContext context) async {
-    final token = await AuthService();
+    final token = AuthService();
     String? accessToken = await token.getValidAccessToken(context);
     final http.Response response = await http.get(
       Uri.parse('${Constants.postUri}/api/features/getOwnFeatures'),

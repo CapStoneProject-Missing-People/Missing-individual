@@ -9,7 +9,6 @@ import 'package:missingpersonapp/features/Notifications/screens/show_push_notifi
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:missingpersonapp/features/home/screens/match_detail.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:missingpersonapp/main.dart'; // Import the main.dart to access the navigatorKey
 import 'package:provider/provider.dart';
 import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';

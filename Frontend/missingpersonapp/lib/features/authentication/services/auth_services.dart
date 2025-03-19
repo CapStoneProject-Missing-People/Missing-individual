@@ -471,7 +471,7 @@ class AuthService {
       }
     } catch (e) {
       print('Error fetching user data: $e');
-      throw e;
+      rethrow;
     }
   }
 
