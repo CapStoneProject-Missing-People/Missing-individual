@@ -19,21 +19,15 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _middleNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _lastPlaceSeenController =
-      TextEditingController();
+  final TextEditingController _lastPlaceSeenController = TextEditingController();
   final TextEditingController _lastTimeSeenController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _lastAddressDescController =
-      TextEditingController();
+  final TextEditingController _lastAddressDescController = TextEditingController();
   final TextEditingController _medicalInformation = TextEditingController();
-  final TextEditingController _circumstanceOfDisappearance =
-      TextEditingController();
-  final TextEditingController _eyeDescriptionController =
-      TextEditingController();
-  final TextEditingController _noseDescriptionController =
-      TextEditingController();
-  final TextEditingController _hairDescriptionController =
-      TextEditingController();
+  final TextEditingController _circumstanceOfDisappearance = TextEditingController();
+  final TextEditingController _eyeDescriptionController = TextEditingController();
+  final TextEditingController _noseDescriptionController = TextEditingController();
+  final TextEditingController _hairDescriptionController = TextEditingController();
 
   String? _selectedGender = 'Select Gender';
   String? _selectedSkinColor = 'Select Skin Color';
@@ -105,8 +99,7 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
     setState(() {
       final months = int.tryParse(_lastTimeSeenController.text) ?? 0;
       _showClothDetails = months <= 2 || _lastTimeSeenController.text.isEmpty;
-      _showAdditionalDetails =
-          months > 2 || _lastTimeSeenController.text.isEmpty;
+      _showAdditionalDetails = months > 2 || _lastTimeSeenController.text.isEmpty;
     });
   }
 
@@ -135,70 +128,28 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
       });
 
       final personToCompare = {
-        'firstName': _firstNameController.text.isNotEmpty
-            ? _firstNameController.text
-            : null,
-        'middleName': _middleNameController.text.isNotEmpty
-            ? _middleNameController.text
-            : null,
-        'lastName': _lastNameController.text.isNotEmpty
-            ? _lastNameController.text
-            : null,
-        'lastSeenLocation': _lastPlaceSeenController.text.isNotEmpty
-            ? _lastPlaceSeenController.text
-            : null,
+        'firstName': _firstNameController.text.isNotEmpty ? _firstNameController.text : null,
+        'middleName': _middleNameController.text.isNotEmpty ? _middleNameController.text : null,
+        'lastName': _lastNameController.text.isNotEmpty ? _lastNameController.text : null,
+        'lastSeenLocation': _lastPlaceSeenController.text.isNotEmpty ? _lastPlaceSeenController.text : null,
         'lastTimeSeen': int.tryParse(_lastTimeSeenController.text),
-        'gender': _selectedGender != null && _selectedGender != 'Select Gender'
-            ? _selectedGender
-            : null,
-        'age': _ageController.text.isNotEmpty
-            ? int.parse(_ageController.text)
-            : null,
-        'skin_color': _selectedSkinColor != null &&
-                _selectedSkinColor != 'Select Skin Color'
-            ? _selectedSkinColor
-            : null,
-        'upperClothType': _selectedUpperClothType != null &&
-                _selectedUpperClothType != 'Select Upper Cloth Type'
-            ? _selectedUpperClothType
-            : null,
-        'upperClothColor': _selectedUpperClothColor != null &&
-                _selectedUpperClothColor != 'Select Upper Cloth Color'
-            ? _selectedUpperClothColor
-            : null,
-        'lowerClothType': _selectedLowerClothType != null &&
-                _selectedLowerClothType != 'Select Lower Cloth Type'
-            ? _selectedLowerClothType
-            : null,
-        'lowerClothColor': _selectedLowerClothColor != null &&
-                _selectedLowerClothColor != 'Select Lower Cloth Color'
-            ? _selectedLowerClothColor
-            : null,
-        'bodySize':
-            _selectedBodySize != 'Select Body Size' ? _selectedBodySize : null,
-        'eyeDescription': _eyeDescriptionController.text.isNotEmpty
-            ? _eyeDescriptionController.text
-            : null,
-        'noseDescription': _noseDescriptionController.text.isNotEmpty
-            ? _noseDescriptionController.text
-            : null,
-        'hairDescription': _hairDescriptionController.text.isNotEmpty
-            ? _hairDescriptionController.text
-            : null,
-        'lastAddressDesc': _lastAddressDescController.text.isNotEmpty
-            ? _lastAddressDescController.text
-            : null,
-        'medicalInformation': _medicalInformation.text.isNotEmpty
-            ? _medicalInformation.text
-            : null,
-        'circumstanceOfDisappearance':
-            _circumstanceOfDisappearance.text.isNotEmpty
-                ? _circumstanceOfDisappearance.text
-                : null,
+        'gender': _selectedGender != null && _selectedGender != 'Select Gender' ? _selectedGender : null,
+        'age': _ageController.text.isNotEmpty ? int.parse(_ageController.text) : null,
+        'skin_color': _selectedSkinColor != null && _selectedSkinColor != 'Select Skin Color' ? _selectedSkinColor : null,
+        'upperClothType': _selectedUpperClothType != null && _selectedUpperClothType != 'Select Upper Cloth Type' ? _selectedUpperClothType : null,
+        'upperClothColor': _selectedUpperClothColor != null && _selectedUpperClothColor != 'Select Upper Cloth Color' ? _selectedUpperClothColor : null,
+        'lowerClothType': _selectedLowerClothType != null && _selectedLowerClothType != 'Select Lower Cloth Type' ? _selectedLowerClothType : null,
+        'lowerClothColor': _selectedLowerClothColor != null && _selectedLowerClothColor != 'Select Lower Cloth Color' ? _selectedLowerClothColor : null,
+        'bodySize': _selectedBodySize != 'Select Body Size' ? _selectedBodySize : null,
+        'eyeDescription': _eyeDescriptionController.text.isNotEmpty ? _eyeDescriptionController.text : null,
+        'noseDescription': _noseDescriptionController.text.isNotEmpty ? _noseDescriptionController.text : null,
+        'hairDescription': _hairDescriptionController.text.isNotEmpty ? _hairDescriptionController.text : null,
+        'lastAddressDesc': _lastAddressDescController.text.isNotEmpty ? _lastAddressDescController.text : null,
+        'medicalInformation': _medicalInformation.text.isNotEmpty ? _medicalInformation.text : null,
+        'circumstanceOfDisappearance': _circumstanceOfDisappearance.text.isNotEmpty ? _circumstanceOfDisappearance.text : null,
       };
 
-      final url = Uri.parse(
-          '${Constants.postUri}/api/features/compare/${personToCompare['lastTimeSeen']}');
+      final url = Uri.parse('${Constants.postUri}/api/features/compare/${personToCompare['lastTimeSeen']}');
 
       try {
         var response = await http.post(
@@ -212,12 +163,10 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
         });
 
         if (response.statusCode == 200) {
-          final responseBody =
-              jsonDecode(response.body) as Map<String, dynamic>;
+          final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
           if (responseBody['matchingStatus'] != null) {
             final List<dynamic> matchingStatus = responseBody['matchingStatus'];
-            final List<FeatureCompare> featureCompareList =
-                FeatureCompare.fromJsonList(matchingStatus);
+            final List<FeatureCompare> featureCompareList = FeatureCompare.fromJsonList(matchingStatus);
 
             Navigator.push(
               context,
@@ -269,72 +218,70 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
           child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildGlassCard(
-                  children: [
-                    _buildTextFormField(_firstNameController, 'First Name'),
-                    _buildTextFormField(_middleNameController, 'Middle Name'),
-                    _buildTextFormField(_lastNameController, 'Last Name'),
-                    _buildTextFormField(_ageController, 'Age', isNumeric: true),
-                    _buildDropdown('Gender', genderItems, _selectedGender,
-                        (value) {
-                      setState(() {
-                        _selectedGender = value;
-                      });
-                    }),
-                    _buildDropdown(
-                        'Skin Color', skinColorItems, _selectedSkinColor,
-                        (value) {
-                      setState(() {
-                        _selectedSkinColor = value;
-                      });
-                    }),
-                    _buildTextFormField(
-                        _lastPlaceSeenController, 'Last Place Seen'),
-                    _buildTextFormField(
-                        _lastTimeSeenController, 'Last Time Seen (Months)',
-                        isNumeric: true),
-                    if (_showClothDetails) ...[
-                      _buildDropdown('Upper Cloth Type', upperClothTypeItems,
-                          _selectedUpperClothType, (value) {
-                        setState(() {
-                          _selectedUpperClothType = value;
-                        });
-                      }),
-                      _buildDropdown('Upper Cloth Color', upperClothColorItems,
-                          _selectedUpperClothColor, (value) {
-                        setState(() {
-                          _selectedUpperClothColor = value;
-                        });
-                      }),
-                      _buildDropdown('Lower Cloth Type', lowerClothTypeItems,
-                          _selectedLowerClothType, (value) {
-                        setState(() {
-                          _selectedLowerClothType = value;
-                        });
-                      }),
-                      _buildDropdown('Lower Cloth Color', lowerClothColorItems,
-                          _selectedLowerClothColor, (value) {
-                        setState(() {
-                          _selectedLowerClothColor = value;
-                        });
-                      }),
-                    ],
-                    _buildTextFormField(
-                        _eyeDescriptionController, 'Eye Description'),
-                    _buildTextFormField(
-                        _noseDescriptionController, 'Nose Description'),
-                    _buildTextFormField(
-                        _hairDescriptionController, 'Hair Description'),
-                    _buildTextFormField(
-                        _lastAddressDescController, 'Last Address Description'),
-                    _buildTextFormField(
-                        _medicalInformation, 'Medical Information'),
-                    _buildTextFormField(_circumstanceOfDisappearance,
-                        'Circumstance Of Disappearance'),
-                  ],
-                ),
-                const SizedBox(height: 20),
+                _buildTextField(_firstNameController, 'First Name'),
+                const SizedBox(height: 10),
+                _buildTextField(_middleNameController, 'Middle Name'),
+                const SizedBox(height: 10),
+                _buildTextField(_lastNameController, 'Last Name'),
+                const SizedBox(height: 10),
+                _buildTextField(_lastTimeSeenController, 'Last Time Seen (in months)', TextInputType.number),
+                const SizedBox(height: 10),
+                _buildDropdown('Gender:', _selectedGender, genderItems, (newValue) {
+                  setState(() {
+                    _selectedGender = newValue;
+                  });
+                }),
+                const SizedBox(height: 10),
+                _buildTextField(_ageController, 'Age', TextInputType.number),
+                const SizedBox(height: 10),
+                _buildDropdown('Skin Color:', _selectedSkinColor, skinColorItems, (newValue) {
+                  setState(() {
+                    _selectedSkinColor = newValue;
+                  });
+                }),
+                const SizedBox(height: 10),
+                _buildTextField(_lastPlaceSeenController, 'Last Place Seen'),
+                const SizedBox(height: 10),
+                if (_showClothDetails) ...[
+                  _buildDropdown('Upper Cloth Type:', _selectedUpperClothType, upperClothTypeItems, (newValue) {
+                    setState(() {
+                      _selectedUpperClothType = newValue;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                  _buildDropdown('Upper Cloth Color:', _selectedUpperClothColor, upperClothColorItems, (newValue) {
+                    setState(() {
+                      _selectedUpperClothColor = newValue;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                  _buildDropdown('Lower Cloth Type:', _selectedLowerClothType, lowerClothTypeItems, (newValue) {
+                    setState(() {
+                      _selectedLowerClothType = newValue;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                  _buildDropdown('Lower Cloth Color:', _selectedLowerClothColor, lowerClothColorItems, (newValue) {
+                    setState(() {
+                      _selectedLowerClothColor = newValue;
+                    });
+                  }),
+                  const SizedBox(height: 10),
+                ],
+                _buildTextField(_eyeDescriptionController, 'Eye Description'),
+                const SizedBox(height: 10),
+                _buildTextField(_noseDescriptionController, 'Nose Description'),
+                const SizedBox(height: 10),
+                _buildTextField(_hairDescriptionController, 'Hair Description'),
+                const SizedBox(height: 10),
+                _buildTextField(_lastAddressDescController, 'Last Address Description'),
+                const SizedBox(height: 10),
+                _buildTextField(_medicalInformation, 'Medical Information'),
+                const SizedBox(height: 10),
+                _buildTextField(_circumstanceOfDisappearance, 'Circumstance Of Disappearance'),
+                const SizedBox(height: 10),
                 GlassmorphismButton(
                   onPressed: _isLoading
                       ? () {} // Fallback empty function when loading
@@ -345,8 +292,7 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
                         },
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Compare',
-                          style: TextStyle(fontSize: 18, color: Colors.white)),
+                      : const Text('Compare', style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
               ],
             ),
@@ -356,87 +302,61 @@ class _ComparePersonPageState extends State<ComparePersonPage> {
     );
   }
 
-  Widget _buildGlassCard({required List<Widget> children}) {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      color: Colors.white.withOpacity(0.1),
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: children,
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label, [
+    TextInputType keyboardType = TextInputType.text,
+  ]) {
+    return TextFormField(
+      controller: controller,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.white70),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
         ),
       ),
+      keyboardType: keyboardType,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter $label';
+        }
+        return null;
+      },
     );
   }
 
-  Widget _buildTextFormField(TextEditingController controller, String labelText,
-      {bool isNumeric = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle: const TextStyle(color: Colors.white70),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.white70),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
-          ),
+  Widget _buildDropdown(
+    String label,
+    String? value,
+    List<String> items,
+    ValueChanged<String?> onChanged,
+  ) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.white70),
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return '$labelText cannot be empty';
-          }
-          return null;
-        },
       ),
-    );
-  }
-
-  Widget _buildDropdown(String labelText, List<String> items,
-      String? selectedItem, ValueChanged<String?> onChanged) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          labelText: labelText,
-          labelStyle: const TextStyle(color: Colors.white70),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.white70),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
-          ),
-        ),
-        dropdownColor: Colors.grey.shade800,
-        style: const TextStyle(color: Colors.white),
-        value: selectedItem,
-        onChanged: onChanged,
-        items: items.map((item) {
-          return DropdownMenuItem<String>(
-            value: item,
-            child: Text(item),
-          );
-        }).toList(),
-        validator: (value) {
-          if (value == null || value == 'Select $labelText') {
-            return 'Please select a $labelText';
-          }
-          return null;
-        },
-      ),
+      dropdownColor: Colors.grey.shade800,
+      style: const TextStyle(color: Colors.white),
+      items: items.map<DropdownMenuItem<String>>((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: onChanged,
     );
   }
 }

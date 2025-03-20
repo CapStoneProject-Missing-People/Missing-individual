@@ -26,92 +26,87 @@ class ProfileDrawer extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // Drawer Header with Glassmorphism Effect
+            // Drawer Header
             Container(
               height: 180,
-              margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
                   ),
-                ],
+                ),
               ),
               child: isLoggedIn
-                  ? Row(
-                      children: [
-                        // User Avatar with Shadow
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
+                  ? GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context); // Close the drawer
+                        Navigator.pushNamed(context, '/manageProfile'); // Navigate to profile
+                      },
+                      child: Row(
+                        children: [
+                          // User Avatar
+                          // User Avatar with Animation
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.blue.shade400,
+                                  Colors.blue.shade700
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
-                            ],
-                          ),
-                          child: CircleAvatar(
-                            backgroundColor: Colors.white,
-                            radius: 30,
-                            child: Text(
-                              user.name.substring(0, 1).toUpperCase(), // First letter of name
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              radius: 30,
+                              child: Text(
+                                user.name
+                                    .substring(0, 1)
+                                    .toUpperCase(), // First letter of name
+                                style: const TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        // User Name and Email
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user.name,
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                          const SizedBox(width: 16),
+                          // User Name
+                          Text(
+                            user.name,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              user.email,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withOpacity(0.8),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     )
-                  : Row(
-                      children: [
-                        // Guest Avatar with Shadow
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: const CircleAvatar(
+                  : GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context); // Close the drawer
+                        Navigator.pushNamed(context, '/login'); // Navigate to login
+                      },
+                      child: const Row(
+                        children: [
+                          // Guest Avatar
+                          CircleAvatar(
                             backgroundColor: Colors.white,
                             radius: 30,
                             child: Icon(
@@ -120,15 +115,9 @@ class ProfileDrawer extends StatelessWidget {
                               size: 32,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Login Button
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context); // Close the drawer
-                            Navigator.pushNamed(context, '/login'); // Navigate to login
-                          },
-                          child: const Text(
+                          SizedBox(width: 16),
+                          // Login Text
+                          Text(
                             'Login',
                             style: TextStyle(
                               fontSize: 22,
@@ -136,8 +125,8 @@ class ProfileDrawer extends StatelessWidget {
                               color: Colors.white,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
             ),
             const SizedBox(height: 10),
@@ -213,7 +202,20 @@ class ProfileDrawer extends StatelessWidget {
   }) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: GestureDetector(
+      child: ListTile(
+        leading: Icon(
+          icon,
+          size: 28,
+          color: Colors.white,
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
         onTap: () {
           Navigator.pop(context); // Close the drawer
           if (route != null) {
@@ -222,40 +224,6 @@ class ProfileDrawer extends StatelessWidget {
             onTap(); // Execute custom onTap function
           }
         },
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                size: 28,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 16),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

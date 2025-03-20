@@ -54,7 +54,7 @@ class _GlassmorphismButtonState extends State<GlassmorphismButton> {
           transform: Matrix4.identity()..scale(_isHovered ? 1.05 : 1.0),
           child: ClipRect(
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
               child: Center(
                 child: widget.child,
               ),
