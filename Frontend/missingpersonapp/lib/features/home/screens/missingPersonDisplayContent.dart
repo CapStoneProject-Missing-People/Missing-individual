@@ -71,11 +71,11 @@ class _HomePageContentState extends State<HomePageContent> {
 
     return missingPersons
         .map((person) {
-          final name = person.lastName;
+          final name = '${person.middleName} ${person.name}${person.lastName}';
           final skinColor = person.skin_color;
           final age = person.age.toString();
-          final weight = person.bodySize?.toLowerCase();
-          final gender = person.gender?.toLowerCase();
+          final weight = person.bodySize.toLowerCase();
+          final gender = person.gender.toLowerCase();
 
           final lowerCaseName = name.toLowerCase();
           final lowerCaseSkinColor = skinColor.toLowerCase();
