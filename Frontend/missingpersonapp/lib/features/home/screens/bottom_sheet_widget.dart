@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:missingpersonapp/common/screens/glass_morphic_button.dart';
 
 class MyDraggableSheet extends StatefulWidget {
   final bool visible;
@@ -7,7 +10,8 @@ class MyDraggableSheet extends StatefulWidget {
   final Function onFilterChanged;
   final Function onClose;
 
-  const MyDraggableSheet({super.key, 
+  const MyDraggableSheet({
+    super.key,
     required this.visible,
     required this.child,
     required this.onFilterChanged,
@@ -23,7 +27,6 @@ class _MyDraggableSheetState extends State<MyDraggableSheet> {
   final TextEditingController _maxAgeController = TextEditingController();
   final DraggableScrollableController _controller =
       DraggableScrollableController();
-  final GlobalKey _sheetKey = GlobalKey(); // Define the key here
 
   int? _minAge;
   int? _maxAge;
@@ -53,7 +56,7 @@ class _MyDraggableSheetState extends State<MyDraggableSheet> {
   void animateSheet(double size) {
     _controller.animateTo(
       size,
-      duration: const Duration(milliseconds: 50),
+      duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
     );
   }
@@ -90,275 +93,382 @@ class _MyDraggableSheetState extends State<MyDraggableSheet> {
   }
 
   DraggableScrollableSheet get getSheet =>
-      _sheetKey.currentWidget as DraggableScrollableSheet; // Update the getter
+      _sheetKey.currentWidget as DraggableScrollableSheet;
+
+  final GlobalKey _sheetKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Visibility(
       visible: widget.visible,
-      child: LayoutBuilder(builder: (context, constraints) {
-        return DraggableScrollableSheet(
-          key: _sheetKey, // Use the key here
-          initialChildSize: 0.6,
-          maxChildSize: 0.95,
-          minChildSize: 0,
-          expand: true,
-          snap: true,
-          snapSizes: [40 / constraints.maxHeight, 0.5],
-          controller: _controller,
-          builder: (BuildContext context, ScrollController scrollController) {
-            return DecoratedBox(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blue,
-                    blurRadius: 10,
-                    spreadRadius: 1,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(22),
-                  topRight: Radius.circular(22),
-                ),
+      child: Stack(
+        children: [
+          // Click outside to close
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () {
+                hide();
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  widget.onClose();
+                });
+              },
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
               ),
-              child: CustomScrollView(
-                controller: scrollController,
-                slivers: [
-                  topButtonIndicator(),
-                  SliverToBoxAdapter(
-                    child: widget.child,
+            ),
+          ),
+          LayoutBuilder(builder: (context, constraints) {
+            return DraggableScrollableSheet(
+              key: _sheetKey,
+              initialChildSize: 0.6,
+              maxChildSize: 0.95,
+              minChildSize: 0,
+              expand: true,
+              snap: true,
+              snapSizes: [40 / constraints.maxHeight, 0.5],
+              controller: _controller,
+              builder: (BuildContext context, ScrollController scrollController) {
+                return DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.grey.shade900, Colors.grey.shade800],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
                   ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  hide();
-                                  Future.delayed(
-                                      const Duration(milliseconds: 50), () {
-                                    widget.onClose();
-                                  });
-                                },
-                                style: const ButtonStyle(
-                                  animationDuration: Duration(seconds: 1),
-                                  splashFactory: InkRipple.splashFactory,
-                                ),
-                                child: const Icon(
-                                  Icons.close,
-                                  color: Colors.blueAccent,
-                                ),
-                              ),
-                              TextButton(
-                                onPressed: _clearFilter,
-                                style: const ButtonStyle(
-                                  animationDuration: Duration(seconds: 1),
-                                ),
-                                child: const Text('Clear Filters',
-                                    style: TextStyle(
-                                        color: Colors.blueAccent,
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                            ],
-                          ),
-                          filterOption(
-                            'Age',
-                            Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                        'Min Age: ${_minAge?.toString() ?? 'Any'}'),
-                                    Text(
-                                        'Max Age: ${_maxAge?.toString() ?? 'Any'}'),
-                                  ],
-                                ),
-                                RangeSlider(
-                                        activeColor: Colors.blueAccent,
-                                        values: RangeValues(
-                                          (_minAge?.toDouble() ?? 0)
-                                              .clamp(0, 150),
-                                          (_maxAge?.toDouble() ?? 150)
-                                              .clamp(0, 150),
-                                        ),
-                                        min: 0,
-                                        max: 150,
-                                        divisions: 150,
-                                        labels: RangeLabels(
-                                          _minAge?.toString() ?? '0',
-                                          _maxAge?.toString() ?? '150',
-                                        ),
-                                        onChanged: (RangeValues values) {
-                                          if (values.start < 0 ||
-                                              values.end > 150) {
-                                            Fluttertoast.showToast(
-                                              msg:
-                                                  'Age must be between 0 and 150',
-                                              toastLength: Toast.LENGTH_SHORT,
-                                              gravity: ToastGravity.BOTTOM,
-                                            );
-                                          } else {
-                                            setState(() {
-                                              _minAge = values.start.toInt();
-                                              _maxAge = values.end.toInt();
-                                              _minAgeController.text =
-                                                  _minAge.toString();
-                                              _maxAgeController.text =
-                                                  _maxAge.toString();
-                                              _applyFilter();
-                                            });
-                                          }
-                                        },
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: CustomScrollView(
+                        controller: scrollController,
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Top Indicator
+                                  Center(
+                                    child: Container(
+                                      width: 40,
+                                      height: 4,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(2),
                                       ),
-                                    
-                              ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  // Header
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        'Filters',
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          hide();
+                                          Future.delayed(
+                                              const Duration(milliseconds: 200), () {
+                                            widget.onClose();
+                                          });
+                                        },
+                                        icon: const Icon(
+                                          Icons.close_outlined,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  // Age Filter
+                                  _buildAgeFilter(),
+                                  const SizedBox(height: 16),
+                                  // Weight Filter
+                                  _buildWeightFilter(),
+                                  const SizedBox(height: 16),
+                                  // Gender Filter
+                                  _buildGenderFilter(),
+                                  const SizedBox(height: 16),
+                                  // Skin Color Filter
+                                  _buildSkinColorFilter(),
+                                  const SizedBox(height: 16),
+                                  // Clear Filters Button
+                                  Center(
+                              child: GlassmorphismButton(
+                                onPressed: _clearFilter,
+                                child: const Text(
+                                  'Clear Filters',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                                ],
+                              ),
                             ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              filterOption(
-                                'Weight',
-                                DropdownButton<String>(
-                                  value: _weight,
-                                  hint: const Text('Any'),
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      _weight = newValue;
-                                      _applyFilter();
-                                    });
-                                  },
-                                  items: <String>[
-                                    'thin',
-                                    'average',
-                                    'muscular',
-                                    'overweight',
-                                    'obese',
-                                    'fit',
-                                    'athletic',
-                                    'curvy',
-                                    'petite',
-                                    'fat',
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                              filterOption(
-                                'Gender',
-                                IconButton(
-                                  icon: Icon(
-                                    _gender == 'male'
-                                        ? Icons.male
-                                        : _gender == 'female'
-                                            ? Icons.female
-                                            : Icons.person_outline,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _gender = _gender == 'male'
-                                          ? 'female'
-                                          : _gender == 'female'
-                                              ? null
-                                              : 'male';
-                                      _applyFilter();
-                                    });
-                                  },
-                                ),
-                              ),
-                              filterOption(
-                                'Skin Color',
-                                DropdownButton<String>(
-                                  value: _skinColor,
-                                  hint: const Text('Any'),
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      _skinColor = newValue;
-                                      _applyFilter();
-                                    });
-                                  },
-                                  items: <String>[
-                                    'fair',
-                                    'black',
-                                    'white',
-                                    'teyim',
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
                         ],
                       ),
                     ),
                   ),
-                ],
-              ),
+                );
+              },
             );
-          },
-        );
-      }),
-    );
-  }
-
-  Widget filterOption(String title, Widget widget) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 8),
-          widget,
+          }),
         ],
       ),
     );
   }
 
-  Widget topButtonIndicator() {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0),
-        child: Center(
-          child: GestureDetector(
-            onTap: () {
-              widget.onClose();
-            },
-            child: Container(
-              width: 60,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+  Widget _buildAgeFilter() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Age',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
         ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Min Age: ${_minAge?.toString() ?? 'Any'}',
+                style: const TextStyle(color: Colors.white)),
+            Text('Max Age: ${_maxAge?.toString() ?? 'Any'}',
+                style: const TextStyle(color: Colors.white)),
+          ],
+        ),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: Colors.blueAccent,
+            inactiveTrackColor: Colors.white.withOpacity(0.2),
+            thumbColor: Colors.blueAccent,
+            overlayColor: Colors.blueAccent.withOpacity(0.2),
+            valueIndicatorColor: Colors.blueAccent,
+            showValueIndicator: ShowValueIndicator.always,
+          ),
+          child: RangeSlider(
+            values: RangeValues(
+              (_minAge?.toDouble() ?? 0).clamp(0, 150),
+              (_maxAge?.toDouble() ?? 150).clamp(0, 150),
+            ),
+            min: 0,
+            max: 150,
+            divisions: 150,
+            labels: RangeLabels(
+              _minAge?.toString() ?? '0',
+              _maxAge?.toString() ?? '150',
+            ),
+            onChanged: (RangeValues values) {
+              if (values.start < 0 || values.end > 150) {
+                Fluttertoast.showToast(
+                  msg: 'Age must be between 0 and 150',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                );
+              } else {
+                setState(() {
+                  _minAge = values.start.toInt();
+                  _maxAge = values.end.toInt();
+                  _applyFilter();
+                });
+              }
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWeightFilter() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Weight',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: DropdownButton<String>(
+            value: _weight,
+            hint: const Text('Any', style: TextStyle(color: Colors.white70)),
+            onChanged: (String? newValue) {
+              setState(() {
+                _weight = newValue;
+                _applyFilter();
+              });
+            },
+            items: const [
+              'thin',
+              'average',
+              'muscular',
+              'overweight',
+              'obese',
+              'fit',
+              'athletic',
+              'curvy',
+              'petite',
+              'fat',
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value, style: const TextStyle(color: Colors.white)),
+              );
+            }).toList(),
+            dropdownColor: Colors.grey.shade900,
+            icon: const Icon(Icons.arrow_drop_down_outlined,
+                color: Colors.white70),
+            isExpanded: true,
+            underline: const SizedBox(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderFilter() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Gender',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildGenderButton('Male', Icons.male_outlined),
+            _buildGenderButton('Female', Icons.female_outlined),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderButton(String label, IconData icon) {
+    final bool isSelected = _gender?.toLowerCase() == label.toLowerCase();
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _gender = isSelected ? null : label.toLowerCase();
+          _applyFilter();
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blueAccent : Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? Colors.blueAccent : Colors.white.withOpacity(0.2),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: isSelected ? Colors.white : Colors.white70),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.white70,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildSkinColorFilter() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Skin Color',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: DropdownButton<String>(
+            value: _skinColor,
+            hint: const Text('Any', style: TextStyle(color: Colors.white70)),
+            onChanged: (String? newValue) {
+              setState(() {
+                _skinColor = newValue;
+                _applyFilter();
+              });
+            },
+            items: const [
+              'fair',
+              'black',
+              'white',
+              'teyim',
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value, style: const TextStyle(color: Colors.white)),
+              );
+            }).toList(),
+            dropdownColor: Colors.grey.shade900,
+            icon: const Icon(Icons.arrow_drop_down_outlined,
+                color: Colors.white70),
+            isExpanded: true,
+            underline: const SizedBox(),
+          ),
+        ),
+      ],
     );
   }
 }

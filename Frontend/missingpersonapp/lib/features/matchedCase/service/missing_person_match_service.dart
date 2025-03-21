@@ -1,22 +1,23 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http; // Import the http package
+import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:missingpersonapp/features/matchedCase/models/description_match_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DescriptionMatchService {
   Future<List<PotentialMatch>> getPotentialMatches() async {
     final apiUrl =
         Uri.parse('${Constants.postUri}/api/features/getPotentialMatch');
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
 
     final response = await http.get(
       apiUrl,
       headers: <String, String>{
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token'
+        'Authorization': 'Bearer $accessToken'
       },
     );
 

@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:missingpersonapp/common/models/missing_person.dart';
+import 'package:missingpersonapp/common/screens/glass_morphic_button.dart';
 import 'package:missingpersonapp/common/screens/missing_person_detail1.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MissingPeopleDisplay extends StatelessWidget {
   final MissingPerson missingPerson;
@@ -24,8 +25,9 @@ class MissingPeopleDisplay extends StatelessWidget {
   Future<void> _shareMissingPerson(BuildContext context) async {
     final String shareContent = '''
 Missing Person Details:
-First Name: ${missingPerson.name}
+Name: ${missingPerson.name}
 Age: ${missingPerson.age}
+Skin Color: ${missingPerson.skin_color}
     ''';
 
     List<XFile> files = [];
@@ -44,7 +46,7 @@ Age: ${missingPerson.age}
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 5,
+      elevation: 10,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       color: Colors.white.withOpacity(0.1), // Glassmorphism effect
       child: InkWell(
@@ -54,8 +56,9 @@ Age: ${missingPerson.age}
             context,
             MaterialPageRoute(
               builder: (context) => MissingPersonDetails(
-                  missingPerson: missingPerson,
-                  header: "Missing Person Details"),
+                missingPerson: missingPerson,
+                header: "Missing Person Details",
+              ),
             ),
           );
         },
@@ -71,7 +74,7 @@ Age: ${missingPerson.age}
                     topRight: Radius.circular(20),
                   ),
                   child: SizedBox(
-                    height: 200,
+                    height: 150,
                     width: double.infinity,
                     child: missingPerson.photos.isNotEmpty
                         ? Image.memory(
@@ -92,7 +95,7 @@ Age: ${missingPerson.age}
                 ),
                 // Gradient Overlay
                 Container(
-                  height: 200,
+                  height: 150,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.only(
@@ -109,114 +112,95 @@ Age: ${missingPerson.age}
                     ),
                   ),
                 ),
-              ],
-            ),
-            // Details Section
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Name
-                      RichText(
-                        text: TextSpan(
-                          children: highlightedName,
-                          style: const TextStyle(
+                // Share Button
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: GlassmorphismButton(
+                    onPressed: () => _shareMissingPerson(context),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.share_outlined,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'Share',
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // Details Section
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name
+                  RichText(
+                    text: TextSpan(
+                      children: highlightedName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(height: 8),
-                      // Age
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.calendar_today_outlined,
-                            color: Colors.white70,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          RichText(
-                            text: TextSpan(
-                              children: highlightedAge,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Age
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today_outlined,
+                        color: Colors.white70,
+                        size: 16,
                       ),
-                      const SizedBox(height: 8),
-                      // Skin Color
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.palette_outlined,
-                            color: Colors.white70,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          RichText(
-                            text: TextSpan(
-                              children: highlightedSkinColor,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      // Phone Number
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.phone_outlined,
-                            color: Colors.white70,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () async {
-                              final url = 'tel:${missingPerson.posterPhone}';
-                              if (await canLaunch(url)) {
-                                await launch(url);
-                              } else {
-                                throw 'Could not launch $url';
-                              }
-                            },
-                            child: Text(
-                              missingPerson.posterPhone,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // Share Button
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: IconButton(
-                          onPressed: () => _shareMissingPerson(context),
-                          icon: const Icon(
-                            Icons.share_outlined,
-                            color: Colors.white70,
+                      const SizedBox(width: 8),
+                      RichText(
+                        text: TextSpan(
+                          children: highlightedAge,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  // Skin Color
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.palette_outlined,
+                        color: Colors.white70,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      RichText(
+                        text: TextSpan(
+                          children: highlightedSkinColor,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],

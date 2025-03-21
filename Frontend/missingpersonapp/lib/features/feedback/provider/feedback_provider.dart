@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:missingpersonapp/features/authentication/utils/utils.dart';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:missingpersonapp/features/feedback/model/feedback_model.dart';
 
 class FeedbackProvider with ChangeNotifier {
@@ -28,13 +28,14 @@ class FeedbackProvider with ChangeNotifier {
 
     // Send the feedback data to the backend
     final url = Uri.parse('${Constants.postUri}/api/postFeedBack');
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
     final response = await http.post(
       url,
       headers: {
         'Content-Type': 'application/json',
-        'authorization': "Bearer $token",
+        'authorization': "Bearer $accessToken",
       },
       body: jsonEncode(feedbackData.toJson()),
     );

@@ -6,30 +6,44 @@ class ProfileDetailItem extends StatelessWidget {
   final IconData icon;
 
   const ProfileDetailItem({
-    super.key,
     required this.label,
     required this.value,
     required this.icon,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          Icon(icon, color: Colors.blue.shade800),
-          const SizedBox(width: 10),
-          Text(
-            label,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+          Icon(
+            icon,
+            color: Colors.white.withOpacity(0.8),
+            size: 24,
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 16),
-            ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white.withOpacity(0.6),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
         ],
       ),

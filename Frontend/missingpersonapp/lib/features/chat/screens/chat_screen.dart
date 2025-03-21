@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';
+import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:missingpersonapp/features/chat/models/message.dart';
 import 'package:provider/provider.dart';
@@ -59,13 +60,15 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _messagesBox.add(message);
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
+
     final response = await http.post(
       Uri.parse('${Constants.postUri}/api/chat'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
       body: jsonEncode({
         'receiver': receiverId,
@@ -129,13 +132,15 @@ class _ChatScreenState extends State<ChatScreen> {
     _messagesBox.add(message);
 
     // Send message to backend
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
+
     final response = await http.post(
       Uri.parse('${Constants.postUri}/api/chat'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
       body: jsonEncode({
         'receiver': receiverId,
@@ -176,13 +181,15 @@ class _ChatScreenState extends State<ChatScreen> {
     await _messagesBox.delete(message.id);
 
     // Remove from backend
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
+
     final response = await http.delete(
       Uri.parse('${Constants.postUri}/api/chat/delete/${message.id}'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
     );
     // print(response);

@@ -71,9 +71,11 @@ class _HomePageContentState extends State<HomePageContent> {
 
     return missingPersons
         .map((person) {
-          final name = person.name;
+          final name = person.lastName;
           final skinColor = person.skin_color;
           final age = person.age.toString();
+          final weight = person.bodySize?.toLowerCase();
+          final gender = person.gender?.toLowerCase();
 
           final lowerCaseName = name.toLowerCase();
           final lowerCaseSkinColor = skinColor.toLowerCase();
@@ -94,7 +96,17 @@ class _HomePageContentState extends State<HomePageContent> {
           final skinColorMatch =
               filters['skinColor'] == null || filters['skinColor'] == skinColor;
 
-          if (searchTextMatch && ageMatch && skinColorMatch) {
+          final weightMatch =
+              filters['weight'] == null || filters['weight'] == weight;
+
+          final genderMatch =
+              filters['gender'] == null || filters['gender'] == gender;
+
+          if (searchTextMatch &&
+              ageMatch &&
+              skinColorMatch &&
+              weightMatch &&
+              genderMatch) {
             final textSpansName = _highlightOccurrences(name, searchText);
             final textSpansSkinColor =
                 _highlightOccurrences(skinColor, searchText);
@@ -249,7 +261,7 @@ class _HomePageContentState extends State<HomePageContent> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
-                  mainAxisExtent: 400, // Adjust height as needed
+                  mainAxisExtent: 300, // Adjust height as needed
                 ),
                 itemBuilder: (context, index) {
                   final item = _displayedMissingPeople[index];

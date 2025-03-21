@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:missingpersonapp/common/screens/glass_morphic_button.dart';
 import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -16,8 +17,8 @@ class AuthGuard extends StatelessWidget {
         if (ModalRoute.of(context)?.isCurrent ?? false) {
           showDialog(
             context: context,
-            barrierDismissible:
-                false, // Prevent dismissing the dialog by tapping outside
+            barrierDismissible: false, // Prevent dismissing the dialog by tapping outside
+            barrierColor: Colors.black.withOpacity(0.5), // Semi-transparent barrier
             builder: (context) => WillPopScope(
               onWillPop: () async {
                 // Navigate to home page when back button is pressed
@@ -27,43 +28,115 @@ class AuthGuard extends StatelessWidget {
                 );
                 return false; // Prevent the default back button behavior
               },
-              child: AlertDialog(
-                title: const Text('Login Required'),
-                content: const Text('You need to be logged in to access this page.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/',
-                        (Route<dynamic> route) => false,
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.red, // Text color
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  dialogBackgroundColor: Colors.transparent, // Make dialog background transparent
+                ),
+                child: Dialog(
+                  backgroundColor: Colors.transparent, // Ensure dialog is transparent
+                  elevation: 0, // Remove shadow
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.grey.shade900, Colors.grey.shade800],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
                     ),
-                    child: const Text('Cancel'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/login', // Change this to your login route
-                        (Route<dynamic> route) => false,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // Background color
-                      foregroundColor: Colors.white, // Text color
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.lock_outline,
+                          size: 50,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Login Required',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'You need to be logged in to access this page.',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white.withOpacity(0.8),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GlassmorphismButton(
+                              onPressed: () {
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                  '/',
+                                  (Route<dynamic> route) => false,
+                                );
+                              },
+                              child: const Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            GlassmorphismButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                  '/login', // Change this to your login route
+                                  (Route<dynamic> route) => false,
+                                );
+                              },
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    child: const Text('Login'),
                   ),
-                ],
+                ),
               ),
             ),
           );
         }
       });
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            color: Colors.white,
+          ),
+        ),
+      );
     } else {
       return child;
     }

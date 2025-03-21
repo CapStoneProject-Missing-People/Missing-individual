@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:missingpersonapp/features/matchedCase/models/image_match_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,13 +14,14 @@ class MatchedCaseProvider with ChangeNotifier {
   List<MatchedCase> get matchedCases => _matchedCases;
 
   Future<void> fetchMatchedCases() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
 
     final response = await http.get(
       Uri.parse('${Constants.postUri}/api/get-missing-person'),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
     );
 
@@ -35,14 +37,15 @@ class MatchedCaseProvider with ChangeNotifier {
   }
 
   Future<void> updateStatusToFound(String id, String matchid) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
 
     final response = await http.put(
       Uri.parse('${Constants.postUri}/api/change-staus-found/$id/status'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
       body: jsonEncode({'status': 'found', 'caseId': id, 'matchid': matchid}),
     );
@@ -61,12 +64,18 @@ class MatchedCaseProvider with ChangeNotifier {
       throw Exception('Failed to update status');
     }
   }
+
   Future<void> deleteMatchedCase(String id) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.getString('authorization');
+    final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
 
     final response = await http.delete(
       Uri.parse('${Constants.faceApi}/delete-match/$id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $accessToken',
+      },
     );
 
     if (response.statusCode == 200) {

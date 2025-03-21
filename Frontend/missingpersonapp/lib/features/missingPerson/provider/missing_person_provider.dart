@@ -53,14 +53,15 @@ class MissingPersonProvider extends ChangeNotifier {
     final url = Uri.parse(
         '${Constants.postUri}/api/features/delete/${missingPerson.id}?timeSinceDisappearance=${missingPerson.timeSinceDisappearance}');
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('authorization');
+      final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
 
       final response = await http.delete(
         url,
         headers: <String, String>{
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token'
+          'Authorization': 'Bearer $accessToken'
         },
       );
 
@@ -149,8 +150,9 @@ class MissingPersonProvider extends ChangeNotifier {
     final updatedTerm = newValue;
     final updatedBy = toCamelCase(field);
     final updateData = {'updateBy': updatedBy, 'updateTerm': updatedTerm};
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
 
     final url = Uri.parse(
         '${Constants.postUri}/api/features/updateFeature/${missingPerson.id}?timeSinceDisappearance=${missingPerson.timeSinceDisappearance}');
@@ -159,7 +161,7 @@ class MissingPersonProvider extends ChangeNotifier {
       url,
       headers: <String, String>{
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token'
+        'Authorization': 'Bearer $accessToken'
       },
       body: json.encode(updateData),
     );
@@ -175,13 +177,14 @@ class MissingPersonProvider extends ChangeNotifier {
 
   Future<void> updateMissingPersonPhotos(MissingPersonSpecific missingPerson,
       List<Uint8List> photos, BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('authorization');
+    final userToken = await AuthService().getTokens();
+
+    final accessToken = userToken['accessToken'];
 
     final url = Uri.parse('${Constants.postUri}/api/update-image');
 
     final request = http.MultipartRequest('PUT', url)
-      ..headers['Authorization'] = 'Bearer $token'
+      ..headers['Authorization'] = 'Bearer $accessToken'
       ..fields['missingId'] = missingPerson.missingCase.id;
 
     for (int i = 0; i < photos.length; i++) {
