@@ -13,7 +13,6 @@ export const requireAuth = (req, res, next) => {
   if (!authHeader)
     return res.status(401).json({ msg: "unauthorized login first" });
   const token = authHeader.split(" ")[1];
-  console.log('token is', token);
   if (token) {
     jwt.verify(token, process.env.PRIV_KEY, async (err, decodedToken) => {
       if (err) {
@@ -40,6 +39,30 @@ export const requireAuth = (req, res, next) => {
     });
   } else {
     return res.status(401).json({ msg: "unauthorized login first" });
+  }
+};
+
+// New optionalAuth middleware
+export const optionalAuth = async (req, res, next) => {
+  const authHeader = req.header('Authorization');
+  if (!authHeader) {
+    req.user = null;
+    return next();
+  }
+
+  const token = authHeader.replace('Bearer ', '');
+  if (!token || !process.env.JWT_SECRET) {
+    req.user = null;
+    return next();
+  }
+
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch (error) {
+    console.log('Optional auth error (non-blocking):', error.message);
+    req.user = null;
+    next();
   }
 };
 

@@ -94,7 +94,6 @@ export const addFaceFeature = async (req, res) => {
     await deleteFaceFeature(person_id);
 
     let result = await uploadFaceFeature(images, person_id);
-    console.log('result', result)
     if (result) {
       return res.status(200).json({ message: "Face stored" });
     } else {

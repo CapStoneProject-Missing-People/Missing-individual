@@ -8,16 +8,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserProvider with ChangeNotifier {
   User _user =
       User(id: '', name: '', email: '', token: '', password: '', phoneNo: '');
+  final Map<String, User> _users = {}; 
   bool _notificationsEnabled = true; // Default value
 
   User get user => _user;
   bool get notificationsEnabled => _notificationsEnabled;
+  Map<String, User> get users => _users;
+
+  // Add this method to cache user data
+  void cacheUser(User user) {
+    _users[user.id] = user;
+    notifyListeners();
+  }
+
+  // Add this method to get user by ID
+  User? getUserById(String userId) {
+    return _users[userId];
+  }
 
   // Updated to accept a Map<String, dynamic>
   void setUser(Map<String, dynamic> userMap) {
     _user = User.fromMap(userMap); // Use fromMap constructor
     notifyListeners();
   }
+  
 
   // Helper method to handle JSON strings (for backward compatibility)
   void setUserFromJson(String userJson) {

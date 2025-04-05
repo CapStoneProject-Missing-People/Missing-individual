@@ -1,7 +1,7 @@
 class Constants {
-  static String postUri = 'http://192.168.1.3:4000';
-  static String faceApi = 'http://192.168.1.3:6000';
-  static String wsUri = '192.168.1.3:4000';
+  static String postUri = 'http://192.168.188.102:4000';
+  static String faceApi = 'http://192.168.188.102:6000';
+  static String wsUri = 'ws://192.168.188.102:4000';
 
   // Token-related constants
   static const String accessTokenKey = 'accessToken';

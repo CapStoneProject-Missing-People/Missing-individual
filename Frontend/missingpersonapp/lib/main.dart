@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,13 @@ import 'package:missingpersonapp/features/Notifications/screens/display_notifica
 import 'package:missingpersonapp/features/PostAdd/screens/addpost.dart';
 import 'package:missingpersonapp/features/Profile/screens/profile_page.dart';
 import 'package:missingpersonapp/features/Settings/settings.dart';
+import 'package:missingpersonapp/features/chat/providers/hive_adapters.dart';
+import 'package:missingpersonapp/features/chat/providers/message_provider.dart';
+import 'package:missingpersonapp/features/chat/repository/chat_repository.dart';
+import 'package:missingpersonapp/features/chat/services/chat_services.dart';
+import 'package:missingpersonapp/features/chat/services/image_upload_service.dart';
+import 'package:missingpersonapp/features/chat/services/socket_services.dart';
+import 'package:missingpersonapp/features/chat/widgets/chat_list_wrapper.dart';
 import 'package:missingpersonapp/features/missingPerson/provider/missing_person_provider.dart';
 import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';
 import 'package:missingpersonapp/features/authentication/screens/login_page.dart';
@@ -19,7 +25,6 @@ import 'package:missingpersonapp/features/missingPerson/screens/missing_person_p
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/chat/models/message.dart';
 import 'package:missingpersonapp/features/chat/providers/chat_provider.dart';
-import 'package:missingpersonapp/features/chat/screens/chat_list_screen.dart';
 import 'package:missingpersonapp/features/compare/screens/compare.dart';
 import 'package:missingpersonapp/features/feedback/provider/feedback_provider.dart';
 import 'package:missingpersonapp/features/feedback/screens/feedback.dart';
@@ -41,22 +46,76 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+Future<void> _verifyHiveBox<T>(String name) async {
+  try {
+    final box = await Hive.openBox<T>(name);
+    // Verify first item if box exists
+    if (box.isNotEmpty) {
+      final first = box.getAt(0);
+      if (first == null) {
+        throw Exception('Corrupted box detected');
+      }
+    }
+  } catch (e) {
+    await Hive.deleteBoxFromDisk(name);
+    await Hive.openBox<T>(name);
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await Hive.initFlutter();
-  Hive.registerAdapter(MessageAdapter());
-  await Hive.openBox<Message>('messages');
-  await Hive.openBox('authBox');
+  
+ // Initialize Hive with robust error handling
+  try {
+    await Hive.initFlutter();
+    HiveAdapters.registerAdapters();
+    
+    // Verify and repair boxes
+    await _verifyHiveBox<Message>('messages');
+    await _verifyHiveBox('authBox');
+  } catch (e) {
+    print('Hive initialization error: $e');
+    await Hive.deleteBoxFromDisk('messages');
+    await Hive.deleteBoxFromDisk('authBox');
+    await Hive.openBox<Message>('messages');
+    await Hive.openBox('authBox');
+  }
+
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   runApp(MultiProvider(
     providers: [
+      Provider<ImageUploadService>(
+        create: (context) => ImageUploadService(),
+      ),
+      Provider<ChatServices>(
+        create: (_) => ChatServices(),
+      ),
+      Provider<SocketService>(
+        create: (_) => SocketService(),
+      ),
+      Provider<ChatRepository>(
+        create: (context) => ChatRepository(
+          chatServices: context.read<ChatServices>(),
+          socketService: context.read<SocketService>(),
+          imageUploadService: context.read<ImageUploadService>(),
+        ),
+      ),
       Provider<AuthService>(
         create: (_) => AuthService(),
       ),
+      Provider(
+          create: (context) => ChatRepository(
+            chatServices: ChatServices(),
+            socketService: SocketService(),
+            imageUploadService: ImageUploadService(),
+          ),
+        ),
       ChangeNotifierProvider(create: (_) => UserProvider()),
       ChangeNotifierProvider(create: (_) => AllMissingPeopleProvider()),
       ChangeNotifierProvider(create: (_) => CaseProvider()),
@@ -68,7 +127,19 @@ void main() async {
             DescriptionMatchProvider(apiService: DescriptionMatchService()),
       ),
       ChangeNotifierProvider(create: (_) => NotificationProvider()),
-      ChangeNotifierProvider(create: (_) => ChatProvider()),
+      // Chat provider that depends on the repository
+        ChangeNotifierProxyProvider<ChatRepository, ChatProvider>(
+          create: (context) => ChatProvider(
+            chatRepository: context.read<ChatRepository>(),
+          ),
+          update: (context, chatRepository, chatProvider) => 
+              chatProvider ?? ChatProvider(chatRepository: chatRepository),
+        ),
+      ChangeNotifierProvider(
+        create: (context) => MessageProvider(
+          chatRepository: context.read<ChatRepository>(),
+        ),
+      ),
       ChangeNotifierProxyProvider<UserProvider, MissingPersonProvider>(
         create: (context) {
           final user = Provider.of<UserProvider>(context, listen: false).user;
@@ -121,6 +192,7 @@ class _MyAppState extends State<MyApp> {
       });
     });
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -162,11 +234,8 @@ class _MyAppState extends State<MyApp> {
         '/missingPersonPosted': (context) =>
             const AuthGuard(child: MissingPersonPage()),
         '/settings': (context) => const AuthGuard(child: SettingsPage()),
-        '/chatList': (context) => AuthGuard(
-              child: ChatListScreen(
-                userId:
-                    Provider.of<UserProvider>(context, listen: false).user.id,
-              ),
+        '/chatList': (context) => const AuthGuard(
+              child: ChatListWrapper(),
             ),
       },
     );

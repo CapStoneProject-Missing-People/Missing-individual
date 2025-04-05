@@ -86,6 +86,8 @@ dependencies:
   hive: any
   http_parser: any
   jwt_decoder: ^2.0.1
+  photo_view: 0.15.0
+  firebase_storage: ^11.7.7
 dev_dependencies:
   flutter_test:
     sdk: flutter

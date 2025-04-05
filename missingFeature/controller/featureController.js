@@ -26,7 +26,6 @@ export const getOwnFeatures = async (req, res) => {
         path: "missing_case_id",
         select: ["status", "imageBuffers", "dateReported"],
       });
-    console.log(features);
 
     res.status(200).json(features);
   } catch (error) {
@@ -86,7 +85,6 @@ export const getFeatures = async (req, res) => {
       path: 'user_id',
       select: ['name', 'email', 'phoneNo'] // Select fields you want to populate from User model
     });
-    console.log(features);
     res.status(200).json(features);
   } catch (error) {
     res.status(500).json({ error: "Server error" });

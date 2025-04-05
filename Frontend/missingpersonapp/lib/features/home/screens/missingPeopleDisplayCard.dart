@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
@@ -7,6 +8,82 @@ import 'package:missingpersonapp/common/screens/glass_morphic_button.dart';
 import 'package:missingpersonapp/common/screens/missing_person_detail1.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+
+class AutoScrollText extends StatefulWidget {
+  final List<TextSpan> textSpans;
+  final TextStyle style;
+
+  const AutoScrollText({
+    super.key,
+    required this.textSpans,
+    required this.style,
+  });
+
+  @override
+  State<AutoScrollText> createState() => _AutoScrollTextState();
+}
+
+class _AutoScrollTextState extends State<AutoScrollText> {
+  final ScrollController _controller = ScrollController();
+  Timer? _scrollTimer;
+  bool _needsScrolling = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkIfNeedsScrolling();
+      _startAutoScrolling();
+    });
+  }
+
+  void _checkIfNeedsScrolling() {
+    if (_controller.position.maxScrollExtent > 0) {
+      setState(() => _needsScrolling = true);
+    }
+  }
+
+  void _startAutoScrolling() {
+    if (!_needsScrolling) return;
+
+    _scrollTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (_controller.position.pixels >= _controller.position.maxScrollExtent) {
+        _controller.jumpTo(0);
+      } else {
+        _controller.position.moveTo(
+          _controller.position.pixels + 1,
+          duration: const Duration(milliseconds: 50),
+          curve: Curves.linear,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollTimer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: widget.style.fontSize! * 1.2, // Approximate text height
+      child: SingleChildScrollView(
+        controller: _controller,
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        child: RichText(
+          text: TextSpan(
+            children: widget.textSpans,
+            style: widget.style,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class MissingPeopleDisplay extends StatelessWidget {
   final MissingPerson missingPerson;
@@ -114,8 +191,8 @@ Skin Color: ${missingPerson.skin_color}
                 ),
                 // Share Button
                 Positioned(
-                  top: 10,
-                  right: 10,
+                  bottom: -5,
+                  right: 0,
                   child: GlassmorphismButton(
                     onPressed: () => _shareMissingPerson(context),
                     child: const Row(
@@ -147,15 +224,13 @@ Skin Color: ${missingPerson.skin_color}
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Name
-                  RichText(
-                    text: TextSpan(
-                      children: highlightedName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  // Name with auto-scroll
+                  AutoScrollText(
+                    textSpans: highlightedName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),

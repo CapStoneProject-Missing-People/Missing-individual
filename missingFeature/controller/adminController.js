@@ -70,7 +70,6 @@ export const getAllPosts = async (req, res) => {
         path: "missing_case_id",
         select: ["status", "imageBuffers", "dateReported"],
       });
-    console.log("features: ", features);
 
     res.status(200).json(features);
   } catch (error) {
@@ -166,11 +165,8 @@ export const deleteUserProfile = async (req, res) => {
       await feedBackModel.deleteOne(feedbackId)
     }
     const mergedFeatureToDelete = await MergedFeaturesModel.findOne({ user_id: userID })
-    console.log(mergedFeatureToDelete)
     const timeSinceDisappearance = await mergedFeatureToDelete.timeSinceDisappearance
-    console.log(timeSinceDisappearance)
     const Features = await initializeFeaturesModel(timeSinceDisappearance)
-    console.log(Features)
     // Remove posts made by the user (if any)
     await MissingPerson.deleteMany({ userID });
     // remove post from merged features model(if any)

@@ -8,6 +8,7 @@ import 'package:missingpersonapp/features/PostAdd/screens/addpost.dart';
 import 'package:missingpersonapp/features/authentication/provider/user_provider.dart';
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/chat/screens/chat_list_screen.dart';
+import 'package:missingpersonapp/features/chat/widgets/chat_list_wrapper.dart';
 import 'package:missingpersonapp/features/compare/screens/compare.dart';
 import 'package:missingpersonapp/features/home/screens/bottom_sheet_widget.dart';
 import 'package:missingpersonapp/features/home/screens/check_face.dart';
@@ -185,13 +186,8 @@ class _HomePageState extends State<HomePage> {
                     : _selectedIndex == 2
                         ? const ComparePersonPage()
                         : _selectedIndex == 3
-                            ? AuthGuard(
-                                child: ChatListScreen(
-                                userId: Provider.of<UserProvider>(context,
-                                        listen: false)
-                                    .user
-                                    .id,
-                              ))
+                            ? const AuthGuard(
+                                child: ChatListWrapper(),)
                             : const NotificationPage(),
             MyDraggableSheet(
               visible: _isFilterVisible,

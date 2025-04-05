@@ -164,8 +164,7 @@ export const login_post = async (req, res) => {
     // Save refresh token to user document
     user.refreshToken = refreshToken;
     await user.save();
-    console.log('access token', accessToken);
-    console.log('refresh token', refreshToken);
+
 
     res.cookie("jwt", refreshToken, {
       httpOnly: true,

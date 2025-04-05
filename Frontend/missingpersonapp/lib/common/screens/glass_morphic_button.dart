@@ -30,7 +30,7 @@ class _GlassmorphismButtonState extends State<GlassmorphismButton> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(6),
             gradient: LinearGradient(
               colors: [
                 Colors.blue.withOpacity(0.3),
