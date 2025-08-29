@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:missingpersonapp/common/models/missing_person.dart';
 import 'package:missingpersonapp/common/screens/glass_morphic_button.dart';
@@ -46,7 +45,7 @@ class _AutoScrollTextState extends State<AutoScrollText> {
   void _startAutoScrolling() {
     if (!_needsScrolling) return;
 
-    _scrollTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+    _scrollTimer = Timer.periodic(const Duration(milliseconds: 350), (timer) {
       if (_controller.position.pixels >= _controller.position.maxScrollExtent) {
         _controller.jumpTo(0);
       } else {

@@ -316,10 +316,8 @@ class AuthService {
 
           // Send FCM token to the backend (if available)
           String? fcmToken = await _fcmService.getToken();
-          if (fcmToken != null) {
-            await _fcmService.sendTokenToBackend(fcmToken);
-          }
-
+          await _fcmService.sendTokenToBackend(fcmToken!);
+        
           // Navigate to the home page
           navigator.pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => const HomePage()),
@@ -408,8 +406,8 @@ class AuthService {
         String? fcmToken = await _fcmService.getToken();
         final storedFcmToken = await _secureStorage.read(key: 'fcmToken');
 
-        if (fcmToken != null && fcmToken != storedFcmToken) {
-          await _fcmService.sendTokenToBackend(fcmToken);
+        if (fcmToken != storedFcmToken) {
+          await _fcmService.sendTokenToBackend(fcmToken!);
           await _secureStorage.write(key: 'fcmToken', value: fcmToken);
         }
 
@@ -459,8 +457,8 @@ class AuthService {
         String? fcmToken = await _fcmService.getToken();
         final storedFcmToken = await _secureStorage.read(key: 'fcmToken');
 
-        if (fcmToken != null && fcmToken != storedFcmToken) {
-          await _fcmService.sendTokenToBackend(fcmToken);
+        if (fcmToken != storedFcmToken) {
+          await _fcmService.sendTokenToBackend(fcmToken!);
           await _secureStorage.write(key: 'fcmToken', value: fcmToken);
         }
 
@@ -504,11 +502,9 @@ class AuthService {
 
       // Clear FCM token
       String? fcmToken = await _fcmService.getToken();
-      if (fcmToken != null) {
-        await _fcmService.sendTokenToBackend(fcmToken);
-        await _secureStorage.delete(key: 'fcmToken');
-      }
-
+      await _fcmService.sendTokenToBackend(fcmToken!);
+      await _secureStorage.delete(key: 'fcmToken');
+    
       // Navigate to home page
       navigator.pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const HomePage()),

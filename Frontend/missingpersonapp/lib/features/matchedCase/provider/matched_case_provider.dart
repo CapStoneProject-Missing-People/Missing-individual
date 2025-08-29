@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:missingpersonapp/features/authentication/services/auth_services.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:missingpersonapp/features/matchedCase/models/image_match_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MatchedCaseProvider with ChangeNotifier {
   List<MatchedCase> _matchedCases = [];

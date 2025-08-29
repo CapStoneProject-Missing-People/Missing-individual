@@ -35,13 +35,7 @@ Future<CroppedFile?> cropImage(String imagePath) async {
   final ImageCropper imageCropper = ImageCropper();
   final CroppedFile? croppedImage = await imageCropper.cropImage(
     sourcePath: imagePath,
-    aspectRatioPresets: [
-      CropAspectRatioPreset.square,
-      CropAspectRatioPreset.ratio3x2,
-      CropAspectRatioPreset.original,
-      CropAspectRatioPreset.ratio4x3,
-      CropAspectRatioPreset.ratio16x9,
-    ],
+    aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
     uiSettings: [
       AndroidUiSettings(
         toolbarTitle: 'Crop Image',

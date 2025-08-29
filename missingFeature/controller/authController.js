@@ -86,6 +86,7 @@ schema
   .spaces();
 
 export const signup_post = async (req, res) => {
+  console.log('signing up')
   const { name, email, phoneNo, password, role } = req.body;
   try {
     if (!schema.validate(password)) {
@@ -123,7 +124,7 @@ export const signup_post = async (req, res) => {
     await AddActionLog({
       action: "Signup",
       user_id: user._id || "",
-      user_agent: req.headers["user-agent"],
+      user_agent: req.headers["user-agent"] || '',
       method: req.method,
       ip: req.socket.remoteAddress,
       status: 200,
@@ -142,7 +143,7 @@ export const signup_post = async (req, res) => {
     AddActionLog({
       action: "Signup",
       user_id: email || "",
-      user_agent: req.headers["User-Agent"],
+      user_agent: req.headers["User-Agent"] || "",
       method: req.method,
       ip: req.ip,
       status: 500,
@@ -176,7 +177,7 @@ export const login_post = async (req, res) => {
     await AddActionLog({
       action: "Login",
       user_id: user._id || "",
-      user_agent: req.headers["user-agent"],
+      user_agent: req.headers["user-agent"] || "",
       method: req.method,
       ip: req.socket.remoteAddress,
       status: 200,
@@ -194,7 +195,7 @@ export const login_post = async (req, res) => {
     AddActionLog({
       action: "Login",
       user_id: email || "",
-      user_agent: req.headers["User-Agent"],
+      user_agent: req.headers["User-Agent"] || "",
       method: req.method,
       ip: req.ip,
       status: 500,
@@ -261,7 +262,7 @@ export const logout_get = async (req, res) => {
     await AddActionLog({
       action: "Logout",
       user_id: id || "",
-      user_agent: req.headers["user-agent"],
+      user_agent: req.headers["user-agent"] || "",
       method: req.method,
       ip: req.socket.remoteAddress,
       status: 200,
@@ -287,7 +288,7 @@ export const admin_login_post = async (req, res) => {
     await AddActionLog({
       action: "admin_login",
       user_id: user._id || "",
-      user_agent: req.headers["user-agent"],
+      user_agent: req.headers["user-agent"] || "",
       method: req.method,
       ip: req.socket.remoteAddress,
       status: 200,

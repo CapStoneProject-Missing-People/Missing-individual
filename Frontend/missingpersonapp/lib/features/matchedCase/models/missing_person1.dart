@@ -29,5 +29,5 @@ class MissingPersonAdd {
     required this.bodySizeMatch,
   });
 
-  static fromJson(json) {}
+  static void fromJson(json) {}
 }

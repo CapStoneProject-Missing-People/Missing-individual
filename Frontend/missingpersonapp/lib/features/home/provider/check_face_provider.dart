@@ -68,11 +68,11 @@ class CheckFaceProvider extends ChangeNotifier {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: Colors.transparent,
-            content: Text(
-                'Location services are disabled. Please enable location services in your device settings.',
-                style: TextStyle(color: Colors.red))),
+          content: Text(
+              'Location services are disabled. Please enable location services in your device settings.',
+              style: TextStyle(color: Colors.red)),
+        ),
       );
-      // Open device settings to enable location services
       await Geolocator.openLocationSettings();
       return;
     }
@@ -84,8 +84,9 @@ class CheckFaceProvider extends ChangeNotifier {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: Colors.transparent,
-              content: Text('Location permissions are denied.',
-                  style: TextStyle(color: Colors.red))),
+            content: Text('Location permissions are denied.',
+                style: TextStyle(color: Colors.red)),
+          ),
         );
         return;
       }
@@ -111,14 +112,6 @@ class CheckFaceProvider extends ChangeNotifier {
         'Contact Info: $contactInfo\nLocation: ${position.latitude}, ${position.longitude}';
 
     notifyListeners();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.transparent,
-        content:
-            Text(_shareLocationValue!, style: const TextStyle(color: Colors.green)),
-      ),
-    );
   }
 
   Future<void> updateMatch(BuildContext context) async {
@@ -144,11 +137,18 @@ class CheckFaceProvider extends ChangeNotifier {
         if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              backgroundColor: Colors.transparent,
-              content: Text('Match updated successfully.',
-                  style: TextStyle(color: Colors.green)),
+              backgroundColor: Color.fromARGB(255, 123, 213, 127),
+              behavior: SnackBarBehavior.floating,
+              content: Center(
+              child: Text(
+                'Match updated successfully.',
+                style: TextStyle(color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+              ),
             ),
           );
+          Navigator.of(context).pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

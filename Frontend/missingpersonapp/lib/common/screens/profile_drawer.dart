@@ -159,12 +159,12 @@ class ProfileDrawer extends StatelessWidget {
                     title: 'Feedback',
                     route: '/feedBack',
                   ),
-                  _buildDrawerItem(
-                    context,
-                    icon: Icons.message,
-                    title: 'Messages',
-                    route: '/chatList',
-                  ),
+                  // _buildDrawerItem(
+                  //   context,
+                  //   icon: Icons.message,
+                  //   title: 'Messages',
+                  //   route: '/chatList',
+                  // ),
                   _buildDrawerItem(
                     context,
                     icon: Icons.settings_outlined,

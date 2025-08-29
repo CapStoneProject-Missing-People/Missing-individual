@@ -8,7 +8,6 @@ import 'package:missingpersonapp/features/missingPerson/models/missing_person_mo
 import 'package:missingpersonapp/features/authentication/models/user.dart';
 import 'package:missingpersonapp/features/authentication/utils/constants.dart';
 import 'package:missingpersonapp/features/authentication/utils/utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mime/mime.dart';
 
 class MissingPersonProvider extends ChangeNotifier {

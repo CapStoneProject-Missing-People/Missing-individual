@@ -55,7 +55,9 @@ class SocketService {
         try {
           final message = Message.fromJson(data);
           onNewMessage(message);
-          _globalMessageCallbacks.values.forEach((cb) => cb(message));
+          for (var cb in _globalMessageCallbacks.values) {
+            cb(message);
+          }
         } catch (e) {
           print('Error handling global message: $e');
         }

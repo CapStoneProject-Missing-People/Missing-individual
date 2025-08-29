@@ -41,7 +41,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final Connectivity _connectivity = Connectivity();
   final Set<String> _unreadMessages = {};
   int _currentSearchIndex = -1;
-  List<int> _searchMatches = [];
+  final List<int> _searchMatches = [];
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   StreamSubscription<Message>? _messageSubscription;
   bool _isAtBottom = true;
@@ -665,8 +665,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     )
                   else
                     const CircleAvatar(
-                      child: Icon(Icons.person, size: 16),
                       radius: 16,
+                      child: Icon(Icons.person, size: 16),
                     ),
                   const SizedBox(width: 12),
                   Column(

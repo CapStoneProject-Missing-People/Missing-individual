@@ -30,7 +30,7 @@ class AuthGuard extends StatelessWidget {
               },
               child: Theme(
                 data: Theme.of(context).copyWith(
-                  dialogBackgroundColor: Colors.transparent, // Make dialog background transparent
+                  dialogTheme: DialogThemeData(backgroundColor: Colors.transparent), // Make dialog background transparent
                 ),
                 child: Dialog(
                   backgroundColor: Colors.transparent, // Ensure dialog is transparent

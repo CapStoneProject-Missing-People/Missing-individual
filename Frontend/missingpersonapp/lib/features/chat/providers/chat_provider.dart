@@ -6,8 +6,6 @@ import 'package:collection/collection.dart';
 import 'package:missingpersonapp/features/chat/models/chat_session.dart';
 import 'package:missingpersonapp/features/chat/models/message.dart';
 import 'package:missingpersonapp/features/chat/repository/chat_repository.dart';
-import 'package:missingpersonapp/features/chat/services/chat_services.dart';
-import 'package:missingpersonapp/features/chat/services/socket_services.dart';
 
 class ChatProvider with ChangeNotifier {
   final ChatRepository _chatRepository;
@@ -207,7 +205,9 @@ void dispose() {
   _messageStreamController.close();
   
   // Clean up typing timers
-  _typingTimers.values.forEach((timer) => timer.cancel());
+  for (var timer in _typingTimers.values) {
+    timer.cancel();
+  }
   _typingTimers.clear();
   
   // Dispose repository

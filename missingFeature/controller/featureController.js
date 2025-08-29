@@ -663,9 +663,9 @@ export const deleteFeature = async (req, res) => {
         "User don't have permission to update other users feature!"
       );
     }
-console.log(mergedFeature.missing_case_id);
-    await MissingPerson.findByIdAndDelete(mergedFeature.missing_case_id);
+    console.log(mergedFeature.missing_case_id);
     await axios.delete(`http://localhost:6000/delete-image/${mergedFeature.missing_case_id}`);
+    await MissingPerson.findByIdAndDelete(mergedFeature.missing_case_id);
     await mergedFeature.deleteOne();
     Features.deleteOne(Features.mergedFeatureId);
     res

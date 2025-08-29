@@ -32,10 +32,8 @@ class FcmService {
         print('User granted permission');
         String? token = await _messaging.getToken();
         print("FCM Token: $token");
-        if (token != null) {
-          await sendTokenToBackend(token);
-        }
-      } else {
+        await sendTokenToBackend(token!);
+            } else {
         print('User declined or has not accepted permission');
       }
 

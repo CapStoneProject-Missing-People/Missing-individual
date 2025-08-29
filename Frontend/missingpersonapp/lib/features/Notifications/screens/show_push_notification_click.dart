@@ -24,7 +24,16 @@ class ShowPushNotificationTap extends StatelessWidget {
           }
 
           if (provider.theCase == null) {
-            return const Center(child: Text("No notification found"));
+            return const Center(
+              child: Text(
+              "No notification found",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+              ),
+            );
           }
 
           final MissingPerson theCase = provider.theCase!;

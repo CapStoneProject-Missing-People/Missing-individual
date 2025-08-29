@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:missingpersonapp/common/screens/glass_morphic_button.dart';
 import 'package:missingpersonapp/common/utils/app_colors.dart';
 import 'package:missingpersonapp/features/chat/models/chat_session.dart';
 import 'package:missingpersonapp/features/chat/screens/chat_screen.dart';
-import 'package:missingpersonapp/features/chat/widgets/chat_Item.dart';
 import 'package:provider/provider.dart';
 import 'package:missingpersonapp/features/chat/providers/chat_provider.dart';
 
@@ -111,14 +111,36 @@ class _ChatListScreenState extends State<ChatListScreen> {
       ),
       floatingActionButton: _isSearching
           ? null
-          : FloatingActionButton(
-              onPressed: () => _showNewChatDialog(context),
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Icon(Icons.message, color: Colors.white),
+    : Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.blue.withOpacity(0.3),
+              Colors.purple.withOpacity(0.3),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.2),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
+          ],
+          shape: BoxShape.circle,
+        ),
+        child: FloatingActionButton(
+          onPressed: () => _showNewChatDialog(context),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: const Icon(Icons.message, color: Colors.white),
+        ),
+      ),
     );
   }
 
@@ -255,20 +277,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
             ),
             const SizedBox(height: 16),
             if (_searchQuery.isEmpty)
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                ),
+              SizedBox(
+              width: 200, // Set a limited width
+              child: GlassmorphismButton(
                 onPressed: () => _showNewChatDialog(context),
                 child: const Text(
-                  'Start New Chat',
-                  style: TextStyle(color: Colors.white),
+                'Start New Chat',
+                style: TextStyle(color: Colors.white),
                 ),
+              ),
               ),
           ],
         ),
@@ -384,7 +401,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              const Text(
                 'New Chat',
                 style: TextStyle(
                   color: Colors.white,
